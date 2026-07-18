@@ -26,6 +26,8 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
+          batch_size: 50
+        order_inserts: true
     open-in-view: false
 
   flyway:
