@@ -39,10 +39,7 @@ public class Roadmap extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
+
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-
-    @OneToMany(mappedBy = "roadmap", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<RoadmapPhase> phases = new ArrayList<>();
 }

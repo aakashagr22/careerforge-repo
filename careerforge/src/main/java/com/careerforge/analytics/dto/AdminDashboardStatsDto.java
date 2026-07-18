@@ -18,5 +18,4 @@ public class AdminDashboardStatsDto {
     private long totalResources;
     private double averageStreak;
     private Map<String, Long> studentDistributionByBranch;
-    private Map<String, Long> studentDistributionByCollege;
 }

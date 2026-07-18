@@ -26,11 +26,9 @@ public class StudentProfileResponse {
     private Integer semester;
     private String branch;
     private String section;
-    private String college;
     private String enrollmentNo;
     private Language preferredLanguage;
     private TargetRole targetRole;
-    private boolean communicationTrackEnabled;
     private Integer streak;
     private String profileImage;
     private LocalDateTime createdAt;

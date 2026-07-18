@@ -31,9 +31,6 @@ public class UpdateStudentProfileRequest {
 
     private String section;
 
-    @NotBlank(message = "College name is required")
-    private String college;
-
     @NotBlank(message = "Enrollment number is required")
     private String enrollmentNo;
 
@@ -42,8 +39,6 @@ public class UpdateStudentProfileRequest {
 
     @NotNull(message = "Target role is required")
     private TargetRole targetRole;
-
-    private boolean communicationTrackEnabled;
 
     private String profileImage;
 }

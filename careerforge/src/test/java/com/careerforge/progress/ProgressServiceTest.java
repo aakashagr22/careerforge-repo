@@ -5,12 +5,15 @@ import com.careerforge.progress.entity.Progress;
 import com.careerforge.progress.repository.ProgressRepository;
 import com.careerforge.progress.service.impl.ProgressServiceImpl;
 import com.careerforge.sheet.entity.Sheet;
-import com.careerforge.sheet.entity.StudentSheetProgress;
 import com.careerforge.sheet.repository.SheetRepository;
 import com.careerforge.sheet.repository.SheetTopicRepository;
 import com.careerforge.sheet.repository.StudentSheetProgressRepository;
 import com.careerforge.student.entity.StudentProfile;
+import com.careerforge.student.entity.TargetRole;
 import com.careerforge.student.repository.StudentProfileRepository;
+import com.careerforge.roadmap.repository.RoadmapRepository;
+import com.careerforge.roadmap.repository.RoadmapSectionQuestionRepository;
+import com.careerforge.roadmap.repository.StudentRoadmapQuestionProgressRepository;
 import com.careerforge.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +50,15 @@ public class ProgressServiceTest {
     @Mock
     private StudentSheetProgressRepository studentSheetProgressRepository;
 
+    @Mock
+    private RoadmapRepository roadmapRepository;
+
+    @Mock
+    private RoadmapSectionQuestionRepository roadmapSectionQuestionRepository;
+
+    @Mock
+    private StudentRoadmapQuestionProgressRepository studentRoadmapQuestionProgressRepository;
+
     @InjectMocks
     private ProgressServiceImpl progressService;
 
@@ -64,6 +76,8 @@ public class ProgressServiceTest {
                 .id(studentId)
                 .user(User.builder().id(userId).build())
                 .streak(0)
+                .semester(5)
+                .targetRole(TargetRole.SDE)
                 .build();
 
         progress = Progress.builder()
@@ -89,9 +103,18 @@ public class ProgressServiceTest {
         when(sheetRepository.findAll()).thenReturn(List.of(sheet));
         when(sheetTopicRepository.countBySheetId(sheet.getId())).thenReturn(5L);
         when(studentSheetProgressRepository.countCompletedByStudentIdAndSheetId(student.getId(), sheet.getId())).thenReturn(5L);
-        when(sheetTopicRepository.count()).thenReturn(10L);
         when(studentSheetProgressRepository.findAllByStudentId(student.getId())).thenReturn(Collections.emptyList());
         when(progressRepository.save(any(Progress.class))).thenReturn(progress);
+
+        com.careerforge.roadmap.entity.Roadmap mockRoadmap = com.careerforge.roadmap.entity.Roadmap.builder()
+                .id(UUID.randomUUID())
+                .build();
+        when(roadmapRepository.findBySemesterAndTargetRole(5, "SDE")).thenReturn(Optional.of(mockRoadmap));
+        
+        List mockList = mock(List.class);
+        when(mockList.size()).thenReturn(10);
+        when(roadmapSectionQuestionRepository.findByRoadmapSectionRoadmapId(mockRoadmap.getId())).thenReturn(mockList);
+        when(studentRoadmapQuestionProgressRepository.countByStudentIdAndRoadmapSectionQuestionRoadmapSectionRoadmapIdAndCompletedTrue(student.getId(), mockRoadmap.getId())).thenReturn(5L);
 
         DashboardResponseDto dashboard = progressService.getStudentDashboard(userId);
 

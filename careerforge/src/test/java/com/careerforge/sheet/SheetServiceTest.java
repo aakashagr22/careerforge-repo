@@ -55,6 +55,12 @@ public class SheetServiceTest {
     @Mock
     private SheetTopicMapper sheetTopicMapper;
 
+    @Mock
+    private com.careerforge.progress.service.ProgressService progressService;
+
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private SheetServiceImpl sheetService;
 

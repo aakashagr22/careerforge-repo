@@ -15,13 +15,30 @@ public interface RoadmapService {
     RoadmapDto getRoadmapById(UUID id);
     Page<RoadmapDto> getAllRoadmaps(Pageable pageable);
 
-    // RoadmapPhase CRUD
-    RoadmapPhaseDto createRoadmapPhase(CreateRoadmapPhaseRequest request);
-    RoadmapPhaseDto updateRoadmapPhase(UUID id, UpdateRoadmapPhaseRequest request);
-    void deleteRoadmapPhase(UUID id);
-    RoadmapPhaseDto getRoadmapPhaseById(UUID id);
-    List<RoadmapPhaseDto> getPhasesByRoadmapId(UUID roadmapId);
+    // RoadmapSection CRUD
+    RoadmapSectionTreeDto createSection(CreateRoadmapSectionRequest request);
+    RoadmapSectionTreeDto updateSection(UUID id, UpdateRoadmapSectionRequest request);
+    void deleteSection(UUID id);
+    List<RoadmapSectionTreeDto> getSectionsTreeByRoadmapId(UUID roadmapId);
+
+    // Question CRUD
+    QuestionDto createQuestion(CreateQuestionRequest request);
+    QuestionDto updateQuestion(UUID id, UpdateQuestionRequest request);
+    void deleteQuestion(UUID id);
+    List<QuestionDto> getAllQuestions();
+
+    // QuestionLink CRUD
+    QuestionLinkDto createQuestionLink(UUID questionId, CreateQuestionLinkRequest request);
+    QuestionLinkDto updateQuestionLink(UUID linkId, UpdateQuestionLinkRequest request);
+    void deleteQuestionLink(UUID linkId);
+
+    // Section Question assignment
+    RoadmapSectionQuestionDto assignQuestionToSection(UUID sectionId, AssignQuestionRequest request);
+    void removeQuestionFromSection(UUID sectionQuestionId);
 
     // Student Personalized Generation
     PersonalizedRoadmapResponse getPersonalizedRoadmap(UUID studentUserId);
+    
+    // Student Progress Tracking
+    void updateStudentQuestionProgress(UUID studentUserId, UUID sectionQuestionId, UpdateStudentProgressRequest request);
 }

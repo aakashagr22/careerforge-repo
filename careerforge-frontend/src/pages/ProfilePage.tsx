@@ -92,7 +92,7 @@ export const ProfilePage: React.FC = () => {
       </Card>
 
       {/* ==================== METRICS SECTION ==================== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         
         {/* Streak Counter */}
         <Card hoverEffect>
@@ -113,27 +113,6 @@ export const ProfilePage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Learning track Status */}
-        <Card hoverEffect>
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
-              <CheckCircle className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide block">
-                Soft-Skill Track Status
-              </span>
-              <span className="text-2xl font-bold text-slate-900 dark:text-white block mt-0.5">
-                {profile.communicationTrackEnabled ? 'Enabled' : 'Disabled'}
-              </span>
-              <span className="text-[10px] text-slate-450 block mt-0.5">
-                Interactive interview modules are active in roadmap.
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
       </div>
 
       {/* ==================== ACADEMIC DETAILS CARD ==================== */}
@@ -145,15 +124,6 @@ export const ProfilePage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-sm">
             
-            <div className="flex items-center gap-3">
-              <School className="h-5 w-5 text-slate-450 shrink-0" />
-              <div className="min-w-0">
-                <span className="text-[10px] text-slate-450 block">University / College</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200 block truncate">
-                  {profile.college || 'Not specified'}
-                </span>
-              </div>
-            </div>
 
             <div className="flex items-center gap-3">
               <BookOpen className="h-5 w-5 text-slate-450 shrink-0" />

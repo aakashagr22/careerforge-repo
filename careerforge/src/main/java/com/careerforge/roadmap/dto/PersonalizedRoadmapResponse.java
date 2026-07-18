@@ -13,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 public class PersonalizedRoadmapResponse {
     private RoadmapDto roadmap;
-    private List<RoadmapPhaseDto> phases;
+    private List<RoadmapSectionTreeDto> sections;
 }

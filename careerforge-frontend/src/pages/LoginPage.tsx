@@ -87,7 +87,7 @@ export const LoginPage: React.FC = () => {
           </label>
           <input
             type="email"
-            placeholder="name@college.edu"
+            placeholder="name@example.com"
             {...register('email')}
             className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
               errors.email 

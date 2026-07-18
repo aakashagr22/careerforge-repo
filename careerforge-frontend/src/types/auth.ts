@@ -18,11 +18,9 @@ export interface StudentProfile {
   semester: number | null;
   branch: string | null;
   section: string | null;
-  college: string | null;
   enrollmentNo: string | null;
   preferredLanguage: 'JAVA' | 'CPP' | 'PYTHON' | null;
   targetRole: 'SDE' | 'FULL_STACK' | 'WEB_DEVELOPER' | 'AI_ML' | 'DEVOPS' | null;
-  communicationTrackEnabled: boolean;
   streak: number;
   profileImage: string | null;
 }

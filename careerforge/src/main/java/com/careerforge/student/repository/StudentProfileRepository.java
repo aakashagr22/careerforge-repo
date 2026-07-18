@@ -18,7 +18,4 @@ public interface StudentProfileRepository extends JpaRepository<StudentProfile, 
 
     @org.springframework.data.jpa.repository.Query("SELECT s.branch, COUNT(s) FROM StudentProfile s GROUP BY s.branch")
     java.util.List<Object[]> getBranchDistribution();
-
-    @org.springframework.data.jpa.repository.Query("SELECT s.college, COUNT(s) FROM StudentProfile s GROUP BY s.college")
-    java.util.List<Object[]> getCollegeDistribution();
 }

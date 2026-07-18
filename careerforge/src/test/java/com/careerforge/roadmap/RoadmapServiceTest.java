@@ -1,13 +1,14 @@
 package com.careerforge.roadmap;
 
+import com.careerforge.exception.BadRequestException;
 import com.careerforge.exception.ResourceNotFoundException;
 import com.careerforge.roadmap.dto.*;
 import com.careerforge.roadmap.entity.Roadmap;
-import com.careerforge.roadmap.entity.RoadmapPhase;
+import com.careerforge.roadmap.entity.RoadmapSection;
+import com.careerforge.roadmap.mapper.QuestionMapper;
 import com.careerforge.roadmap.mapper.RoadmapMapper;
-import com.careerforge.roadmap.mapper.RoadmapPhaseMapper;
-import com.careerforge.roadmap.repository.RoadmapPhaseRepository;
-import com.careerforge.roadmap.repository.RoadmapRepository;
+import com.careerforge.roadmap.mapper.RoadmapSectionMapper;
+import com.careerforge.roadmap.repository.*;
 import com.careerforge.roadmap.service.impl.RoadmapServiceImpl;
 import com.careerforge.student.entity.Language;
 import com.careerforge.student.entity.StudentProfile;
@@ -21,6 +22,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,7 +39,19 @@ public class RoadmapServiceTest {
     private RoadmapRepository roadmapRepository;
 
     @Mock
-    private RoadmapPhaseRepository roadmapPhaseRepository;
+    private RoadmapSectionRepository roadmapSectionRepository;
+
+    @Mock
+    private QuestionRepository questionRepository;
+
+    @Mock
+    private QuestionLinkRepository questionLinkRepository;
+
+    @Mock
+    private RoadmapSectionQuestionRepository roadmapSectionQuestionRepository;
+
+    @Mock
+    private StudentRoadmapQuestionProgressRepository studentRoadmapQuestionProgressRepository;
 
     @Mock
     private StudentProfileRepository studentProfileRepository;
@@ -45,7 +60,10 @@ public class RoadmapServiceTest {
     private RoadmapMapper roadmapMapper;
 
     @Mock
-    private RoadmapPhaseMapper roadmapPhaseMapper;
+    private RoadmapSectionMapper roadmapSectionMapper;
+
+    @Mock
+    private QuestionMapper questionMapper;
 
     @InjectMocks
     private RoadmapServiceImpl roadmapService;
@@ -53,19 +71,14 @@ public class RoadmapServiceTest {
     private Roadmap roadmap;
     private RoadmapDto roadmapDto;
     private CreateRoadmapRequest createRequest;
-    private UpdateRoadmapRequest updateRequest;
-
-    private RoadmapPhase phase;
-    private RoadmapPhaseDto phaseDto;
-    private CreateRoadmapPhaseRequest createPhaseRequest;
-    private UpdateRoadmapPhaseRequest updatePhaseRequest;
-
     private StudentProfile student;
+    private RoadmapSection section;
+    private RoadmapSectionTreeDto sectionTreeDto;
 
     @BeforeEach
     void setUp() {
         UUID roadmapId = UUID.randomUUID();
-        UUID phaseId = UUID.randomUUID();
+        UUID sectionId = UUID.randomUUID();
         UUID studentId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
@@ -95,59 +108,29 @@ public class RoadmapServiceTest {
                 .description("Path to SDE")
                 .build();
 
-        updateRequest = UpdateRoadmapRequest.builder()
-                .semester(5)
-                .monthsRemaining(10)
-                .targetRoles(List.of(TargetRole.SDE))
-                .title("SDE Roadmap (Updated)")
-                .build();
-
-        phase = RoadmapPhase.builder()
-                .id(phaseId)
-                .roadmap(roadmap)
-                .title("DSA Foundation")
-                .description("Algorithms core")
-                .startMonth(1)
-                .endMonth(4)
-                .priority(1)
-                .build();
-
-        phaseDto = RoadmapPhaseDto.builder()
-                .id(phaseId)
-                .roadmapId(roadmapId)
-                .title("DSA Foundation")
-                .description("Algorithms core")
-                .startMonth(1)
-                .endMonth(4)
-                .priority(1)
-                .build();
-
-        createPhaseRequest = CreateRoadmapPhaseRequest.builder()
-                .roadmapId(roadmapId)
-                .title("DSA Foundation")
-                .startMonth(1)
-                .endMonth(4)
-                .priority(1)
-                .build();
-
-        updatePhaseRequest = UpdateRoadmapPhaseRequest.builder()
-                .title("DSA Advanced")
-                .startMonth(1)
-                .endMonth(4)
-                .priority(1)
-                .build();
-
         student = StudentProfile.builder()
                 .id(studentId)
                 .user(User.builder().id(userId).build())
                 .semester(5)
                 .preferredLanguage(Language.JAVA)
                 .targetRole(TargetRole.SDE)
-                .communicationTrackEnabled(false)
+                .build();
+
+        section = RoadmapSection.builder()
+                .id(sectionId)
+                .roadmap(roadmap)
+                .title("Basics")
+                .position(0)
+                .build();
+
+        sectionTreeDto = RoadmapSectionTreeDto.builder()
+                .id(sectionId)
+                .title("Basics")
+                .position(0)
+                .children(new ArrayList<>())
+                .questions(new ArrayList<>())
                 .build();
     }
-
-    // ======================== Roadmap Tests ========================
 
     @Test
     void createRoadmap_ShouldSaveAndReturnDto() {
@@ -172,60 +155,62 @@ public class RoadmapServiceTest {
         assertEquals(roadmap.getId(), result.getId());
     }
 
-    // ======================== Phase Tests ========================
-
     @Test
-    void createRoadmapPhase_ShouldSaveAndReturnDto_WhenRoadmapExists() {
+    void createSection_ShouldSaveAndReturnDto_WhenRoadmapExists() {
         when(roadmapRepository.findById(roadmap.getId())).thenReturn(Optional.of(roadmap));
-        when(roadmapPhaseRepository.save(any(RoadmapPhase.class))).thenReturn(phase);
-        when(roadmapPhaseMapper.toDto(phase)).thenReturn(phaseDto);
+        when(roadmapSectionRepository.findByRoadmapIdOrderByPositionAsc(roadmap.getId())).thenReturn(Collections.emptyList());
+        when(roadmapSectionRepository.save(any(RoadmapSection.class))).thenReturn(section);
+        when(roadmapSectionMapper.toTreeDto(section)).thenReturn(sectionTreeDto);
 
-        RoadmapPhaseDto result = roadmapService.createRoadmapPhase(createPhaseRequest);
+        CreateRoadmapSectionRequest request = CreateRoadmapSectionRequest.builder()
+                .roadmapId(roadmap.getId())
+                .title("Basics")
+                .position(0)
+                .build();
+
+        RoadmapSectionTreeDto result = roadmapService.createSection(request);
 
         assertNotNull(result);
-        assertEquals("DSA Foundation", result.getTitle());
+        assertEquals("Basics", result.getTitle());
     }
 
-    // ======================== Personalized Roadmap Retrieval ========================
-
     @Test
-    void getPersonalizedRoadmap_ShouldReturnRoadmapWithPhases() {
+    void getPersonalizedRoadmap_ShouldReturnRoadmapWithSections() {
         when(studentProfileRepository.findByUserId(student.getUser().getId())).thenReturn(Optional.of(student));
         when(roadmapRepository.findBySemesterAndTargetRole(5, "SDE")).thenReturn(Optional.of(roadmap));
-        when(roadmapPhaseRepository.findByRoadmapIdOrderByPriorityAsc(roadmap.getId())).thenReturn(List.of(phase));
+        when(roadmapSectionRepository.findByRoadmapIdOrderByPositionAsc(roadmap.getId())).thenReturn(List.of(section));
+        when(roadmapSectionQuestionRepository.findByRoadmapSectionRoadmapId(roadmap.getId())).thenReturn(Collections.emptyList());
         when(roadmapMapper.toDto(roadmap)).thenReturn(roadmapDto);
-        when(roadmapPhaseMapper.toDto(phase)).thenReturn(phaseDto);
+        when(roadmapSectionMapper.toTreeDto(section)).thenReturn(sectionTreeDto);
 
         PersonalizedRoadmapResponse result = roadmapService.getPersonalizedRoadmap(student.getUser().getId());
 
         assertNotNull(result);
         assertEquals("SDE Roadmap", result.getRoadmap().getTitle());
-        assertEquals(1, result.getPhases().size());
-        assertEquals("DSA Foundation", result.getPhases().get(0).getTitle());
+        assertEquals(1, result.getSections().size());
+        assertEquals("Basics", result.getSections().get(0).getTitle());
     }
 
     @Test
-    void getPersonalizedRoadmap_ShouldAppendSoftSkillsPhase_WhenCommunicationTrackEnabled() {
-        student.setCommunicationTrackEnabled(true);
-        when(studentProfileRepository.findByUserId(student.getUser().getId())).thenReturn(Optional.of(student));
-        when(roadmapRepository.findBySemesterAndTargetRole(5, "SDE")).thenReturn(Optional.of(roadmap));
-        when(roadmapPhaseRepository.findByRoadmapIdOrderByPriorityAsc(roadmap.getId())).thenReturn(List.of(phase));
-        when(roadmapMapper.toDto(roadmap)).thenReturn(roadmapDto);
-        when(roadmapPhaseMapper.toDto(phase)).thenReturn(phaseDto);
+    void updateSection_ShouldThrowException_WhenCycleDetected() {
+        UUID sectionId = section.getId();
+        RoadmapSection parentSec = RoadmapSection.builder()
+                .id(UUID.randomUUID())
+                .roadmap(roadmap)
+                .title("Sub Section")
+                .parentSection(section)
+                .position(0)
+                .build();
 
-        PersonalizedRoadmapResponse result = roadmapService.getPersonalizedRoadmap(student.getUser().getId());
+        when(roadmapSectionRepository.findById(sectionId)).thenReturn(Optional.of(section));
+        when(roadmapSectionRepository.findById(parentSec.getId())).thenReturn(Optional.of(parentSec));
 
-        assertNotNull(result);
-        assertEquals(2, result.getPhases().size());
-        assertEquals("Communication & Interview Skills", result.getPhases().get(1).getTitle());
-        assertEquals(100, result.getPhases().get(1).getPriority());
-    }
+        UpdateRoadmapSectionRequest request = UpdateRoadmapSectionRequest.builder()
+                .parentId(parentSec.getId())
+                .title("Basics (Updated)")
+                .position(0)
+                .build();
 
-    @Test
-    void getPersonalizedRoadmap_ShouldThrowException_WhenNoMatchingRoadmap() {
-        when(studentProfileRepository.findByUserId(student.getUser().getId())).thenReturn(Optional.of(student));
-        when(roadmapRepository.findBySemesterAndTargetRole(5, "SDE")).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> roadmapService.getPersonalizedRoadmap(student.getUser().getId()));
+        assertThrows(BadRequestException.class, () -> roadmapService.updateSection(sectionId, request));
     }
 }

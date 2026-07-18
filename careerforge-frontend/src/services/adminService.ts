@@ -71,27 +71,19 @@ export const adminService = {
     return response.data.data;
   },
 
-  async getRoadmapPhases(roadmapId: string): Promise<any> {
-    const response = await apiClient.get(`/api/admin/roadmaps/${roadmapId}/phases`);
-    const data = response.data.data || [];
-    return data.map((p: any) => ({
-      id: p.id,
-      roadmapId: p.roadmapId,
-      phaseName: p.title,
-      description: p.description,
-      durationMonths: (p.endMonth - p.startMonth + 1) || 1,
-      orderIndex: p.priority,
-    }));
-  },
-
-  // Roadmap Phases CRUD
-  async createRoadmapPhase(data: any): Promise<any> {
-    const response = await apiClient.post('/api/admin/roadmaps/phases', data);
+  async getRoadmapSectionsTree(roadmapId: string): Promise<any> {
+    const response = await apiClient.get(`/api/admin/roadmaps/${roadmapId}/tree`);
     return response.data.data;
   },
 
-  async deleteRoadmapPhase(id: string): Promise<any> {
-    const response = await apiClient.delete(`/api/admin/roadmaps/phases/${id}`);
+  // Roadmap Sections CRUD
+  async createRoadmapSection(data: any): Promise<any> {
+    const response = await apiClient.post('/api/admin/roadmaps/sections', data);
+    return response.data.data;
+  },
+
+  async deleteRoadmapSection(id: string): Promise<any> {
+    const response = await apiClient.delete(`/api/admin/roadmaps/sections/${id}`);
     return response.data;
   },
 };

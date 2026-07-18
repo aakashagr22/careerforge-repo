@@ -19,11 +19,9 @@ const profileSchema = zod.object({
   semester: zod.number().min(1, 'Semester must be 1-8').max(8),
   branch: zod.string().min(1, 'Branch is required'),
   section: zod.string().optional(),
-  college: zod.string().min(1, 'College name is required'),
   enrollmentNo: zod.string().min(1, 'Enrollment number is required'),
   preferredLanguage: zod.enum(['JAVA', 'CPP', 'PYTHON']),
   targetRole: zod.enum(['SDE', 'FULL_STACK', 'WEB_DEVELOPER', 'AI_ML', 'DEVOPS']),
-  communicationTrackEnabled: zod.boolean().default(false),
 });
 
 type ProfileFormValues = zod.infer<typeof profileSchema>;
@@ -47,11 +45,9 @@ export const SettingsPage: React.FC = () => {
       semester: 5,
       branch: '',
       section: '',
-      college: '',
       enrollmentNo: '',
       preferredLanguage: 'JAVA',
       targetRole: 'SDE',
-      communicationTrackEnabled: false,
     }
   });
 
@@ -64,11 +60,9 @@ export const SettingsPage: React.FC = () => {
         semester: profile.semester || 5,
         branch: profile.branch || '',
         section: profile.section || '',
-        college: profile.college || '',
         enrollmentNo: profile.enrollmentNo || '',
         preferredLanguage: profile.preferredLanguage as any || 'JAVA',
         targetRole: profile.targetRole as any || 'SDE',
-        communicationTrackEnabled: profile.communicationTrackEnabled || false,
       });
     }
   }, [profile, reset]);
@@ -201,13 +195,7 @@ export const SettingsPage: React.FC = () => {
             </div>
 
             {/* Academic details */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Input
-                label="College Name"
-                placeholder="e.g., IIT Bombay"
-                error={errors.college?.message}
-                {...register('college')}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Branch / Major"
                 placeholder="e.g., Computer Science"
@@ -271,23 +259,6 @@ export const SettingsPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Comms track switcher */}
-            <div className="flex items-center gap-3 bg-slate-50 dark:bg-zinc-800/10 border border-slate-100 dark:border-zinc-800/30 p-4 rounded-2xl">
-              <input
-                id="comms-track-checkbox"
-                type="checkbox"
-                className="h-4.5 w-4.5 rounded border-slate-300 dark:border-dark-border text-brand-600"
-                {...register('communicationTrackEnabled')}
-              />
-              <div>
-                <label htmlFor="comms-track-checkbox" className="block text-xs font-bold text-slate-800 dark:text-slate-200 select-none">
-                  Enable Communication & Interview Tracker
-                </label>
-                <span className="block text-[10px] text-slate-450 mt-0.5">
-                  Check this to append professional soft-skill modules to your study timeline.
-                </span>
-              </div>
-            </div>
 
             {/* Save trigger */}
             <div className="flex justify-end pt-4 border-t border-slate-200/50 dark:border-dark-border/40">

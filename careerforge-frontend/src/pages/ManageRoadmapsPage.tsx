@@ -7,27 +7,25 @@ import toast from 'react-hot-toast';
 import { adminService } from '../services/adminService';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Input } from '../components/Input';
-import { Badge } from '../components/Badge';
 import { Compass, Plus, Trash2, Loader2, Settings } from 'lucide-react';
 
 const roadmapSchema = zod.object({
   title: zod.string().min(1, 'Title is required').max(100),
-  description: zod.string().min(1, 'Description is required').max(250),
+  description: zod.string().max(250).optional().or(zod.literal('')),
   targetRoles: zod.array(zod.enum(['SDE', 'FULL_STACK', 'WEB_DEVELOPER', 'AI_ML', 'DEVOPS'])).min(1, 'Select at least one role'),
   semester: zod.number().min(1, 'Semester must be 1-8').max(8),
   monthsRemaining: zod.number().min(1, 'Months remaining must be at least 1'),
 });
 
-const phaseSchema = zod.object({
+const sectionSchema = zod.object({
   roadmapId: zod.string().min(1, 'Please select a parent roadmap'),
-  phaseName: zod.string().min(1, 'Phase name is required').max(100),
-  description: zod.string().min(1, 'Description is required').max(300),
-  durationMonths: zod.number().min(1, 'Duration must be positive'),
-  orderIndex: zod.number().min(1, 'Order index must be positive'),
+  parentId: zod.string().optional(),
+  title: zod.string().min(1, 'Section title is required').max(100),
+  position: zod.number().min(0, 'Position must be positive'),
 });
 
 type RoadmapFormValues = zod.infer<typeof roadmapSchema>;
-type PhaseFormValues = zod.infer<typeof phaseSchema>;
+type SectionFormValues = zod.infer<typeof sectionSchema>;
 
 export const ManageRoadmapsPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -39,10 +37,10 @@ export const ManageRoadmapsPage: React.FC = () => {
     queryFn: () => adminService.getAllRoadmaps(0, 100),
   });
 
-  // Fetch phases of the selected roadmap
-  const { data: phases = [], isLoading: loadingPhases } = useQuery({
-    queryKey: ['adminRoadmapPhases', selectedRoadmapId],
-    queryFn: () => adminService.getRoadmapPhases(selectedRoadmapId),
+  // Fetch sections of the selected roadmap
+  const { data: sections = [], isLoading: loadingSections } = useQuery({
+    queryKey: ['adminRoadmapSections', selectedRoadmapId],
+    queryFn: () => adminService.getRoadmapSectionsTree(selectedRoadmapId),
     enabled: !!selectedRoadmapId,
   });
 
@@ -52,10 +50,16 @@ export const ManageRoadmapsPage: React.FC = () => {
     defaultValues: { title: '', description: '', targetRoles: [], semester: 5, monthsRemaining: 6 }
   });
 
-  const phaseForm = useForm<PhaseFormValues>({
-    resolver: zodResolver(phaseSchema),
-    defaultValues: { roadmapId: '', phaseName: '', description: '', durationMonths: 2, orderIndex: 1 }
+  const sectionForm = useForm<SectionFormValues>({
+    resolver: zodResolver(sectionSchema),
+    defaultValues: { roadmapId: '', parentId: '', title: '', position: 0 }
   });
+
+  // Sync selectedRoadmapId with sectionForm's roadmapId to keep both dropdowns synchronized
+  React.useEffect(() => {
+    sectionForm.setValue('roadmapId', selectedRoadmapId, { shouldValidate: true });
+  }, [selectedRoadmapId, sectionForm]);
+
 
   // Create Roadmap Mutation
   const createRoadmapMutation = useMutation({
@@ -85,34 +89,33 @@ export const ManageRoadmapsPage: React.FC = () => {
     }
   });
 
-  // Create Phase Mutation
-  const createPhaseMutation = useMutation({
-    mutationFn: adminService.createRoadmapPhase,
+  // Create Section Mutation
+  const createSectionMutation = useMutation({
+    mutationFn: adminService.createRoadmapSection,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminRoadmapPhases', selectedRoadmapId] });
-      phaseForm.reset({
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      sectionForm.reset({
         roadmapId: selectedRoadmapId,
-        phaseName: '',
-        description: '',
-        durationMonths: 2,
-        orderIndex: phases.length + 2,
+        parentId: '',
+        title: '',
+        position: flattenSections(sections).length,
       });
-      toast.success('Learning phase added!');
+      toast.success('Roadmap section added!');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to add learning phase.');
+      toast.error(error.response?.data?.message || 'Failed to add roadmap section.');
     }
   });
 
-  // Delete Phase Mutation
-  const deletePhaseMutation = useMutation({
-    mutationFn: adminService.deleteRoadmapPhase,
+  // Delete Section Mutation
+  const deleteSectionMutation = useMutation({
+    mutationFn: adminService.deleteRoadmapSection,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminRoadmapPhases', selectedRoadmapId] });
-      toast.success('Phase deleted successfully.');
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('Section deleted successfully.');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to delete phase.');
+      toast.error(error.response?.data?.message || 'Failed to delete section.');
     }
   });
 
@@ -127,41 +130,44 @@ export const ManageRoadmapsPage: React.FC = () => {
     createRoadmapMutation.mutate(payload);
   };
 
-  const onPhaseSubmit = (values: PhaseFormValues) => {
-    const sortedPhases = [...phases].sort((a, b) => a.orderIndex - b.orderIndex);
-    
-    let startMonth = 1;
-    for (const p of sortedPhases) {
-      if (p.orderIndex < values.orderIndex) {
-        startMonth += p.durationMonths;
-      }
-    }
-    const endMonth = startMonth + values.durationMonths - 1;
-
+  const onSectionSubmit = (values: SectionFormValues) => {
     const payload = {
       roadmapId: values.roadmapId,
-      title: values.phaseName,
-      description: values.description,
-      startMonth,
-      endMonth,
-      priority: values.orderIndex,
+      parentId: values.parentId || null,
+      title: values.title,
+      position: values.position,
     };
-    createPhaseMutation.mutate(payload);
+    createSectionMutation.mutate(payload);
   };
 
   const handleDeleteRoadmap = (id: string) => {
-    if (window.confirm('Delete this roadmap and all monthly phases inside it?')) {
+    if (window.confirm('Delete this roadmap and all nested sections inside it?')) {
       deleteRoadmapMutation.mutate(id);
     }
   };
 
-  const handleDeletePhase = (id: string) => {
-    if (window.confirm('Delete this learning phase milestone?')) {
-      deletePhaseMutation.mutate(id);
+  const handleDeleteSection = (id: string) => {
+    if (window.confirm('Delete this roadmap section?')) {
+      deleteSectionMutation.mutate(id);
     }
   };
 
+  function flattenSections(nodes: any[]): any[] {
+    const list: any[] = [];
+    const recurse = (arr: any[]) => {
+      for (const n of arr) {
+        list.push(n);
+        if (n.children && n.children.length > 0) {
+          recurse(n.children);
+        }
+      }
+    };
+    recurse(nodes);
+    return list;
+  }
+
   const roadmaps = roadmapPage?.content || [];
+  const flatSectionsList = flattenSections(sections);
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
@@ -170,7 +176,7 @@ export const ManageRoadmapsPage: React.FC = () => {
           <Compass className="h-7 w-7 text-rose-650" /> Configure Curriculum Roadmaps
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Define semester-wise milestones, languages, target paths, or soft-skill phases.
+          Define semester-wise milestones, target paths, or hierarchical learning sections.
         </p>
       </div>
 
@@ -259,26 +265,26 @@ export const ManageRoadmapsPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Create Phase Form */}
+          {/* Create Section Form */}
           <Card>
             <CardHeader>
               <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <Plus className="h-4.5 w-4.5 text-brand-650" /> Add Roadmap Phase
+                <Plus className="h-4.5 w-4.5 text-brand-650" /> Add Roadmap Section
               </CardTitle>
             </CardHeader>
             <CardContent className="p-5">
-              <form onSubmit={phaseForm.handleSubmit(onPhaseSubmit)} className="space-y-4">
+              <form onSubmit={sectionForm.handleSubmit(onSectionSubmit)} className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
                     Select Target Roadmap
                   </label>
                   <select
-                    {...phaseForm.register('roadmapId', {
+                    {...sectionForm.register('roadmapId', {
                       onChange: (e) => {
                         setSelectedRoadmapId(e.target.value);
-                        phaseForm.setValue('roadmapId', e.target.value);
                       }
                     })}
+                    value={sectionForm.watch('roadmapId')}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none text-slate-750 dark:text-slate-350"
                   >
                     <option value="">-- Choose Target Roadmap --</option>
@@ -286,51 +292,47 @@ export const ManageRoadmapsPage: React.FC = () => {
                       <option key={r.id} value={r.id}>{r.title} (Sem {r.semester})</option>
                     ))}
                   </select>
-                  {phaseForm.formState.errors.roadmapId && (
-                    <p className="text-xs text-red-500">{phaseForm.formState.errors.roadmapId.message}</p>
+                  {sectionForm.formState.errors.roadmapId && (
+                    <p className="text-xs text-red-500">{sectionForm.formState.errors.roadmapId.message}</p>
                   )}
                 </div>
 
-                <Input
-                  label="Phase Name"
-                  placeholder="e.g., Data Structures Foundations"
-                  error={phaseForm.formState.errors.phaseName?.message}
-                  {...phaseForm.register('phaseName')}
-                />
-
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Description
+                    Select Parent Section (Optional)
                   </label>
-                  <textarea
-                    placeholder="List bullet points / topics..."
-                    {...phaseForm.register('description')}
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none h-16 resize-none"
-                  />
+                  <select
+                    {...sectionForm.register('parentId')}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none text-slate-750 dark:text-slate-350"
+                  >
+                    <option value="">-- Root Section (No Parent) --</option>
+                    {flatSectionsList.map((sec: any) => (
+                      <option key={sec.id} value={sec.id}>{sec.title}</option>
+                    ))}
+                  </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    label="Est. Duration (Months)"
-                    type="number"
-                    error={phaseForm.formState.errors.durationMonths?.message}
-                    {...phaseForm.register('durationMonths', { valueAsNumber: true })}
-                  />
+                <Input
+                  label="Section Title"
+                  placeholder="e.g., Data Structures Foundations"
+                  error={sectionForm.formState.errors.title?.message}
+                  {...sectionForm.register('title')}
+                />
 
-                  <Input
-                    label="Phase Order Sequence"
-                    type="number"
-                    error={phaseForm.formState.errors.orderIndex?.message}
-                    {...phaseForm.register('orderIndex', { valueAsNumber: true })}
-                  />
-                </div>
+
+                <Input
+                  label="Position Sequence"
+                  type="number"
+                  error={sectionForm.formState.errors.position?.message}
+                  {...sectionForm.register('position', { valueAsNumber: true })}
+                />
 
                 <button
                   type="submit"
-                  disabled={createPhaseMutation.isPending}
+                  disabled={createSectionMutation.isPending}
                   className="w-full inline-flex items-center justify-center gap-2 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs transition-colors"
                 >
-                  Publish Phase
+                  Publish Section
                 </button>
               </form>
             </CardContent>
@@ -342,7 +344,7 @@ export const ManageRoadmapsPage: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row justify-between items-center px-6 py-4">
               <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <Settings className="h-4.5 w-4.5 text-brand-650" /> Milestones & Tracks Preview
+                <Settings className="h-4.5 w-4.5 text-brand-650" /> Sections & Tracks Preview
               </CardTitle>
               {selectedRoadmapId && (
                 <button
@@ -357,8 +359,8 @@ export const ManageRoadmapsPage: React.FC = () => {
               
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-505 uppercase tracking-wide">
-                    Choose a roadmap to view phases:
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                    Choose a roadmap to view sections:
                   </label>
                   <select
                     value={selectedRoadmapId}
@@ -373,37 +375,31 @@ export const ManageRoadmapsPage: React.FC = () => {
                 </div>
 
                 {selectedRoadmapId ? (
-                  loadingPhases ? (
+                  loadingSections ? (
                     <div className="flex items-center justify-center py-10 gap-2 text-slate-500 text-xs font-semibold">
-                      <Loader2 className="h-4 w-4 animate-spin text-brand-600" /> Loading milestones...
+                      <Loader2 className="h-4 w-4 animate-spin text-brand-600" /> Loading sections...
                     </div>
-                  ) : phases.length === 0 ? (
+                  ) : flatSectionsList.length === 0 ? (
                     <div className="text-center py-10 text-slate-500 text-sm">
-                      No learning phases added to this roadmap track. Publish your first phase on the bottom-left form!
+                      No learning sections added to this roadmap track. Publish your first section on the bottom-left form!
                     </div>
                   ) : (
                     <div className="divide-y divide-slate-100 dark:divide-zinc-800/60 mt-4 border border-slate-200/50 dark:border-zinc-800/65 rounded-xl overflow-hidden bg-slate-50/10 dark:bg-zinc-800/5">
-                      {phases.map((p: any) => {
-                        const isComms = p.phaseName.toLowerCase().includes('soft') || p.phaseName.toLowerCase().includes('communication');
+                      {flatSectionsList.map((p: any) => {
                         return (
                           <div key={p.id} className="p-4 flex justify-between items-center gap-4 hover:bg-slate-50/20 dark:hover:bg-zinc-800/10 transition-colors">
                             <div className="min-w-0 space-y-1">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-xs font-bold text-slate-400">Phase #{p.orderIndex}</span>
+                                <span className="text-xs font-bold text-slate-400">Position #{p.position}</span>
                                 <span className="font-semibold text-sm text-slate-800 dark:text-slate-200 truncate">
-                                  {p.phaseName}
+                                  {p.title}
                                 </span>
-                                <Badge variant={isComms ? 'success' : 'brand'} className="text-[8px] tracking-wider py-0 leading-none">
-                                  {p.durationMonths} {p.durationMonths === 1 ? 'Month' : 'Months'}
-                                </Badge>
                               </div>
-                              <p className="text-xs text-slate-450 line-clamp-1 leading-normal">
-                                {p.description}
-                              </p>
+
                             </div>
 
                             <button
-                              onClick={() => handleDeletePhase(p.id)}
+                              onClick={() => handleDeleteSection(p.id)}
                               className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-colors shrink-0"
                             >
                               <Trash2 className="h-4.5 w-4.5" />
@@ -415,7 +411,7 @@ export const ManageRoadmapsPage: React.FC = () => {
                   )
                 ) : (
                   <div className="text-center py-12 text-slate-400 text-sm">
-                    Select a roadmap from the dropdown selector to preview or manage its phase milestones.
+                    Select a roadmap from the dropdown selector to preview or manage its section milestones.
                   </div>
                 )}
               </div>

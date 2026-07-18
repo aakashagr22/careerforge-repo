@@ -12,7 +12,6 @@ interface StudentProfileRow {
   lastName: string;
   email: string;
   branch: string;
-  college: string;
   semester: number;
   targetRole: string;
   streak: number;
@@ -63,12 +62,11 @@ export const ManageStudentsPage: React.FC = () => {
       key: 'email',
     },
     {
-      header: 'Branch & College',
+      header: 'Branch',
       render: (row) => (
-        <div className="text-xs">
-          <p className="font-medium text-slate-750 dark:text-zinc-300">{row.branch || 'N/A'}</p>
-          <p className="text-slate-400 mt-0.5">{row.college || 'N/A'}</p>
-        </div>
+        <span className="text-xs font-semibold text-slate-750 dark:text-zinc-300">
+          {row.branch || 'N/A'}
+        </span>
       ),
     },
     {

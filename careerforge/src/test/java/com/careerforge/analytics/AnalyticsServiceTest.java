@@ -47,9 +47,6 @@ public class AnalyticsServiceTest {
         Object[] branch2 = new Object[]{"Electrical Engineering", 5L};
         List<Object[]> branches = List.of(branch1, branch2);
 
-        Object[] college1 = new Object[]{"Engineering College A", 12L};
-        Object[] college2 = new Object[]{"Engineering College B", 3L};
-        List<Object[]> colleges = List.of(college1, college2);
 
         when(studentProfileRepository.count()).thenReturn(15L);
         when(userRepository.countByRoleAndActiveTrue(Role.STUDENT)).thenReturn(12L);
@@ -57,7 +54,6 @@ public class AnalyticsServiceTest {
         when(resourceRepository.count()).thenReturn(8L);
         when(studentProfileRepository.getAverageStreak()).thenReturn(4.5);
         when(studentProfileRepository.getBranchDistribution()).thenReturn(branches);
-        when(studentProfileRepository.getCollegeDistribution()).thenReturn(colleges);
 
         AdminDashboardStatsDto result = analyticsService.getAdminDashboardStats();
 
@@ -68,6 +64,5 @@ public class AnalyticsServiceTest {
         assertEquals(8, result.getTotalResources());
         assertEquals(4.5, result.getAverageStreak());
         assertEquals(10L, result.getStudentDistributionByBranch().get("Computer Science"));
-        assertEquals(3L, result.getStudentDistributionByCollege().get("Engineering College B"));
     }
 }

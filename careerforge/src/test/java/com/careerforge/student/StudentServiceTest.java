@@ -65,11 +65,9 @@ public class StudentServiceTest {
                 .user(user)
                 .semester(5)
                 .branch("Computer Science")
-                .college("Engineering College")
                 .enrollmentNo("CS12345")
                 .preferredLanguage(Language.JAVA)
                 .targetRole(TargetRole.SDE)
-                .communicationTrackEnabled(true)
                 .streak(5)
                 .build();
 
@@ -78,11 +76,9 @@ public class StudentServiceTest {
                 .lastName("Smith")
                 .semester(6)
                 .branch("Computer Science")
-                .college("Engineering College")
-                .enrollmentNo("CS12345") // same
+                .enrollmentNo("CS12345")
                 .preferredLanguage(Language.PYTHON)
                 .targetRole(TargetRole.FULL_STACK)
-                .communicationTrackEnabled(true)
                 .build();
 
         response = StudentProfileResponse.builder()

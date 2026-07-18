@@ -13,6 +13,9 @@ import com.careerforge.sheet.repository.SheetTopicRepository;
 import com.careerforge.sheet.repository.StudentSheetProgressRepository;
 import com.careerforge.student.entity.StudentProfile;
 import com.careerforge.student.repository.StudentProfileRepository;
+import com.careerforge.roadmap.repository.RoadmapRepository;
+import com.careerforge.roadmap.repository.RoadmapSectionQuestionRepository;
+import com.careerforge.roadmap.repository.StudentRoadmapQuestionProgressRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,17 +40,26 @@ public class ProgressServiceImpl implements ProgressService {
     private final SheetRepository sheetRepository;
     private final SheetTopicRepository sheetTopicRepository;
     private final StudentSheetProgressRepository studentSheetProgressRepository;
+    private final RoadmapRepository roadmapRepository;
+    private final RoadmapSectionQuestionRepository roadmapSectionQuestionRepository;
+    private final StudentRoadmapQuestionProgressRepository studentRoadmapQuestionProgressRepository;
 
     public ProgressServiceImpl(ProgressRepository progressRepository,
                                StudentProfileRepository studentProfileRepository,
                                SheetRepository sheetRepository,
                                SheetTopicRepository sheetTopicRepository,
-                               StudentSheetProgressRepository studentSheetProgressRepository) {
+                               StudentSheetProgressRepository studentSheetProgressRepository,
+                               RoadmapRepository roadmapRepository,
+                               RoadmapSectionQuestionRepository roadmapSectionQuestionRepository,
+                               StudentRoadmapQuestionProgressRepository studentRoadmapQuestionProgressRepository) {
         this.progressRepository = progressRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.sheetRepository = sheetRepository;
         this.sheetTopicRepository = sheetTopicRepository;
         this.studentSheetProgressRepository = studentSheetProgressRepository;
+        this.roadmapRepository = roadmapRepository;
+        this.roadmapSectionQuestionRepository = roadmapSectionQuestionRepository;
+        this.studentRoadmapQuestionProgressRepository = studentRoadmapQuestionProgressRepository;
     }
 
     @Override
@@ -79,10 +92,25 @@ public class ProgressServiceImpl implements ProgressService {
             }
         }
 
-        // Calculate roadmap progress (completions / total topics available)
-        long totalTopicsAvailable = sheetTopicRepository.count();
-        double roadmapProgress = totalTopicsAvailable > 0
-                ? ((double) completedTopics / totalTopicsAvailable) * 100.0
+        // Calculate roadmap progress (completions / total roadmap questions available for student's active roadmap)
+        long totalRoadmapQuestions = 0;
+        long completedRoadmapQuestions = 0;
+        
+        if (student.getSemester() != null && student.getTargetRole() != null) {
+            Optional<com.careerforge.roadmap.entity.Roadmap> roadmapOpt = roadmapRepository.findBySemesterAndTargetRole(
+                    student.getSemester(),
+                    student.getTargetRole().name()
+            );
+            if (roadmapOpt.isPresent()) {
+                UUID roadmapId = roadmapOpt.get().getId();
+                totalRoadmapQuestions = roadmapSectionQuestionRepository.findByRoadmapSectionRoadmapId(roadmapId).size();
+                completedRoadmapQuestions = studentRoadmapQuestionProgressRepository
+                        .countByStudentIdAndRoadmapSectionQuestionRoadmapSectionRoadmapIdAndCompletedTrue(student.getId(), roadmapId);
+            }
+        }
+        
+        double roadmapProgress = totalRoadmapQuestions > 0
+                ? ((double) completedRoadmapQuestions / totalRoadmapQuestions) * 100.0
                 : 0.0;
 
         // Fetch weekly progress (last 7 days counts)

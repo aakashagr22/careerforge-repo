@@ -52,6 +52,9 @@ public class AuthServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private AuthServiceImpl authService;
 

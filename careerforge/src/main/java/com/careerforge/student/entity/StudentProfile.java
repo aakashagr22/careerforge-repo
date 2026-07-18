@@ -34,9 +34,6 @@ public class StudentProfile extends BaseEntity {
     @Column(name = "section")
     private String section;
 
-    @Column(name = "college")
-    private String college;
-
     @Column(name = "enrollment_no", unique = true)
     private String enrollmentNo;
 
@@ -47,10 +44,6 @@ public class StudentProfile extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "target_role")
     private TargetRole targetRole;
-
-    @Builder.Default
-    @Column(name = "communication_track_enabled", nullable = false)
-    private boolean communicationTrackEnabled = false;
 
     @Builder.Default
     @Column(name = "streak", nullable = false)

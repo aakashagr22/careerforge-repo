@@ -53,14 +53,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                         Long::sum
                 ));
 
-        List<Object[]> collegeResults = studentProfileRepository.getCollegeDistribution();
-        Map<String, Long> collegeMap = collegeResults.stream()
-                .collect(Collectors.toMap(
-                        res -> res[0] != null ? (String) res[0] : "Not Specified",
-                        res -> (Long) res[1],
-                        Long::sum
-                ));
-
         return AdminDashboardStatsDto.builder()
                 .totalStudents(totalStudents)
                 .activeStudents(activeStudents)
@@ -68,7 +60,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .totalResources(totalResources)
                 .averageStreak(averageStreak)
                 .studentDistributionByBranch(branchMap)
-                .studentDistributionByCollege(collegeMap)
                 .build();
     }
 }

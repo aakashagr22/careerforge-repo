@@ -72,7 +72,6 @@ public class AuthServiceImpl implements AuthService {
         if (assignedRole == Role.STUDENT) {
             StudentProfile profile = StudentProfile.builder()
                     .user(savedUser)
-                    .communicationTrackEnabled(false)
                     .streak(0)
                     .build();
             StudentProfile savedProfile = studentProfileRepository.save(profile);

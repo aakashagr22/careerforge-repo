@@ -53,10 +53,6 @@ export const AdminDashboard: React.FC = () => {
     students: val,
   }));
 
-  const collegeData = Object.entries(stats.studentDistributionByCollege || {}).map(([key, val]) => ({
-    name: key,
-    students: val,
-  }));
 
   const COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
 
@@ -139,7 +135,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* ==================== CHARTS ROW ==================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         
         {/* Branch Distribution Bar Chart */}
         <Card>
@@ -170,44 +166,6 @@ export const AdminDashboard: React.FC = () => {
                     <Bar dataKey="students" radius={[6, 6, 0, 0]}>
                       {branchData.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* College Distribution Bar Chart */}
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-base font-bold font-heading text-slate-800 dark:text-white mb-4">
-              Students by College
-            </h3>
-            {collegeData.length === 0 ? (
-              <div className="h-64 flex items-center justify-center text-slate-500 text-sm">
-                No college distribution metrics available yet.
-              </div>
-            ) : (
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={collegeData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" strokeOpacity={0.1} />
-                    <XAxis dataKey="name" stroke="#888888" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#888888" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#18181b', 
-                        borderColor: '#27272a',
-                        borderRadius: '12px',
-                        color: '#ffffff',
-                        fontSize: '12px'
-                      }}
-                    />
-                    <Bar dataKey="students" radius={[6, 6, 0, 0]}>
-                      {collegeData.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
                       ))}
                     </Bar>
                   </BarChart>

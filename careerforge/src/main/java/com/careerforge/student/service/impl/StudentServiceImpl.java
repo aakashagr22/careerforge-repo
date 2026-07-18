@@ -72,11 +72,9 @@ public class StudentServiceImpl implements StudentService {
         profile.setSemester(request.getSemester());
         profile.setBranch(request.getBranch());
         profile.setSection(request.getSection());
-        profile.setCollege(request.getCollege());
         profile.setEnrollmentNo(request.getEnrollmentNo());
         profile.setPreferredLanguage(request.getPreferredLanguage());
         profile.setTargetRole(request.getTargetRole());
-        profile.setCommunicationTrackEnabled(request.isCommunicationTrackEnabled());
         profile.setProfileImage(request.getProfileImage());
 
         StudentProfile updatedProfile = studentProfileRepository.save(profile);
