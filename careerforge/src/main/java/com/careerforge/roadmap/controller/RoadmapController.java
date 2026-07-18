@@ -179,6 +179,13 @@ public class RoadmapController {
         return ResponseEntity.ok(ApiResponse.success("Question assignment removed successfully"));
     }
 
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-dsa")
+    @Operation(summary = "Seed sample DSA roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedDsaRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedDsaRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample DSA roadmap seeded successfully"));
+    }
+
     // ======================== Student Endpoints ========================
 
     @GetMapping("/api/student/roadmap")

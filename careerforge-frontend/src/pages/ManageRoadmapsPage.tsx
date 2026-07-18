@@ -7,7 +7,10 @@ import toast from 'react-hot-toast';
 import { adminService } from '../services/adminService';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Input } from '../components/Input';
-import { Compass, Plus, Trash2, Loader2, Settings } from 'lucide-react';
+import { 
+  Compass, Plus, Trash2, Loader2, Settings, 
+  ChevronDown, ChevronRight, X, Play, BookOpen, Link, Star, Save, Sparkles
+} from 'lucide-react';
 
 const roadmapSchema = zod.object({
   title: zod.string().min(1, 'Title is required').max(100),
@@ -24,20 +27,33 @@ const sectionSchema = zod.object({
   position: zod.number().min(0, 'Position must be positive'),
 });
 
+const questionFormSchema = zod.object({
+  title: zod.string().min(1, 'Title is required').max(100),
+  description: zod.string().max(250).optional().or(zod.literal('')),
+  difficulty: zod.enum(['BEGINNER', 'EASY', 'MEDIUM', 'HARD', 'ADVANCED']),
+  solveUrl: zod.string().url('Must be a valid URL').min(1, 'Solve link is required'),
+  videoUrl: zod.string().url('Must be a valid URL').optional().or(zod.literal('')),
+  articleUrl: zod.string().url('Must be a valid URL').optional().or(zod.literal('')),
+  practiceUrl: zod.string().url('Must be a valid URL').optional().or(zod.literal('')),
+});
+
 type RoadmapFormValues = zod.infer<typeof roadmapSchema>;
 type SectionFormValues = zod.infer<typeof sectionSchema>;
+type QuestionFormValues = zod.infer<typeof questionFormSchema>;
 
 export const ManageRoadmapsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [selectedRoadmapId, setSelectedRoadmapId] = useState<string>('');
+  const [assigningToSectionId, setAssigningToSectionId] = useState<string | null>(null);
+  const [savingQuestion, setSavingQuestion] = useState(false);
 
-  // Fetch all roadmaps (paginated query, set 0 page size 100 for admin fetch)
+  // Fetch all roadmaps
   const { data: roadmapPage } = useQuery({
     queryKey: ['adminRoadmaps'],
     queryFn: () => adminService.getAllRoadmaps(0, 100),
   });
 
-  // Fetch sections of the selected roadmap
+  // Fetch sections tree of the selected roadmap
   const { data: sections = [], isLoading: loadingSections } = useQuery({
     queryKey: ['adminRoadmapSections', selectedRoadmapId],
     queryFn: () => adminService.getRoadmapSectionsTree(selectedRoadmapId),
@@ -55,11 +71,15 @@ export const ManageRoadmapsPage: React.FC = () => {
     defaultValues: { roadmapId: '', parentId: '', title: '', position: 0 }
   });
 
-  // Sync selectedRoadmapId with sectionForm's roadmapId to keep both dropdowns synchronized
+  const questionForm = useForm<QuestionFormValues>({
+    resolver: zodResolver(questionFormSchema),
+    defaultValues: { title: '', description: '', difficulty: 'EASY', solveUrl: '', videoUrl: '', articleUrl: '', practiceUrl: '' }
+  });
+
+  // Sync selectedRoadmapId with sectionForm's roadmapId
   React.useEffect(() => {
     sectionForm.setValue('roadmapId', selectedRoadmapId, { shouldValidate: true });
   }, [selectedRoadmapId, sectionForm]);
-
 
   // Create Roadmap Mutation
   const createRoadmapMutation = useMutation({
@@ -89,6 +109,24 @@ export const ManageRoadmapsPage: React.FC = () => {
     }
   });
 
+  // Seed Sample DSA Mutation
+  const seedDsaMutation = useMutation({
+    mutationFn: adminService.seedRoadmapDsa,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('Sample DSA hierarchical roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed sample DSA data.');
+    }
+  });
+
+  const handleSeedSampleDsa = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedDsaMutation.mutate(id);
+    }
+  };
+
   // Create Section Mutation
   const createSectionMutation = useMutation({
     mutationFn: adminService.createRoadmapSection,
@@ -98,7 +136,7 @@ export const ManageRoadmapsPage: React.FC = () => {
         roadmapId: selectedRoadmapId,
         parentId: '',
         title: '',
-        position: flattenSections(sections).length,
+        position: flatSectionsList.length,
       });
       toast.success('Roadmap section added!');
     },
@@ -119,15 +157,20 @@ export const ManageRoadmapsPage: React.FC = () => {
     }
   });
 
+  // Unassign Question Mutation
+  const removeQuestionMutation = useMutation({
+    mutationFn: adminService.removeQuestionFromSection,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('Question unassigned successfully.');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to unassign question.');
+    }
+  });
+
   const onRoadmapSubmit = (values: RoadmapFormValues) => {
-    const payload = {
-      title: values.title,
-      description: values.description,
-      semester: values.semester,
-      monthsRemaining: values.monthsRemaining,
-      targetRoles: values.targetRoles,
-    };
-    createRoadmapMutation.mutate(payload);
+    createRoadmapMutation.mutate(values);
   };
 
   const onSectionSubmit = (values: SectionFormValues) => {
@@ -147,18 +190,87 @@ export const ManageRoadmapsPage: React.FC = () => {
   };
 
   const handleDeleteSection = (id: string) => {
-    if (window.confirm('Delete this roadmap section?')) {
+    if (window.confirm('Delete this roadmap section and all problems attached to it?')) {
       deleteSectionMutation.mutate(id);
+    }
+  };
+
+  const handleRemoveQuestion = (sectionQuestionId: string) => {
+    if (window.confirm('Are you sure you want to remove this problem from the section?')) {
+      removeQuestionMutation.mutate(sectionQuestionId);
+    }
+  };
+
+  const onQuestionSubmit = async (values: QuestionFormValues) => {
+    if (!assigningToSectionId) return;
+
+    setSavingQuestion(true);
+    try {
+      // 1. Create canonical question
+      const question = await adminService.createQuestion({
+        title: values.title,
+        description: values.description,
+        difficulty: values.difficulty,
+      });
+
+      // 2. Add Links
+      if (values.solveUrl) {
+        await adminService.createQuestionLink(question.id, {
+          linkType: 'SOLVE',
+          label: 'Solve',
+          url: values.solveUrl,
+          position: 0,
+        });
+      }
+      if (values.videoUrl) {
+        await adminService.createQuestionLink(question.id, {
+          linkType: 'VIDEO',
+          label: 'Video Solution',
+          url: values.videoUrl,
+          position: 1,
+        });
+      }
+      if (values.articleUrl) {
+        await adminService.createQuestionLink(question.id, {
+          linkType: 'ARTICLE',
+          label: 'Article Tutorial',
+          url: values.articleUrl,
+          position: 2,
+        });
+      }
+      if (values.practiceUrl) {
+        await adminService.createQuestionLink(question.id, {
+          linkType: 'PRACTICE',
+          label: 'Practice Link',
+          url: values.practiceUrl,
+          position: 3,
+        });
+      }
+
+      // 3. Assign Question to Section
+      await adminService.assignQuestionToSection(assigningToSectionId, {
+        questionId: question.id,
+        position: 0,
+      });
+
+      toast.success('Problem added and assigned successfully!');
+      setAssigningToSectionId(null);
+      questionForm.reset();
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to build question hierarchy.');
+    } finally {
+      setSavingQuestion(false);
     }
   };
 
   function flattenSections(nodes: any[]): any[] {
     const list: any[] = [];
-    const recurse = (arr: any[]) => {
+    const recurse = (arr: any[], depth = 0) => {
       for (const n of arr) {
-        list.push(n);
+        list.push({ ...n, depth });
         if (n.children && n.children.length > 0) {
-          recurse(n.children);
+          recurse(n.children, depth + 1);
         }
       }
     };
@@ -170,18 +282,19 @@ export const ManageRoadmapsPage: React.FC = () => {
   const flatSectionsList = flattenSections(sections);
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-8 max-w-5xl mx-auto pb-12">
       <div>
         <h1 className="text-3xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
           <Compass className="h-7 w-7 text-rose-650" /> Configure Curriculum Roadmaps
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Define semester-wise milestones, target paths, or hierarchical learning sections.
+          Define semester-wise milestones, target paths, hierarchical learning sections, and attach preparation sheets.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
+        {/* Left Forms column */}
         <div className="space-y-6 lg:col-span-1">
           {/* Create Roadmap form */}
           <Card>
@@ -307,7 +420,9 @@ export const ManageRoadmapsPage: React.FC = () => {
                   >
                     <option value="">-- Root Section (No Parent) --</option>
                     {flatSectionsList.map((sec: any) => (
-                      <option key={sec.id} value={sec.id}>{sec.title}</option>
+                      <option key={sec.id} value={sec.id}>
+                        {'- '.repeat(sec.depth)}{sec.title}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -318,7 +433,6 @@ export const ManageRoadmapsPage: React.FC = () => {
                   error={sectionForm.formState.errors.title?.message}
                   {...sectionForm.register('title')}
                 />
-
 
                 <Input
                   label="Position Sequence"
@@ -339,20 +453,34 @@ export const ManageRoadmapsPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Roadmap Preview lists */}
+        {/* Roadmap Preview list & Hierarchical Preview */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
-            <CardHeader className="flex flex-row justify-between items-center px-6 py-4">
+            <CardHeader className="flex flex-row justify-between items-center px-6 py-4 flex-wrap gap-3">
               <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
                 <Settings className="h-4.5 w-4.5 text-brand-650" /> Sections & Tracks Preview
               </CardTitle>
               {selectedRoadmapId && (
-                <button
-                  onClick={() => handleDeleteRoadmap(selectedRoadmapId)}
-                  className="text-xs font-semibold text-red-500 hover:underline flex items-center gap-1"
-                >
-                  <Trash2 className="h-3.5 w-3.5" /> Delete Selected Roadmap
-                </button>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => handleSeedSampleDsa(selectedRoadmapId)}
+                    disabled={seedDsaMutation.isPending}
+                    className="text-xs font-bold text-amber-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
+                  >
+                    {seedDsaMutation.isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    Seed Sample DSA Template
+                  </button>
+                  <button
+                    onClick={() => handleDeleteRoadmap(selectedRoadmapId)}
+                    className="text-xs font-semibold text-red-500 hover:underline flex items-center gap-1"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Delete Selected Roadmap
+                  </button>
+                </div>
               )}
             </CardHeader>
             <CardContent className="p-6">
@@ -387,23 +515,64 @@ export const ManageRoadmapsPage: React.FC = () => {
                     <div className="divide-y divide-slate-100 dark:divide-zinc-800/60 mt-4 border border-slate-200/50 dark:border-zinc-800/65 rounded-xl overflow-hidden bg-slate-50/10 dark:bg-zinc-800/5">
                       {flatSectionsList.map((p: any) => {
                         return (
-                          <div key={p.id} className="p-4 flex justify-between items-center gap-4 hover:bg-slate-50/20 dark:hover:bg-zinc-800/10 transition-colors">
-                            <div className="min-w-0 space-y-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-xs font-bold text-slate-400">Position #{p.position}</span>
-                                <span className="font-semibold text-sm text-slate-800 dark:text-slate-200 truncate">
+                          <div key={p.id} className="p-4 hover:bg-slate-50/20 dark:hover:bg-zinc-800/10 transition-colors">
+                            <div className="flex justify-between items-center gap-4">
+                              <div className="min-w-0 flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-slate-400">Pos #{p.position}</span>
+                                <span 
+                                  style={{ paddingLeft: `${p.depth * 16}px` }}
+                                  className="font-semibold text-sm text-slate-800 dark:text-slate-200 flex items-center gap-1.5"
+                                >
+                                  {p.depth > 0 && <span className="text-slate-400">↳</span>}
                                   {p.title}
                                 </span>
                               </div>
 
+                              <div className="flex items-center gap-3 shrink-0">
+                                <button
+                                  onClick={() => setAssigningToSectionId(p.id)}
+                                  className="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline flex items-center gap-1"
+                                >
+                                  <Plus className="h-3 w-3" /> Add Problem
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteSection(p.id)}
+                                  className="text-red-500 hover:text-red-700 p-1 rounded transition-colors"
+                                  title="Delete Section"
+                                >
+                                  <Trash2 className="h-4.5 w-4.5" />
+                                </button>
+                              </div>
                             </div>
 
-                            <button
-                              onClick={() => handleDeleteSection(p.id)}
-                              className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-colors shrink-0"
-                            >
-                              <Trash2 className="h-4.5 w-4.5" />
-                            </button>
+                            {/* Render Attached Questions List */}
+                            {p.questions && p.questions.length > 0 && (
+                              <div className="mt-2.5 space-y-1.5 pl-6 md:pl-8">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Assigned Problems:</span>
+                                {p.questions.map((q: any) => (
+                                  <div key={q.sectionQuestionId} className="flex items-center justify-between bg-slate-100/40 dark:bg-zinc-800/20 px-3 py-2 rounded-xl border border-slate-200/20">
+                                    <div className="flex items-center gap-2 text-xs">
+                                      <span className="font-semibold text-slate-700 dark:text-slate-300">{q.title}</span>
+                                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${
+                                        q.difficulty === 'BEGINNER' || q.difficulty === 'EASY'
+                                          ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/20'
+                                          : q.difficulty === 'MEDIUM'
+                                          ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/20'
+                                          : 'bg-red-50 text-red-600 dark:bg-red-950/20'
+                                      }`}>
+                                        {q.difficulty}
+                                      </span>
+                                    </div>
+                                    <button
+                                      onClick={() => handleRemoveQuestion(q.sectionQuestionId)}
+                                      className="text-[10px] font-bold text-red-500 hover:underline"
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -421,6 +590,113 @@ export const ManageRoadmapsPage: React.FC = () => {
         </div>
 
       </div>
+
+      {/* Add Question to Section Modal Overlay */}
+      {assigningToSectionId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-lg shadow-2xl">
+            <CardHeader className="flex flex-row justify-between items-center">
+              <div>
+                <CardTitle className="text-sm font-bold uppercase tracking-wider">
+                  Add Coding Problem to Section
+                </CardTitle>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  Creates a canonical question and attaches study links to populate the learning checklist.
+                </p>
+              </div>
+              <button
+                onClick={() => setAssigningToSectionId(null)}
+                className="text-slate-400 hover:text-slate-650 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </CardHeader>
+            <CardContent className="p-6">
+              <form onSubmit={questionForm.handleSubmit(onQuestionSubmit)} className="space-y-4">
+                <Input
+                  label="Problem Title"
+                  placeholder="e.g. Find Prime Factors of N"
+                  error={questionForm.formState.errors.title?.message}
+                  {...questionForm.register('title')}
+                />
+
+                <Input
+                  label="Description / Instructions"
+                  placeholder="e.g. Optimize algorithm to run in O(sqrt(N)) time complexity."
+                  error={questionForm.formState.errors.description?.message}
+                  {...questionForm.register('description')}
+                />
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Difficulty Level</label>
+                  <select
+                    {...questionForm.register('difficulty')}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none"
+                  >
+                    <option value="BEGINNER">Beginner</option>
+                    <option value="EASY">Easy</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HARD">Hard</option>
+                    <option value="ADVANCED">Advanced</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Solve Link URL (LeetCode/GFG)"
+                    placeholder="https://leetcode.com/problems/..."
+                    error={questionForm.formState.errors.solveUrl?.message}
+                    {...questionForm.register('solveUrl')}
+                  />
+                  <Input
+                    label="Video Solution URL"
+                    placeholder="https://youtube.com/watch?v=..."
+                    error={questionForm.formState.errors.videoUrl?.message}
+                    {...questionForm.register('videoUrl')}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Article Tutorial URL"
+                    placeholder="https://takeuforward.org/..."
+                    error={questionForm.formState.errors.articleUrl?.message}
+                    {...questionForm.register('articleUrl')}
+                  />
+                  <Input
+                    label="Practice/Sandbox URL"
+                    placeholder="https://ide.geeksforgeeks.org/..."
+                    error={questionForm.formState.errors.practiceUrl?.message}
+                    {...questionForm.register('practiceUrl')}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setAssigningToSectionId(null)}
+                    className="px-4 py-2 border border-slate-200 dark:border-dark-border rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-zinc-800/40 text-slate-700 dark:text-slate-350"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingQuestion}
+                    className="inline-flex items-center gap-1.5 bg-brand-650 hover:bg-brand-700 text-white px-5 py-2 rounded-xl text-xs font-bold disabled:opacity-75"
+                  >
+                    {savingQuestion ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Save className="h-3.5 w-3.5" />
+                    )}
+                    Save and Assign
+                  </button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

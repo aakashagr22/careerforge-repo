@@ -41,4 +41,7 @@ public interface RoadmapService {
     
     // Student Progress Tracking
     void updateStudentQuestionProgress(UUID studentUserId, UUID sectionQuestionId, UpdateStudentProgressRequest request);
+
+    // Seeder
+    void seedDsaRoadmap(UUID roadmapId);
 }

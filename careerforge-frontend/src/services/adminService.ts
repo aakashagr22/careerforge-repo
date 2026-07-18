@@ -86,5 +86,38 @@ export const adminService = {
     const response = await apiClient.delete(`/api/admin/roadmaps/sections/${id}`);
     return response.data;
   },
+
+  // Canonical Questions CRUD
+  async createQuestion(data: { title: string; description?: string; difficulty: string }): Promise<any> {
+    const response = await apiClient.post('/api/admin/questions', data);
+    return response.data.data;
+  },
+
+  async deleteQuestion(id: string): Promise<any> {
+    const response = await apiClient.delete(`/api/admin/questions/${id}`);
+    return response.data;
+  },
+
+  // Question Links CRUD
+  async createQuestionLink(questionId: string, data: { linkType: string; label?: string; url: string; position: number }): Promise<any> {
+    const response = await apiClient.post(`/api/admin/questions/${questionId}/links`, data);
+    return response.data.data;
+  },
+
+  // Section Question Placement CRUD
+  async assignQuestionToSection(sectionId: string, data: { questionId: string; position: number }): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/sections/${sectionId}/question-items`, data);
+    return response.data.data;
+  },
+
+  async removeQuestionFromSection(sectionQuestionId: string): Promise<any> {
+    const response = await apiClient.delete(`/api/admin/roadmaps/sections/question-items/${sectionQuestionId}`);
+    return response.data;
+  },
+
+  async seedRoadmapDsa(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-dsa`);
+    return response.data;
+  },
 };
 export default adminService;

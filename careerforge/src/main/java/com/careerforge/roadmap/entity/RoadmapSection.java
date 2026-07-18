@@ -41,7 +41,7 @@ public class RoadmapSection extends BaseEntity {
     })
     private RoadmapSection parentSection;
 
-    @OneToMany(mappedBy = "parentSection", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parentSection", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @OrderBy("position ASC")
     @Builder.Default
     private List<RoadmapSection> subSections = new ArrayList<>();

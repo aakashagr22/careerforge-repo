@@ -196,12 +196,21 @@ export const SettingsPage: React.FC = () => {
 
             {/* Academic details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input
-                label="Branch / Major"
-                placeholder="e.g., Computer Science"
-                error={errors.branch?.message}
-                {...register('branch')}
-              />
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-zinc-300">Branch / Major</label>
+                <select
+                  {...register('branch')}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-350"
+                >
+                  <option value="Computer Science (CSE)">Computer Science (CSE)</option>
+                  <option value="Information Technology (IT)">Information Technology (IT)</option>
+                  <option value="Electronics and Communication Engineering (ECE)">Electronics and Communication Engineering (ECE)</option>
+                  <option value="Electrical Engineering (EE)">Electrical Engineering (EE)</option>
+                </select>
+                {errors.branch && (
+                  <p className="text-xs text-red-500 mt-1">{errors.branch.message}</p>
+                )}
+              </div>
               <Input
                 label="Section"
                 placeholder="e.g., A"
@@ -265,7 +274,7 @@ export const SettingsPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={updateMutation.isPending}
-                className="inline-flex items-center gap-2 bg-brand-650 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors disabled:opacity-70 shadow-lg shadow-brand-550/10"
+                className="inline-flex items-center gap-2 bg-brand-650 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors disabled:opacity-70 shadow-lg shadow-brand-500/10"
               >
                 {updateMutation.isPending ? (
                   <>
