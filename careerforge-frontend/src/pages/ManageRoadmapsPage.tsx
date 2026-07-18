@@ -13,10 +13,9 @@ import { Compass, Plus, Trash2, Loader2, Settings } from 'lucide-react';
 const roadmapSchema = zod.object({
   title: zod.string().min(1, 'Title is required').max(100),
   description: zod.string().min(1, 'Description is required').max(250),
-  targetRole: zod.enum(['SDE', 'FULL_STACK', 'WEB_DEVELOPER', 'AI_ML', 'DEVOPS']),
-  preferredLanguage: zod.enum(['JAVA', 'CPP', 'PYTHON']),
+  targetRoles: zod.array(zod.enum(['SDE', 'FULL_STACK', 'WEB_DEVELOPER', 'AI_ML', 'DEVOPS'])).min(1, 'Select at least one role'),
   semester: zod.number().min(1, 'Semester must be 1-8').max(8),
-  communicationTrackEnabled: zod.boolean(),
+  monthsRemaining: zod.number().min(1, 'Months remaining must be at least 1'),
 });
 
 const phaseSchema = zod.object({
@@ -50,7 +49,7 @@ export const ManageRoadmapsPage: React.FC = () => {
   // React Hook Forms
   const roadmapForm = useForm<RoadmapFormValues>({
     resolver: zodResolver(roadmapSchema) as any,
-    defaultValues: { title: '', description: '', targetRole: 'SDE', preferredLanguage: 'JAVA', semester: 5, communicationTrackEnabled: false }
+    defaultValues: { title: '', description: '', targetRoles: [], semester: 5, monthsRemaining: 6 }
   });
 
   const phaseForm = useForm<PhaseFormValues>({
@@ -118,11 +117,36 @@ export const ManageRoadmapsPage: React.FC = () => {
   });
 
   const onRoadmapSubmit = (values: RoadmapFormValues) => {
-    createRoadmapMutation.mutate(values);
+    const payload = {
+      title: values.title,
+      description: values.description,
+      semester: values.semester,
+      monthsRemaining: values.monthsRemaining,
+      targetRoles: values.targetRoles,
+    };
+    createRoadmapMutation.mutate(payload);
   };
 
   const onPhaseSubmit = (values: PhaseFormValues) => {
-    createPhaseMutation.mutate(values);
+    const sortedPhases = [...phases].sort((a, b) => a.orderIndex - b.orderIndex);
+    
+    let startMonth = 1;
+    for (const p of sortedPhases) {
+      if (p.orderIndex < values.orderIndex) {
+        startMonth += p.durationMonths;
+      }
+    }
+    const endMonth = startMonth + values.durationMonths - 1;
+
+    const payload = {
+      roadmapId: values.roadmapId,
+      title: values.phaseName,
+      description: values.description,
+      startMonth,
+      endMonth,
+      priority: values.orderIndex,
+    };
+    createPhaseMutation.mutate(payload);
   };
 
   const handleDeleteRoadmap = (id: string) => {
@@ -180,36 +204,32 @@ export const ManageRoadmapsPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                      Target Role
-                    </label>
-                    <select
-                      {...roadmapForm.register('targetRole')}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none text-slate-750 dark:text-slate-350"
-                    >
-                      <option value="SDE">SDE</option>
-                      <option value="FULL_STACK">Full Stack</option>
-                      <option value="WEB_DEVELOPER">Web Dev</option>
-                      <option value="AI_ML">AI / ML</option>
-                      <option value="DEVOPS">DevOps</option>
-                    </select>
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                    Target Roles
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 border border-slate-100 dark:border-dark-border p-3 rounded-xl bg-slate-50/30 dark:bg-zinc-800/10">
+                    {[
+                      { value: 'SDE', label: 'SDE' },
+                      { value: 'FULL_STACK', label: 'Full Stack' },
+                      { value: 'WEB_DEVELOPER', label: 'Web Dev' },
+                      { value: 'AI_ML', label: 'AI / ML' },
+                      { value: 'DEVOPS', label: 'DevOps' }
+                    ].map((role) => (
+                      <label key={role.value} className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-455 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          value={role.value}
+                          className="h-3.5 w-3.5 rounded border-slate-300 dark:border-dark-border text-brand-600"
+                          {...roadmapForm.register('targetRoles')}
+                        />
+                        {role.label}
+                      </label>
+                    ))}
                   </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                      Language
-                    </label>
-                    <select
-                      {...roadmapForm.register('preferredLanguage')}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none text-slate-750 dark:text-slate-350"
-                    >
-                      <option value="JAVA">Java</option>
-                      <option value="CPP">C++</option>
-                      <option value="PYTHON">Python</option>
-                    </select>
-                  </div>
+                  {roadmapForm.formState.errors.targetRoles && (
+                    <p className="text-xs text-red-500">{roadmapForm.formState.errors.targetRoles.message}</p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 items-center">
@@ -220,17 +240,12 @@ export const ManageRoadmapsPage: React.FC = () => {
                     {...roadmapForm.register('semester', { valueAsNumber: true })}
                   />
 
-                  <div className="flex items-center gap-2 mt-5">
-                    <input
-                      id="comms-admin"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-slate-300 dark:border-dark-border text-brand-600"
-                      {...roadmapForm.register('communicationTrackEnabled')}
-                    />
-                    <label htmlFor="comms-admin" className="text-xs font-semibold text-slate-650 dark:text-slate-350 select-none">
-                      Enable Comms Track
-                    </label>
-                  </div>
+                  <Input
+                    label="Prep Duration (Months)"
+                    type="number"
+                    error={roadmapForm.formState.errors.monthsRemaining?.message}
+                    {...roadmapForm.register('monthsRemaining', { valueAsNumber: true })}
+                  />
                 </div>
 
                 <button
@@ -352,7 +367,7 @@ export const ManageRoadmapsPage: React.FC = () => {
                   >
                     <option value="">-- Choose Roadmap Track from Directory --</option>
                     {roadmaps.map((r: any) => (
-                      <option key={r.id} value={r.id}>{r.title} (Sem {r.semester} - {r.targetRole})</option>
+                      <option key={r.id} value={r.id}>{r.title} (Sem {r.semester} - {r.targetRoles?.join(', ')})</option>
                     ))}
                   </select>
                 </div>

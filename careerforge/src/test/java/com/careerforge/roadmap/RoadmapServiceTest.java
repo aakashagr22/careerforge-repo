@@ -73,8 +73,7 @@ public class RoadmapServiceTest {
                 .id(roadmapId)
                 .semester(5)
                 .monthsRemaining(12)
-                .language(Language.JAVA)
-                .targetRole(TargetRole.SDE)
+                .targetRoles(List.of(TargetRole.SDE))
                 .title("SDE Roadmap")
                 .description("Path to SDE")
                 .build();
@@ -83,8 +82,7 @@ public class RoadmapServiceTest {
                 .id(roadmapId)
                 .semester(5)
                 .monthsRemaining(12)
-                .language(Language.JAVA)
-                .targetRole(TargetRole.SDE)
+                .targetRoles(List.of(TargetRole.SDE))
                 .title("SDE Roadmap")
                 .description("Path to SDE")
                 .build();
@@ -92,8 +90,7 @@ public class RoadmapServiceTest {
         createRequest = CreateRoadmapRequest.builder()
                 .semester(5)
                 .monthsRemaining(12)
-                .language(Language.JAVA)
-                .targetRole(TargetRole.SDE)
+                .targetRoles(List.of(TargetRole.SDE))
                 .title("SDE Roadmap")
                 .description("Path to SDE")
                 .build();
@@ -101,8 +98,7 @@ public class RoadmapServiceTest {
         updateRequest = UpdateRoadmapRequest.builder()
                 .semester(5)
                 .monthsRemaining(10)
-                .language(Language.JAVA)
-                .targetRole(TargetRole.SDE)
+                .targetRoles(List.of(TargetRole.SDE))
                 .title("SDE Roadmap (Updated)")
                 .build();
 
@@ -195,7 +191,7 @@ public class RoadmapServiceTest {
     @Test
     void getPersonalizedRoadmap_ShouldReturnRoadmapWithPhases() {
         when(studentProfileRepository.findByUserId(student.getUser().getId())).thenReturn(Optional.of(student));
-        when(roadmapRepository.findBySemesterAndLanguageAndTargetRole(5, Language.JAVA, TargetRole.SDE)).thenReturn(Optional.of(roadmap));
+        when(roadmapRepository.findBySemesterAndTargetRole(5, "SDE")).thenReturn(Optional.of(roadmap));
         when(roadmapPhaseRepository.findByRoadmapIdOrderByPriorityAsc(roadmap.getId())).thenReturn(List.of(phase));
         when(roadmapMapper.toDto(roadmap)).thenReturn(roadmapDto);
         when(roadmapPhaseMapper.toDto(phase)).thenReturn(phaseDto);
@@ -212,7 +208,7 @@ public class RoadmapServiceTest {
     void getPersonalizedRoadmap_ShouldAppendSoftSkillsPhase_WhenCommunicationTrackEnabled() {
         student.setCommunicationTrackEnabled(true);
         when(studentProfileRepository.findByUserId(student.getUser().getId())).thenReturn(Optional.of(student));
-        when(roadmapRepository.findBySemesterAndLanguageAndTargetRole(5, Language.JAVA, TargetRole.SDE)).thenReturn(Optional.of(roadmap));
+        when(roadmapRepository.findBySemesterAndTargetRole(5, "SDE")).thenReturn(Optional.of(roadmap));
         when(roadmapPhaseRepository.findByRoadmapIdOrderByPriorityAsc(roadmap.getId())).thenReturn(List.of(phase));
         when(roadmapMapper.toDto(roadmap)).thenReturn(roadmapDto);
         when(roadmapPhaseMapper.toDto(phase)).thenReturn(phaseDto);
@@ -228,7 +224,7 @@ public class RoadmapServiceTest {
     @Test
     void getPersonalizedRoadmap_ShouldThrowException_WhenNoMatchingRoadmap() {
         when(studentProfileRepository.findByUserId(student.getUser().getId())).thenReturn(Optional.of(student));
-        when(roadmapRepository.findBySemesterAndLanguageAndTargetRole(5, Language.JAVA, TargetRole.SDE)).thenReturn(Optional.empty());
+        when(roadmapRepository.findBySemesterAndTargetRole(5, "SDE")).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> roadmapService.getPersonalizedRoadmap(student.getUser().getId()));
     }

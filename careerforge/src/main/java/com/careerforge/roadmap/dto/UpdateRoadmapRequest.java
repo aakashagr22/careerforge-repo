@@ -1,15 +1,17 @@
 package com.careerforge.roadmap.dto;
 
-import com.careerforge.student.entity.Language;
 import com.careerforge.student.entity.TargetRole;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -26,11 +28,8 @@ public class UpdateRoadmapRequest {
     @Min(value = 1, message = "Months remaining must be at least 1")
     private Integer monthsRemaining;
 
-    @NotNull(message = "Preferred language is required")
-    private Language language;
-
-    @NotNull(message = "Target role is required")
-    private TargetRole targetRole;
+    @NotEmpty(message = "At least one target role is required")
+    private List<TargetRole> targetRoles;
 
     @NotBlank(message = "Title is required")
     private String title;

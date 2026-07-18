@@ -258,7 +258,7 @@ export const RoadmapPage: React.FC = () => {
         <div className="space-y-3 relative z-10">
           <div className="flex items-center gap-2">
             <Badge variant="brand">{roadmap.targetRole}</Badge>
-            <Badge variant="slate">{roadmap.preferredLanguage}</Badge>
+            <Badge variant="slate">{profile?.preferredLanguage}</Badge>
             <Badge variant="slate">Semester {roadmap.semester}</Badge>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold font-heading text-slate-900 dark:text-white tracking-tight">

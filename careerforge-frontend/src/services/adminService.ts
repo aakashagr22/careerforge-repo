@@ -73,7 +73,15 @@ export const adminService = {
 
   async getRoadmapPhases(roadmapId: string): Promise<any> {
     const response = await apiClient.get(`/api/admin/roadmaps/${roadmapId}/phases`);
-    return response.data.data;
+    const data = response.data.data || [];
+    return data.map((p: any) => ({
+      id: p.id,
+      roadmapId: p.roadmapId,
+      phaseName: p.title,
+      description: p.description,
+      durationMonths: (p.endMonth - p.startMonth + 1) || 1,
+      orderIndex: p.priority,
+    }));
   },
 
   // Roadmap Phases CRUD

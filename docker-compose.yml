@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: careerforge-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: careerforge
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    volumes:
+      - careerforge_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./careerforge
+      dockerfile: Dockerfile
+    container_name: careerforge-backend
+    restart: always
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/careerforge
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgrespassword
+      - JWT_SECRET=d3b07384d113edec49eaa6238ad5ff00b73c407519969c3a3721345d2f6ffb18
+      - JWT_EXPIRATION_MS=86400000
+      - JWT_REFRESH_EXPIRATION_MS=604800000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  careerforge_pgdata:

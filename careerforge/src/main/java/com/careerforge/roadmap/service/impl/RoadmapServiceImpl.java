@@ -52,8 +52,7 @@ public class RoadmapServiceImpl implements RoadmapService {
         Roadmap roadmap = Roadmap.builder()
                 .semester(request.getSemester())
                 .monthsRemaining(request.getMonthsRemaining())
-                .language(request.getLanguage())
-                .targetRole(request.getTargetRole())
+                .targetRoles(request.getTargetRoles())
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .build();
@@ -69,8 +68,7 @@ public class RoadmapServiceImpl implements RoadmapService {
 
         roadmap.setSemester(request.getSemester());
         roadmap.setMonthsRemaining(request.getMonthsRemaining());
-        roadmap.setLanguage(request.getLanguage());
-        roadmap.setTargetRole(request.getTargetRole());
+        roadmap.setTargetRoles(request.getTargetRoles());
         roadmap.setTitle(request.getTitle());
         roadmap.setDescription(request.getDescription());
 
@@ -174,17 +172,15 @@ public class RoadmapServiceImpl implements RoadmapService {
         StudentProfile student = studentProfileRepository.findByUserId(studentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student profile not found for user ID: " + studentUserId));
 
-        if (student.getSemester() == null || student.getPreferredLanguage() == null || student.getTargetRole() == null) {
-            throw new IllegalArgumentException("Student profile is incomplete. Please set your semester, language, and target role first.");
+        if (student.getSemester() == null || student.getTargetRole() == null) {
+            throw new IllegalArgumentException("Student profile is incomplete. Please set your semester and target role first.");
         }
-
-        Roadmap roadmap = roadmapRepository.findBySemesterAndLanguageAndTargetRole(
+        Roadmap roadmap = roadmapRepository.findBySemesterAndTargetRole(
                 student.getSemester(),
-                student.getPreferredLanguage(),
-                student.getTargetRole()
+                student.getTargetRole().name()
         ).orElseThrow(() -> new ResourceNotFoundException(
-                String.format("No personalized roadmap found matching Semester: %d, Language: %s, and Target Role: %s. Please contact the administrator.",
-                        student.getSemester(), student.getPreferredLanguage(), student.getTargetRole())
+                String.format("No personalized roadmap found matching Semester: %d and Target Role: %s. Please contact the administrator.",
+                        student.getSemester(), student.getTargetRole())
         ));
 
         List<RoadmapPhase> phases = roadmapPhaseRepository.findByRoadmapIdOrderByPriorityAsc(roadmap.getId());
