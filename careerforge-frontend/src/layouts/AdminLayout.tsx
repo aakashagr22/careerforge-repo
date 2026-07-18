@@ -30,7 +30,7 @@ export const AdminLayout: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="h-screen flex overflow-hidden bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 transition-colors duration-200">
       
       {/* ==================== DESKTOP ADMIN SIDEBAR ==================== */}
       <aside className={`hidden md:flex flex-col border-r border-slate-200/80 dark:border-dark-border bg-white dark:bg-dark-card transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
