@@ -10,11 +10,13 @@ import { Card, CardContent } from '../components/Card';
 import { Input } from '../components/Input';
 import { Badge } from '../components/Badge';
 import { 
-  Milestone, Calendar, Award, Star, 
-  Loader2, ChevronDown, ChevronRight, PlayCircle, 
-  BookOpen, HelpCircle, FileCode2, ExternalLink, StickyNote, Save, X
+  Milestone, Calendar, Award, 
+  Loader2, ChevronDown, ChevronRight, 
+  HelpCircle, FileCode2, ExternalLink, StickyNote, Save, X
 } from 'lucide-react';
 import { RoadmapSection, RoadmapSectionQuestion, PersonalizedRoadmapResponse } from '../types/roadmap';
+import { YouTubePlayerModal, YoutubeIcon } from '../components/YouTubePlayerModal';
+
 
 const profileSetupSchema = zod.object({
   semester: zod.number().min(1, 'Semester must be between 1 and 8').max(8),
@@ -26,12 +28,12 @@ const profileSetupSchema = zod.object({
 
 type ProfileSetupValues = zod.infer<typeof profileSetupSchema>;
 
+
 interface RoadmapSectionNodeProps {
   section: RoadmapSection;
   depth: number;
   onEditNote: (id: string, title: string, currentNote: string) => void;
   onToggleComplete: (id: string, currentVal: boolean) => void;
-  onToggleRevision: (id: string, currentVal: boolean) => void;
 }
 
 const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
@@ -39,9 +41,9 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
   depth,
   onEditNote,
   onToggleComplete,
-  onToggleRevision,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [activeVideo, setActiveVideo] = useState<{ title: string; url: string } | null>(null);
   const hasChildren = section.children && section.children.length > 0;
   const hasQuestions = section.questions && section.questions.length > 0;
   const isEmpty = !hasChildren && !hasQuestions;
@@ -119,7 +121,6 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
                   depth={depth + 1}
                   onEditNote={onEditNote}
                   onToggleComplete={onToggleComplete}
-                  onToggleRevision={onToggleRevision}
                 />
               ))}
             </div>
@@ -137,10 +138,8 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
                     <th className="p-3.5 min-w-[200px]">Problem</th>
                     <th className="p-3.5 w-20 text-center">Solve</th>
                     <th className="p-3.5 w-16 text-center">Video</th>
-                    <th className="p-3.5 w-16 text-center">Article</th>
                     <th className="p-3.5 w-16 text-center">Practice</th>
                     <th className="p-3.5 w-16 text-center">Note</th>
-                    <th className="p-3.5 w-16 text-center">Revision</th>
                     <th className="p-3.5 w-20 text-center">Difficulty</th>
                   </tr>
                 </thead>
@@ -195,35 +194,19 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
 
                         <td className="p-3 text-center">
                           {videoLink ? (
-                            <a
-                              href={videoLink.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-red-500 hover:text-red-600 transition-colors inline-block"
+                            <button
+                              onClick={() => setActiveVideo({ title: q.title, url: videoLink.url })}
+                              className="text-red-500 hover:text-red-650 transition-colors inline-block focus:outline-none"
                               title={videoLink.label || 'Watch Video'}
                             >
-                              <PlayCircle className="h-5 w-5" />
-                            </a>
+                              <YoutubeIcon className="h-5.5 w-5.5 text-red-500 fill-red-500 hover:scale-110 transition-transform" />
+                            </button>
                           ) : (
                             <span className="text-slate-400">-</span>
                           )}
                         </td>
 
-                        <td className="p-3 text-center">
-                          {articleLink ? (
-                            <a
-                              href={articleLink.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:text-blue-600 transition-colors inline-block"
-                              title={articleLink.label || 'Read Article'}
-                            >
-                              <BookOpen className="h-5 w-5" />
-                            </a>
-                          ) : (
-                            <span className="text-slate-400">-</span>
-                          )}
-                        </td>
+
 
                         <td className="p-3 text-center">
                           {practiceLink ? (
@@ -258,20 +241,7 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
                           </button>
                         </td>
 
-                        <td className="p-3 text-center">
-                          <button
-                            onClick={() => onToggleRevision(q.sectionQuestionId, q.revisionMarked || false)}
-                            className="transition-colors focus:outline-none"
-                          >
-                            <Star
-                              className={`h-4.5 w-4.5 ${
-                                q.revisionMarked
-                                  ? 'fill-amber-400 text-amber-400'
-                                  : 'text-slate-350 hover:text-amber-400'
-                              }`}
-                            />
-                          </button>
-                        </td>
+
 
                         <td className="p-3 text-center">
                           <span
@@ -294,6 +264,13 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
             </div>
           )}
         </div>
+      )}
+      {activeVideo && (
+        <YouTubePlayerModal
+          title={activeVideo.title}
+          url={activeVideo.url}
+          onClose={() => setActiveVideo(null)}
+        />
       )}
     </div>
   );
@@ -453,64 +430,20 @@ export const RoadmapPage: React.FC = () => {
     }
 
     const initialSnapshot = prevPending ? prevPending.initialSnapshot : queryClient.getQueryData<PersonalizedRoadmapResponse>(['studentRoadmap']);
-    const initialQuestion = findQuestionInSections(initialSnapshot?.sections || [], id);
-
-    const mergedCompleted = newVal;
-    const mergedRevision = prevPending && prevPending.revisionMarked !== undefined
-      ? prevPending.revisionMarked
-      : initialQuestion?.revisionMarked;
 
     const timer = window.setTimeout(() => {
-      toggleProgressMutation.mutate({ id, completed: mergedCompleted, revisionMarked: mergedRevision, initialSnapshot });
+      toggleProgressMutation.mutate({ id, completed: newVal, initialSnapshot });
       delete pendingUpdatesRef.current[id];
     }, 500);
 
     pendingUpdatesRef.current[id] = {
       timer,
-      completed: mergedCompleted,
-      revisionMarked: mergedRevision,
+      completed: newVal,
       initialSnapshot
     };
   };
 
-  const handleToggleRevision = (id: string, currentVal: boolean) => {
-    const newVal = !currentVal;
 
-    // 1. Instantly update UI cache
-    queryClient.setQueryData<PersonalizedRoadmapResponse>(['studentRoadmap'], (old) => {
-      if (!old) return old;
-      return {
-        ...old,
-        sections: updateQuestionInSections(old.sections, id, { revisionMarked: newVal })
-      };
-    });
-
-    // 2. Debounce backend API request
-    const prevPending = pendingUpdatesRef.current[id];
-    if (prevPending) {
-      window.clearTimeout(prevPending.timer);
-    }
-
-    const initialSnapshot = prevPending ? prevPending.initialSnapshot : queryClient.getQueryData<PersonalizedRoadmapResponse>(['studentRoadmap']);
-    const initialQuestion = findQuestionInSections(initialSnapshot?.sections || [], id);
-
-    const mergedCompleted = prevPending && prevPending.completed !== undefined
-      ? prevPending.completed
-      : initialQuestion?.completed;
-    const mergedRevision = newVal;
-
-    const timer = window.setTimeout(() => {
-      toggleProgressMutation.mutate({ id, completed: mergedCompleted, revisionMarked: mergedRevision, initialSnapshot });
-      delete pendingUpdatesRef.current[id];
-    }, 500);
-
-    pendingUpdatesRef.current[id] = {
-      timer,
-      completed: mergedCompleted,
-      revisionMarked: mergedRevision,
-      initialSnapshot
-    };
-  };
 
   const handleEditNoteClick = (id: string, title: string, currentNote: string) => {
     setEditingQuestionNote({ id, title, note: currentNote });
@@ -806,7 +739,6 @@ export const RoadmapPage: React.FC = () => {
             depth={0}
             onEditNote={handleEditNoteClick}
             onToggleComplete={handleToggleComplete}
-            onToggleRevision={handleToggleRevision}
           />
         ))}
       </div>
