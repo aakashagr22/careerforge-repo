@@ -6,7 +6,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { notificationService } from '../services/notificationService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Flame, LayoutDashboard, Milestone, CheckSquare, Library, User, Settings, 
+  Flame, LayoutDashboard, Milestone, CheckSquare, Library, User, Settings, Compass,
   LogOut, Sun, Moon, Laptop, Bell, Menu, X, Check, BookOpen, MessageSquare
 } from 'lucide-react';
 
@@ -42,6 +42,7 @@ export const StudentLayout: React.FC = () => {
 
   const navLinks = [
     { to: '/student/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/student/journey', label: 'My Journey', icon: Compass },
     { to: '/student/roadmap', label: 'My Roadmap', icon: Milestone },
     { to: '/student/sheets', label: 'Practice Sheets', icon: CheckSquare },
     { to: '/student/resources', label: 'Study Resources', icon: Library },

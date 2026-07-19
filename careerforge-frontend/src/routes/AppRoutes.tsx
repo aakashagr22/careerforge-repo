@@ -24,6 +24,7 @@ import { BlogDetailPage } from '../pages/BlogDetailPage';
 import { StudentSuggestionsPage } from '../pages/StudentSuggestionsPage';
 import { ProfilePage } from '../pages/ProfilePage';
 import { SettingsPage } from '../pages/SettingsPage';
+import { JourneyPage } from '../pages/JourneyPage';
 
 // Admin Pages
 import { AdminDashboard } from '../pages/AdminDashboard';
@@ -60,6 +61,7 @@ export const AppRoutes: React.FC = () => {
       >
         <Route path="dashboard" element={<StudentDashboard />} />
         <Route path="roadmap" element={<RoadmapPage />} />
+        <Route path="journey" element={<JourneyPage />} />
         <Route path="sheets" element={<PracticeSheetsPage />} />
         <Route path="resources" element={<StudyResourcesPage />} />
         <Route path="blogs" element={<StudentBlogsPage />} />

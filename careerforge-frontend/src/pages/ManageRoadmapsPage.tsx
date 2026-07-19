@@ -16,7 +16,7 @@ import {
 const roadmapSchema = zod.object({
   title: zod.string().min(1, 'Title is required').max(100),
   description: zod.string().max(250).optional().or(zod.literal('')),
-  targetRoles: zod.array(zod.enum(['SDE', 'FULL_STACK', 'WEB_DEVELOPER', 'AI_ML', 'DEVOPS'])).min(1, 'Select at least one role'),
+  targetRoles: zod.array(zod.enum(['SDE', 'FULL_STACK', 'AI_ML', 'DATA_SCIENTIST'])).min(1, 'Select at least one role'),
   semester: zod.number().min(1, 'Semester must be 1-8').max(8),
   monthsRemaining: zod.number().min(1, 'Months remaining must be at least 1'),
 });
@@ -125,6 +125,114 @@ export const ManageRoadmapsPage: React.FC = () => {
   const handleSeedSampleDsa = (id: string) => {
     if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
       seedDsaMutation.mutate(id);
+    }
+  };
+
+  // Seed Spring Boot Mutation
+  const seedSpringBootMutation = useMutation({
+    mutationFn: adminService.seedRoadmapSpringBoot,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('Spring Boot Prep roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed Spring Boot Prep data.');
+    }
+  });
+
+  const handleSeedSpringBoot = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedSpringBootMutation.mutate(id);
+    }
+  };
+
+  // Seed MERN Stack Mutation
+  const seedMernMutation = useMutation({
+    mutationFn: adminService.seedRoadmapMern,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('MERN Stack roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed MERN Stack data.');
+    }
+  });
+
+  const handleSeedMern = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedMernMutation.mutate(id);
+    }
+  };
+
+  // Seed FastAPI Mutation
+  const seedFastApiMutation = useMutation({
+    mutationFn: adminService.seedRoadmapFastApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('Python FastAPI roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed Python FastAPI data.');
+    }
+  });
+
+  const handleSeedFastApi = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedFastApiMutation.mutate(id);
+    }
+  };
+
+  // Seed Frontend Mutation
+  const seedFrontendMutation = useMutation({
+    mutationFn: adminService.seedRoadmapFrontend,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('Frontend (React) roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed Frontend React data.');
+    }
+  });
+
+  const handleSeedFrontend = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedFrontendMutation.mutate(id);
+    }
+  };
+
+  // Seed AI/ML Mutation
+  const seedAiMlMutation = useMutation({
+    mutationFn: adminService.seedRoadmapAiMl,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('AI/ML Prep roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed AI/ML data.');
+    }
+  });
+
+  const handleSeedAiMl = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedAiMlMutation.mutate(id);
+    }
+  };
+
+  // Seed Data Scientist Mutation
+  const seedDataScientistMutation = useMutation({
+    mutationFn: adminService.seedRoadmapDataScientist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('Data Scientist roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed Data Scientist data.');
+    }
+  });
+
+  const handleSeedDataScientist = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedDataScientistMutation.mutate(id);
     }
   };
 
@@ -332,9 +440,8 @@ export const ManageRoadmapsPage: React.FC = () => {
                     {[
                       { value: 'SDE', label: 'SDE' },
                       { value: 'FULL_STACK', label: 'Full Stack' },
-                      { value: 'WEB_DEVELOPER', label: 'Web Dev' },
                       { value: 'AI_ML', label: 'AI / ML' },
-                      { value: 'DEVOPS', label: 'DevOps' }
+                      { value: 'DATA_SCIENTIST', label: 'Data Scientist' }
                     ].map((role) => (
                       <label key={role.value} className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-455 cursor-pointer select-none">
                         <input
@@ -475,6 +582,78 @@ export const ManageRoadmapsPage: React.FC = () => {
                       <Sparkles className="h-3.5 w-3.5" />
                     )}
                     Seed Sample DSA Template
+                  </button>
+                  <button
+                    onClick={() => handleSeedSpringBoot(selectedRoadmapId)}
+                    disabled={seedSpringBootMutation.isPending}
+                    className="text-xs font-bold text-emerald-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
+                  >
+                    {seedSpringBootMutation.isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    Seed Spring Boot Prep
+                  </button>
+                  <button
+                    onClick={() => handleSeedMern(selectedRoadmapId)}
+                    disabled={seedMernMutation.isPending}
+                    className="text-xs font-bold text-sky-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
+                  >
+                    {seedMernMutation.isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    Seed MERN Stack
+                  </button>
+                  <button
+                    onClick={() => handleSeedFastApi(selectedRoadmapId)}
+                    disabled={seedFastApiMutation.isPending}
+                    className="text-xs font-bold text-teal-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
+                  >
+                    {seedFastApiMutation.isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    Seed FastAPI
+                  </button>
+                  <button
+                    onClick={() => handleSeedFrontend(selectedRoadmapId)}
+                    disabled={seedFrontendMutation.isPending}
+                    className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
+                  >
+                    {seedFrontendMutation.isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    Seed Frontend (React)
+                  </button>
+                  <button
+                    onClick={() => handleSeedAiMl(selectedRoadmapId)}
+                    disabled={seedAiMlMutation.isPending}
+                    className="text-xs font-bold text-purple-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
+                  >
+                    {seedAiMlMutation.isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    Seed AI/ML
+                  </button>
+                  <button
+                    onClick={() => handleSeedDataScientist(selectedRoadmapId)}
+                    disabled={seedDataScientistMutation.isPending}
+                    className="text-xs font-bold text-rose-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
+                  >
+                    {seedDataScientistMutation.isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    Seed Data Scientist
                   </button>
                   <button
                     onClick={() => handleDeleteRoadmap(selectedRoadmapId)}

@@ -29,6 +29,8 @@ public class StudentProfileResponse {
     private String enrollmentNo;
     private Language preferredLanguage;
     private TargetRole targetRole;
+    private Integer startingSemester;
+    private String framework;
     private Integer streak;
     private String profileImage;
     private LocalDateTime createdAt;

@@ -22,7 +22,9 @@ const profileSchema = zod.object({
   section: zod.string().optional(),
   enrollmentNo: zod.string().min(1, 'Enrollment number is required'),
   preferredLanguage: zod.enum(['JAVA', 'CPP', 'PYTHON']),
-  targetRole: zod.enum(['SDE', 'FULL_STACK', 'WEB_DEVELOPER', 'AI_ML', 'DEVOPS']),
+  targetRole: zod.enum(['SDE', 'FULL_STACK', 'AI_ML', 'DATA_SCIENTIST']),
+  startingSemester: zod.number().min(1, 'Starting semester must be 1-5').max(5),
+  framework: zod.enum(['SPRING_BOOT', 'NODE_JS', 'PYTHON_FASTAPI', 'PYTHON']),
 });
 
 type ProfileFormValues = zod.infer<typeof profileSchema>;
@@ -38,7 +40,7 @@ export const SettingsPage: React.FC = () => {
     queryFn: studentService.getMyProfile,
   });
 
-  const { register, handleSubmit, control, reset, formState: { errors } } = useForm<ProfileFormValues>({
+  const { register, handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema) as any,
     defaultValues: {
       firstName: '',
@@ -49,6 +51,8 @@ export const SettingsPage: React.FC = () => {
       enrollmentNo: '',
       preferredLanguage: 'JAVA',
       targetRole: 'SDE',
+      startingSemester: 1,
+      framework: 'SPRING_BOOT',
     }
   });
 
@@ -64,9 +68,27 @@ export const SettingsPage: React.FC = () => {
         enrollmentNo: profile.enrollmentNo || '',
         preferredLanguage: profile.preferredLanguage as any || 'JAVA',
         targetRole: profile.targetRole as any || 'SDE',
+        startingSemester: profile.startingSemester || 1,
+        framework: profile.framework as any || 'SPRING_BOOT',
       });
     }
   }, [profile, reset]);
+
+  const selectedRole = watch('targetRole');
+  const frameworkOptions = selectedRole === 'AI_ML' || selectedRole === 'DATA_SCIENTIST'
+    ? [{ value: 'PYTHON', label: 'Python' }]
+    : [
+        { value: 'SPRING_BOOT', label: 'Spring Boot' },
+        { value: 'NODE_JS', label: 'Node.js' },
+        { value: 'PYTHON_FASTAPI', label: 'Python FastAPI' },
+      ];
+
+  useEffect(() => {
+    const currentFramework = watch('framework');
+    if (!frameworkOptions.some(option => option.value === currentFramework)) {
+      setValue('framework', frameworkOptions[0].value as ProfileFormValues['framework']);
+    }
+  }, [frameworkOptions, setValue, selectedRole, watch]);
 
   // Update profile mutation
   const updateMutation = useMutation({
@@ -273,13 +295,39 @@ export const SettingsPage: React.FC = () => {
                     options={[
                       { value: 'SDE', label: 'Software Development Engineer (SDE)' },
                       { value: 'FULL_STACK', label: 'Full Stack Developer' },
-                      { value: 'WEB_DEVELOPER', label: 'Frontend Developer' },
                       { value: 'AI_ML', label: 'Machine Learning Engineer' },
-                      { value: 'DEVOPS', label: 'DevOps & Cloud Engineer' }
+                      { value: 'DATA_SCIENTIST', label: 'Data Scientist' }
                     ]}
                     value={field.value || 'SDE'}
                     onChange={field.onChange}
                     className="w-full text-left"
+                  />
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Controller
+                control={control}
+                name="startingSemester"
+                render={({ field }) => (
+                  <Select
+                    label="Starting Semester for Journey"
+                    options={[1, 2, 3, 4, 5].map(value => ({ value: String(value), label: `Semester ${value}` }))}
+                    value={String(field.value || 1)}
+                    onChange={(value) => field.onChange(Number(value))}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="framework"
+                render={({ field }) => (
+                  <Select
+                    label="Preferred Framework"
+                    options={frameworkOptions}
+                    value={frameworkOptions.some(option => option.value === field.value) ? field.value : frameworkOptions[0].value}
+                    onChange={field.onChange}
                   />
                 )}
               />

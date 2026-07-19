@@ -124,5 +124,35 @@ export const adminService = {
     const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-dsa`);
     return response.data;
   },
+
+  async seedRoadmapSpringBoot(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-springboot`);
+    return response.data;
+  },
+
+  async seedRoadmapMern(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-mern`);
+    return response.data;
+  },
+
+  async seedRoadmapFastApi(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-fastapi`);
+    return response.data;
+  },
+
+  async seedRoadmapFrontend(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-frontend`);
+    return response.data;
+  },
+
+  async seedRoadmapAiMl(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-aiml`);
+    return response.data;
+  },
+
+  async seedRoadmapDataScientist(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-datascientist`);
+    return response.data;
+  },
 };
 export default adminService;

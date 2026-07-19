@@ -20,7 +20,9 @@ export interface StudentProfile {
   section: string | null;
   enrollmentNo: string | null;
   preferredLanguage: 'JAVA' | 'CPP' | 'PYTHON' | null;
-  targetRole: 'SDE' | 'FULL_STACK' | 'WEB_DEVELOPER' | 'AI_ML' | 'DEVOPS' | null;
+  targetRole: 'SDE' | 'FULL_STACK' | 'AI_ML' | 'DATA_SCIENTIST' | null;
+  startingSemester: number | null;
+  framework: string | null;
   streak: number;
   profileImage: string | null;
 }

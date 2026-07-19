@@ -186,13 +186,56 @@ public class RoadmapController {
         return ResponseEntity.ok(ApiResponse.success("Sample DSA roadmap seeded successfully"));
     }
 
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-springboot")
+    @Operation(summary = "Seed sample Spring Boot roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedSpringBootRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedSpringBootRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample Spring Boot roadmap seeded successfully"));
+    }
+
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-mern")
+    @Operation(summary = "Seed sample MERN Stack roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedMernRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedMernRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample MERN Stack roadmap seeded successfully"));
+    }
+
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-fastapi")
+    @Operation(summary = "Seed sample Python FastAPI roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedFastApiRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedFastApiRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample Python FastAPI roadmap seeded successfully"));
+    }
+
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-frontend")
+    @Operation(summary = "Seed sample Frontend React roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedFrontendRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedFrontendRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample Frontend React roadmap seeded successfully"));
+    }
+
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-aiml")
+    @Operation(summary = "Seed sample AI/ML roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedAiMlRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedAiMlRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample AI/ML roadmap seeded successfully"));
+    }
+
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-datascientist")
+    @Operation(summary = "Seed sample Data Scientist roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedDataScientistRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedDataScientistRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample Data Scientist roadmap seeded successfully"));
+    }
+
     // ======================== Student Endpoints ========================
 
     @GetMapping("/api/student/roadmap")
     @Operation(summary = "Get personalized nested roadmap tree with progress (Student)")
     public ResponseEntity<ApiResponse<PersonalizedRoadmapResponse>> getPersonalizedRoadmap(
-            @AuthenticationPrincipal UserPrincipal principal) {
-        PersonalizedRoadmapResponse roadmapResponse = roadmapService.getPersonalizedRoadmap(principal.getId());
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam(required = false) UUID roadmapId) {
+        PersonalizedRoadmapResponse roadmapResponse = roadmapService.getPersonalizedRoadmap(principal.getId(), roadmapId);
         return ResponseEntity.ok(ApiResponse.success(roadmapResponse, "Personalized roadmap tree retrieved successfully"));
     }
 

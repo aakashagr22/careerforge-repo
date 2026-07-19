@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Repository
 public interface RoadmapRepository extends JpaRepository<Roadmap, UUID> {
-    @Query(value = "SELECT * FROM roadmaps r WHERE r.semester = :semester AND :targetRole = ANY(r.target_roles)", nativeQuery = true)
+    @Query(value = "SELECT * FROM roadmaps r WHERE r.semester = :semester AND :targetRole = ANY(r.target_roles) ORDER BY r.created_at DESC LIMIT 1", nativeQuery = true)
     Optional<Roadmap> findBySemesterAndTargetRole(
             @Param("semester") Integer semester, 
             @Param("targetRole") String targetRole);

@@ -1,33 +1,18 @@
 import React, { useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as zod from 'zod';
 import toast from 'react-hot-toast';
 import { studentService } from '../services/studentService';
 import { roadmapService } from '../services/roadmapService';
 import { Card, CardContent } from '../components/Card';
-import { Input } from '../components/Input';
 import { Badge } from '../components/Badge';
-import { Select } from '../components/Select';
 import { 
   Milestone, Calendar, Award, 
   Loader2, ChevronDown, ChevronRight, 
-  HelpCircle, FileCode2, ExternalLink, StickyNote, Save, X
+  HelpCircle, FileCode2, ExternalLink, StickyNote, Save, X, Compass, BookOpen
 } from 'lucide-react';
 import { RoadmapSection, RoadmapSectionQuestion, PersonalizedRoadmapResponse } from '../types/roadmap';
 import { YouTubePlayerModal, YoutubeIcon } from '../components/YouTubePlayerModal';
-
-
-const profileSetupSchema = zod.object({
-  semester: zod.number().min(1, 'Semester must be between 1 and 8').max(8),
-  branch: zod.string().min(1, 'Branch is required'),
-  enrollmentNo: zod.string().min(1, 'Enrollment number is required'),
-  preferredLanguage: zod.enum(['JAVA', 'CPP', 'PYTHON']),
-  targetRole: zod.enum(['SDE', 'FULL_STACK', 'WEB_DEVELOPER', 'AI_ML', 'DEVOPS']),
-});
-
-type ProfileSetupValues = zod.infer<typeof profileSetupSchema>;
 
 
 interface RoadmapSectionNodeProps {
@@ -139,6 +124,7 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
                     <th className="p-3.5 min-w-[200px]">Problem</th>
                     <th className="p-3.5 w-20 text-center">Solve</th>
                     <th className="p-3.5 w-16 text-center">Video</th>
+                    <th className="p-3.5 w-16 text-center">Article</th>
                     <th className="p-3.5 w-16 text-center">Practice</th>
                     <th className="p-3.5 w-16 text-center">Note</th>
                     <th className="p-3.5 w-20 text-center">Difficulty</th>
@@ -207,7 +193,21 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
                           )}
                         </td>
 
-
+                        <td className="p-3 text-center">
+                          {articleLink ? (
+                            <a
+                              href={articleLink.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:text-blue-600 transition-colors inline-block"
+                              title={articleLink.label || 'Read Article'}
+                            >
+                              <BookOpen className="h-5 w-5" />
+                            </a>
+                          ) : (
+                            <span className="text-slate-400">-</span>
+                          )}
+                        </td>
 
                         <td className="p-3 text-center">
                           {practiceLink ? (
@@ -278,8 +278,10 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
 };
 
 export const RoadmapPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const roadmapId = searchParams.get('roadmapId') || undefined;
   const queryClient = useQueryClient();
-  const [editingProfile, setEditingProfile] = useState(false);
   const [editingQuestionNote, setEditingQuestionNote] = useState<{ id: string; title: string; note: string } | null>(null);
   const [noteValue, setNoteValue] = useState('');
 
@@ -304,38 +306,13 @@ export const RoadmapPage: React.FC = () => {
     queryFn: studentService.getMyProfile,
   });
 
-  // Fetch Roadmap (only if profile is configured)
+  // Fetch Roadmap (only if profile is configured or roadmapId is provided)
   const isProfileConfigured = !!(profile?.semester && profile?.preferredLanguage && profile?.targetRole);
 
   const { data: roadmapData, isLoading: loadingRoadmap, error: roadmapError } = useQuery({
-    queryKey: ['studentRoadmap'],
-    queryFn: roadmapService.getPersonalizedRoadmap,
-    enabled: isProfileConfigured && !editingProfile,
-  });
-
-  const { register, handleSubmit, control, formState: { errors } } = useForm<ProfileSetupValues>({
-    resolver: zodResolver(profileSetupSchema),
-    values: profile ? {
-      semester: profile.semester || 1,
-      branch: profile.branch || '',
-      enrollmentNo: profile.enrollmentNo || '',
-      preferredLanguage: profile.preferredLanguage || 'JAVA',
-      targetRole: profile.targetRole || 'SDE',
-    } : undefined
-  });
-
-  // Mutation to update profile details
-  const updateProfileMutation = useMutation({
-    mutationFn: studentService.updateMyProfile,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
-      queryClient.invalidateQueries({ queryKey: ['studentRoadmap'] });
-      setEditingProfile(false);
-      toast.success('Preferences configured successfully!');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update preferences.');
-    }
+    queryKey: ['studentRoadmap', roadmapId],
+    queryFn: () => roadmapService.getPersonalizedRoadmap(roadmapId),
+    enabled: Boolean(roadmapId) || isProfileConfigured,
   });
 
   // Helper: deep-clone sections and update a specific question's fields
@@ -402,15 +379,6 @@ export const RoadmapPage: React.FC = () => {
       toast.error(err.response?.data?.message || 'Failed to save note.');
     }
   });
-
-  const onSubmit = (values: ProfileSetupValues) => {
-    updateProfileMutation.mutate({
-      ...values,
-      firstName: profile?.firstName || '',
-      lastName: profile?.lastName || '',
-      section: profile?.section || '',
-    });
-  };
 
   const handleToggleComplete = (id: string, currentVal: boolean) => {
     const newVal = !currentVal;
@@ -517,111 +485,33 @@ export const RoadmapPage: React.FC = () => {
     );
   }
 
-  if (!isProfileConfigured || editingProfile) {
+  if (!roadmapId && !isProfileConfigured) {
     return (
-      <div className="max-w-md mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-extrabold font-heading text-slate-800 dark:text-white">
-            Setup Learning Path
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Choose your target roles and semester to align your curriculum benchmarks.
-          </p>
+      <div className="max-w-xl mx-auto text-center py-20 space-y-5">
+        <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-br from-brand-100 to-indigo-100 dark:from-brand-900/30 dark:to-indigo-900/30 grid place-items-center">
+          <Compass className="h-8 w-8 text-brand-600" />
         </div>
-
-        <Card>
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Controller
-                  control={control}
-                  name="semester"
-                  render={({ field }) => (
-                    <Select
-                      label="Target Semester"
-                      options={[1, 2, 3, 4, 5, 6, 7, 8].map(s => ({ value: s.toString(), label: `Semester ${s}` }))}
-                      value={field.value?.toString() || '1'}
-                      onChange={(val) => field.onChange(parseInt(val, 10))}
-                      className="w-full text-left"
-                    />
-                  )}
-                />
-
-                <Controller
-                  control={control}
-                  name="preferredLanguage"
-                  render={({ field }) => (
-                    <Select
-                      label="Preferred Lang"
-                      options={[
-                        { value: 'JAVA', label: 'Java' },
-                        { value: 'CPP', label: 'C++' },
-                        { value: 'PYTHON', label: 'Python' }
-                      ]}
-                      value={field.value || 'JAVA'}
-                      onChange={field.onChange}
-                      className="w-full text-left"
-                    />
-                  )}
-                />
-              </div>
-
-              <Controller
-                control={control}
-                name="targetRole"
-                render={({ field }) => (
-                  <Select
-                    label="Target Domain Path"
-                    options={[
-                      { value: 'SDE', label: 'Software Development Engineer (SDE)' },
-                      { value: 'FULL_STACK', label: 'Full Stack Developer' },
-                      { value: 'WEB_DEVELOPER', label: 'Frontend / Web Specialist' },
-                      { value: 'AI_ML', label: 'Artificial Intelligence / Machine Learning' },
-                      { value: 'DEVOPS', label: 'DevOps & Cloud Infrastructure' }
-                    ]}
-                    value={field.value || 'SDE'}
-                    onChange={field.onChange}
-                    className="w-full text-left"
-                  />
-                )}
-              />
-
-              <div className="space-y-1.5">
-                <Controller
-                  control={control}
-                  name="branch"
-                  render={({ field }) => (
-                    <Select
-                      label="Engineering Branch"
-                      options={[
-                        { value: 'Computer Science (CSE)', label: 'Computer Science (CSE)' },
-                        { value: 'Information Technology (IT)', label: 'Information Technology (IT)' },
-                        { value: 'Electronics and Communication Engineering (ECE)', label: 'Electronics and Communication Engineering (ECE)' },
-                        { value: 'Electrical Engineering (EE)', label: 'Electrical Engineering (EE)' }
-                      ]}
-                      value={field.value || ''}
-                      onChange={field.onChange}
-                      className="w-full text-left"
-                    />
-                  )}
-                />
-                {errors.branch && (
-                  <p className="text-xs text-red-500 mt-1">{errors.branch.message}</p>
-                )}
-              </div>
-              <Input label="Enrollment Number" placeholder="e.g. 0101CS201025" error={errors.enrollmentNo?.message} {...register('enrollmentNo')} />
-
-              <button
-                type="submit"
-                disabled={updateProfileMutation.isPending}
-                className="w-full inline-flex items-center justify-center gap-2 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-colors mt-2"
-              >
-                {updateProfileMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                Save Preferences
-              </button>
-            </form>
-          </CardContent>
-        </Card>
+        <h1 className="text-2xl font-extrabold font-heading text-slate-800 dark:text-white">
+          No Learning Path Active
+        </h1>
+        <p className="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+          Please configure your <strong>starting semester</strong>, <strong>target role</strong>, and <strong>framework</strong> in
+          Settings to view your personalized roadmap, or check out the Journey page.
+        </p>
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={() => navigate('/student/settings')}
+            className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+          >
+            Go to Settings
+          </button>
+          <button
+            onClick={() => navigate('/student/journey')}
+            className="inline-flex items-center gap-2 border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-zinc-800/40 text-slate-700 dark:text-slate-200 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+          >
+            Go to My Journey
+          </button>
+        </div>
       </div>
     );
   }
@@ -638,14 +528,22 @@ export const RoadmapPage: React.FC = () => {
         </div>
         <h2 className="text-xl font-bold font-heading">No matching roadmap configured</h2>
         <p className="text-sm text-slate-500 max-w-md">
-          There are currently no curriculum roadmaps matches configured for **{profile?.targetRole}** in **Semester {profile?.semester}** using **{profile?.preferredLanguage}**.
+          {roadmapId 
+            ? "This roadmap is either not configured or doesn't exist. Please check the ID or contact the administrator."
+            : `There are currently no curriculum roadmaps matches configured for ${profile?.targetRole || 'your role'} in Semester ${profile?.semester || 'your semester'} using ${profile?.preferredLanguage || 'your preferred language'}. Please contact the administrator.`}
         </p>
         <div className="flex gap-4">
           <button
-            onClick={() => setEditingProfile(true)}
+            onClick={() => navigate('/student/settings')}
             className="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
           >
             Adjust Preferences
+          </button>
+          <button
+            onClick={() => navigate('/student/journey')}
+            className="border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-zinc-800/40 text-slate-700 dark:text-slate-200 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+          >
+            Back to Journey
           </button>
         </div>
       </div>
@@ -680,7 +578,7 @@ export const RoadmapPage: React.FC = () => {
           </div>
         </div>
         <button
-          onClick={() => setEditingProfile(true)}
+          onClick={() => navigate('/student/settings')}
           className="px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-zinc-800/40 shrink-0 relative z-10 text-slate-750 dark:text-slate-200"
         >
           Change Target Settings

@@ -40,5 +40,12 @@ public class UpdateStudentProfileRequest {
     @NotNull(message = "Target role is required")
     private TargetRole targetRole;
 
+    @Min(value = 1, message = "Starting semester must be at least 1")
+    @Max(value = 5, message = "Starting semester cannot exceed 5")
+    private Integer startingSemester;
+
+    @Size(max = 50, message = "Framework must not exceed 50 characters")
+    private String framework;
+
     private String profileImage;
 }

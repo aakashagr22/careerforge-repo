@@ -5,6 +5,7 @@ import com.careerforge.exception.ResourceNotFoundException;
 import com.careerforge.student.dto.StudentProfileResponse;
 import com.careerforge.student.dto.UpdateStudentProfileRequest;
 import com.careerforge.student.entity.StudentProfile;
+import com.careerforge.student.entity.TargetRole;
 import com.careerforge.student.mapper.StudentMapper;
 import com.careerforge.student.repository.StudentProfileRepository;
 import com.careerforge.student.service.StudentService;
@@ -62,6 +63,14 @@ public class StudentServiceImpl implements StudentService {
             }
         }
 
+        if ((request.getStartingSemester() == null) != (request.getFramework() == null)) {
+            throw new BadRequestException("Starting semester and framework must be configured together");
+        }
+        if ((request.getTargetRole() == TargetRole.AI_ML || request.getTargetRole() == TargetRole.DATA_SCIENTIST)
+                && request.getFramework() != null && !"PYTHON".equals(request.getFramework())) {
+            throw new BadRequestException("AI/ML and Data Scientist journeys require the Python framework");
+        }
+
         // Update User info
         User user = profile.getUser();
         user.setFirstName(request.getFirstName());
@@ -75,6 +84,8 @@ public class StudentServiceImpl implements StudentService {
         profile.setEnrollmentNo(request.getEnrollmentNo());
         profile.setPreferredLanguage(request.getPreferredLanguage());
         profile.setTargetRole(request.getTargetRole());
+        profile.setStartingSemester(request.getStartingSemester());
+        profile.setFramework(request.getFramework());
         profile.setProfileImage(request.getProfileImage());
 
         StudentProfile updatedProfile = studentProfileRepository.save(profile);

@@ -37,11 +37,17 @@ public interface RoadmapService {
     void removeQuestionFromSection(UUID sectionQuestionId);
 
     // Student Personalized Generation
-    PersonalizedRoadmapResponse getPersonalizedRoadmap(UUID studentUserId);
+    PersonalizedRoadmapResponse getPersonalizedRoadmap(UUID studentUserId, UUID roadmapId);
     
     // Student Progress Tracking
     void updateStudentQuestionProgress(UUID studentUserId, UUID sectionQuestionId, UpdateStudentProgressRequest request);
 
     // Seeder
     void seedDsaRoadmap(UUID roadmapId);
+    void seedSpringBootRoadmap(UUID roadmapId);
+    void seedMernRoadmap(UUID roadmapId);
+    void seedFastApiRoadmap(UUID roadmapId);
+    void seedFrontendRoadmap(UUID roadmapId);
+    void seedAiMlRoadmap(UUID roadmapId);
+    void seedDataScientistRoadmap(UUID roadmapId);
 }

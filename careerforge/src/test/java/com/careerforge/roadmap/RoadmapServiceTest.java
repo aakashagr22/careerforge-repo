@@ -183,7 +183,7 @@ public class RoadmapServiceTest {
         when(roadmapMapper.toDto(roadmap)).thenReturn(roadmapDto);
         when(roadmapSectionMapper.toTreeDto(section)).thenReturn(sectionTreeDto);
 
-        PersonalizedRoadmapResponse result = roadmapService.getPersonalizedRoadmap(student.getUser().getId());
+        PersonalizedRoadmapResponse result = roadmapService.getPersonalizedRoadmap(student.getUser().getId(), null);
 
         assertNotNull(result);
         assertEquals("SDE Roadmap", result.getRoadmap().getTitle());

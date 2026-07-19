@@ -45,6 +45,12 @@ public class StudentProfile extends BaseEntity {
     @Column(name = "target_role")
     private TargetRole targetRole;
 
+    @Column(name = "starting_semester")
+    private Integer startingSemester;
+
+    @Column(name = "framework")
+    private String framework;
+
     @Builder.Default
     @Column(name = "streak", nullable = false)
     private Integer streak = 0;
