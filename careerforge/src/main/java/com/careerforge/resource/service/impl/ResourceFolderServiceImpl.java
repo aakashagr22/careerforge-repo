@@ -3,6 +3,7 @@ package com.careerforge.resource.service.impl;
 import com.careerforge.exception.ResourceNotFoundException;
 import com.careerforge.resource.dto.*;
 import com.careerforge.resource.entity.ResourceFolder;
+import com.careerforge.resource.entity.ResourceType;
 import com.careerforge.resource.mapper.ResourceMapper;
 import com.careerforge.resource.repository.ResourceFolderRepository;
 import com.careerforge.resource.repository.ResourceRepository;
@@ -103,7 +104,7 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
 
     @Override
     @Transactional(readOnly = true)
-    public FolderDirectoryDto getFolderDirectory(UUID folderId, Pageable pageable) {
+    public FolderDirectoryDto getFolderDirectory(UUID folderId, ResourceType type, Pageable pageable) {
         FolderDto currentFolderDto = null;
         List<FolderBreadcrumbDto> breadcrumbs = new ArrayList<>();
         List<FolderDto> childFolders;
@@ -131,8 +132,8 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
                     .map(this::toFolderDto)
                     .collect(Collectors.toList());
 
-            // Fetch direct resources inside this folder (no category/difficulty filter)
-            resources = resourceRepository.searchAndFilterByFolder(folderId, null, pageable)
+            // Fetch direct resources inside this folder (filtered by type)
+            resources = resourceRepository.searchAndFilterByFolder(folderId, type, pageable)
                     .map(resourceMapper::toDto);
 
         } else {
@@ -141,7 +142,7 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
                     .map(this::toFolderDto)
                     .collect(Collectors.toList());
 
-            resources = resourceRepository.searchAndFilterByFolder(null, null, pageable)
+            resources = resourceRepository.searchAndFilterByFolder(null, type, pageable)
                     .map(resourceMapper::toDto);
         }
 

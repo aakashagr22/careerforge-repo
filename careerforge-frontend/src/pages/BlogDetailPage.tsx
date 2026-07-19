@@ -194,8 +194,11 @@ export const BlogDetailPage: React.FC = () => {
                     <button
                       type="submit"
                       disabled={rejectMutation.isPending}
-                      className="px-3 py-1.5 bg-red-600 hover:bg-red-750 text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-70"
+                      className="px-3 py-1.5 bg-red-600 hover:bg-red-750 text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-70 inline-flex items-center gap-1"
                     >
+                      {rejectMutation.isPending ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : null}
                       Submit Rejection
                     </button>
                   </div>
@@ -216,7 +219,12 @@ export const BlogDetailPage: React.FC = () => {
                       onClick={handleApprove}
                       className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4.5 py-2.5 rounded-xl text-xs font-bold transition-colors shadow-sm disabled:opacity-70"
                     >
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Approve & Publish
+                      {approveMutation.isPending ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                      )}
+                      Approve & Publish
                     </button>
                   )}
                 </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import toast from 'react-hot-toast';
@@ -9,6 +9,7 @@ import { sheetService } from '../services/sheetService';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Input } from '../components/Input';
 import { Badge } from '../components/Badge';
+import { Select } from '../components/Select';
 import { Layers, Plus, Trash2, Loader2, LayoutGrid } from 'lucide-react';
 
 const sheetSchema = zod.object({
@@ -178,26 +179,31 @@ export const ManageSheetsPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Category Type
-                  </label>
-                  <select
-                    {...sheetForm.register('category')}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none text-slate-750 dark:text-slate-350"
-                  >
-                    <option value="DSA">Data Structures & Algorithms</option>
-                    <option value="WEB_DEVELOPER">Web Development</option>
-                    <option value="SYSTEM_DESIGN">System Design</option>
-                    <option value="MACHINE_LEARNING">Machine Learning</option>
-                  </select>
-                </div>
+                <Controller
+                  control={sheetForm.control}
+                  name="category"
+                  render={({ field }) => (
+                    <Select
+                      label="Category Type"
+                      options={[
+                        { value: 'DSA', label: 'Data Structures & Algorithms' },
+                        { value: 'WEB_DEVELOPER', label: 'Web Development' },
+                        { value: 'SYSTEM_DESIGN', label: 'System Design' },
+                        { value: 'MACHINE_LEARNING', label: 'Machine Learning' }
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      className="w-full text-left"
+                    />
+                  )}
+                />
 
                 <button
                   type="submit"
                   disabled={createSheetMutation.isPending}
                   className="w-full inline-flex items-center justify-center gap-2 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs transition-colors"
                 >
+                  {createSheetMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                   Create Sheet
                 </button>
               </form>
@@ -213,61 +219,63 @@ export const ManageSheetsPage: React.FC = () => {
             </CardHeader>
             <CardContent className="p-5">
               <form onSubmit={topicForm.handleSubmit(onTopicSubmit)} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Select Sheet
-                  </label>
-                  <select
-                    {...topicForm.register('sheetId', {
-                      onChange: (e) => {
-                        setSelectedSheetId(e.target.value);
-                        topicForm.setValue('sheetId', e.target.value);
-                      }
-                    })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none text-slate-750 dark:text-slate-350"
-                  >
-                    <option value="">-- Choose Target Sheet --</option>
-                    {sheets.map(s => (
-                      <option key={s.id} value={s.id}>{s.title}</option>
-                    ))}
-                  </select>
-                  {topicForm.formState.errors.sheetId && (
-                    <p className="text-xs text-red-500">{topicForm.formState.errors.sheetId.message}</p>
+                <Controller
+                  control={topicForm.control}
+                  name="sheetId"
+                  render={({ field }) => (
+                    <Select
+                      label="Select Sheet"
+                      options={sheets.map(s => ({ value: s.id, label: s.title }))}
+                      value={field.value}
+                      onChange={(val) => {
+                        field.onChange(val);
+                        setSelectedSheetId(val);
+                      }}
+                      placeholder="-- Choose Target Sheet --"
+                      className="w-full text-left"
+                    />
                   )}
-                </div>
-
-                <Input
-                  label="Topic Name"
-                  placeholder="e.g., Two Pointer Traversal"
-                  error={topicForm.formState.errors.title?.message}
-                  {...topicForm.register('title')}
                 />
+                {topicForm.formState.errors.sheetId && (
+                  <p className="text-xs text-red-500 mt-1">{topicForm.formState.errors.sheetId.message}</p>
+                )}
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Task description
-                  </label>
-                  <textarea
-                    placeholder="Define challenge details..."
-                    {...topicForm.register('description')}
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none h-16 resize-none"
-                  />
-                </div>
+              <Input
+                label="Topic Name"
+                placeholder="e.g., Two Pointer Traversal"
+                error={topicForm.formState.errors.title?.message}
+                {...topicForm.register('title')}
+              />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                      Difficulty
-                    </label>
-                    <select
-                      {...topicForm.register('difficulty')}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none text-slate-750 dark:text-slate-350"
-                    >
-                      <option value="EASY">Easy</option>
-                      <option value="MEDIUM">Medium</option>
-                      <option value="HARD">Hard</option>
-                    </select>
-                  </div>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                  Task description
+                </label>
+                <textarea
+                  placeholder="Define challenge details..."
+                  {...topicForm.register('description')}
+                  className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none h-16 resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Controller
+                  control={topicForm.control}
+                  name="difficulty"
+                  render={({ field }) => (
+                    <Select
+                      label="Difficulty"
+                      options={[
+                        { value: 'EASY', label: 'Easy' },
+                        { value: 'MEDIUM', label: 'Medium' },
+                        { value: 'HARD', label: 'Hard' }
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      className="w-full text-left"
+                    />
+                  )}
+                />
 
                   <Input
                     label="Sequence Order"
@@ -282,6 +290,7 @@ export const ManageSheetsPage: React.FC = () => {
                   disabled={createTopicMutation.isPending}
                   className="w-full inline-flex items-center justify-center gap-2 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs transition-colors"
                 >
+                  {createTopicMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                   Publish Topic
                 </button>
               </form>
@@ -310,21 +319,14 @@ export const ManageSheetsPage: React.FC = () => {
             <CardContent className="p-6">
               
               <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                    Choose a sheet to view list:
-                  </label>
-                  <select
+                  <Select
+                    label="Choose a sheet to view list:"
+                    options={sheets.map(s => ({ value: s.id, label: `${s.title} (${s.category})` }))}
                     value={selectedSheetId}
-                    onChange={(e) => setSelectedSheetId(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-bg text-sm focus:outline-none text-slate-700 dark:text-slate-350"
-                  >
-                    <option value="">-- Choose Sheet from Directory --</option>
-                    {sheets.map(s => (
-                      <option key={s.id} value={s.id}>{s.title} ({s.category})</option>
-                    ))}
-                  </select>
-                </div>
+                    onChange={(val) => setSelectedSheetId(val)}
+                    placeholder="-- Choose Sheet from Directory --"
+                    className="w-full text-left"
+                  />
 
                 {selectedSheetId ? (
                   loadingTopics ? (

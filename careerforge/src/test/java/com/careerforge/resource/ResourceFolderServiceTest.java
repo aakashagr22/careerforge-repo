@@ -154,7 +154,7 @@ public class ResourceFolderServiceTest {
                 .thenReturn(new PageImpl<>(List.of(resource)));
         when(resourceMapper.toDto(resource)).thenReturn(resourceDto);
 
-        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(childFolder.getId(), pageable);
+        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(childFolder.getId(), null, pageable);
 
         assertNotNull(directory);
         assertEquals(childFolder.getName(), directory.getCurrentFolder().getName());

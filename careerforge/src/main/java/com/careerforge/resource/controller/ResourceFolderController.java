@@ -2,6 +2,7 @@ package com.careerforge.resource.controller;
 
 import com.careerforge.common.dto.ApiResponse;
 import com.careerforge.resource.dto.*;
+import com.careerforge.resource.entity.ResourceType;
 import com.careerforge.resource.service.ResourceFolderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,10 +54,11 @@ public class ResourceFolderController {
     @GetMapping("/api/admin/resource-folders/root")
     @Operation(summary = "Get admin root directory (Admin)")
     public ResponseEntity<ApiResponse<FolderDirectoryDto>> getAdminRootDirectory(
+            @RequestParam(required = false) ResourceType type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(null, pageable);
+        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(null, type, pageable);
         return ResponseEntity.ok(ApiResponse.success(directory, "Root directory retrieved successfully"));
     }
 
@@ -64,10 +66,11 @@ public class ResourceFolderController {
     @Operation(summary = "Get admin folder directory (Admin)")
     public ResponseEntity<ApiResponse<FolderDirectoryDto>> getAdminFolderDirectory(
             @PathVariable UUID id,
+            @RequestParam(required = false) ResourceType type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(id, pageable);
+        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(id, type, pageable);
         return ResponseEntity.ok(ApiResponse.success(directory, "Folder directory retrieved successfully"));
     }
 
@@ -76,10 +79,11 @@ public class ResourceFolderController {
     @GetMapping("/api/student/resource-folders/root")
     @Operation(summary = "Get student root directory (Student)")
     public ResponseEntity<ApiResponse<FolderDirectoryDto>> getStudentRootDirectory(
+            @RequestParam(required = false) ResourceType type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(null, pageable);
+        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(null, type, pageable);
         return ResponseEntity.ok(ApiResponse.success(directory, "Root directory retrieved successfully"));
     }
 
@@ -87,10 +91,11 @@ public class ResourceFolderController {
     @Operation(summary = "Get student folder directory (Student)")
     public ResponseEntity<ApiResponse<FolderDirectoryDto>> getStudentFolderDirectory(
             @PathVariable UUID id,
+            @RequestParam(required = false) ResourceType type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(id, pageable);
+        FolderDirectoryDto directory = resourceFolderService.getFolderDirectory(id, type, pageable);
         return ResponseEntity.ok(ApiResponse.success(directory, "Folder directory retrieved successfully"));
     }
 }

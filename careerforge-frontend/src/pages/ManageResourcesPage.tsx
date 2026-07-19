@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import toast from 'react-hot-toast';
@@ -12,6 +12,7 @@ import { ResourceCard } from '../components/ResourceCard';
 import { YouTubePlayerModal } from '../components/YouTubePlayerModal';
 import { Card, CardContent } from '../components/Card';
 import { Input } from '../components/Input';
+import { Select } from '../components/Select';
 import { 
   Library, Plus, FolderPlus, X, Loader2, Save, FolderOpen 
 } from 'lucide-react';
@@ -31,6 +32,7 @@ export const ManageResourcesPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
+  const [type, setType] = useState<'ALL' | 'VIDEO' | 'ARTICLE'>('ALL');
   const [activeVideo, setActiveVideo] = useState<{ title: string; url: string } | null>(null);
   const size = 9; // Paginated files count
 
@@ -44,12 +46,12 @@ export const ManageResourcesPage: React.FC = () => {
 
   // Fetch Directory (folders + paginated resources)
   const { data: directoryData, isLoading: loadingDirectory } = useQuery({
-    queryKey: ['adminDirectory', activeFolderId, page, size],
-    queryFn: () => resourceFolderService.getDirectory(true, activeFolderId, page, size),
+    queryKey: ['adminDirectory', activeFolderId, page, size, type],
+    queryFn: () => resourceFolderService.getDirectory(true, activeFolderId, page, size, type),
     staleTime: 5 * 60 * 1000,
   });
 
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<ResourceFormValues>({
+  const { register, handleSubmit, control, reset, setValue, formState: { errors } } = useForm<ResourceFormValues>({
     resolver: zodResolver(resourceSchema),
     defaultValues: {
       title: '',
@@ -263,10 +265,33 @@ export const ManageResourcesPage: React.FC = () => {
 
       {/* ==================== BREADCRUMB NAV ==================== */}
       {!loadingDirectory && (
-        <Breadcrumbs
-          breadcrumbs={directoryData?.breadcrumbs || []}
-          onNavigate={(id) => { setActiveFolderId(id); setPage(0); }}
-        />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <Breadcrumbs
+            breadcrumbs={directoryData?.breadcrumbs || []}
+            onNavigate={(id) => { setActiveFolderId(id); setPage(0); }}
+          />
+
+          {/* Format selection filter */}
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-zinc-800/40 p-1.5 rounded-xl border border-slate-200/40 dark:border-dark-border/10 shrink-0">
+            {([
+              { id: 'ALL', name: 'All Formats' },
+              { id: 'VIDEO', name: 'Videos' },
+              { id: 'ARTICLE', name: 'Articles' }
+            ] as const).map((format) => (
+              <button
+                key={format.id}
+                onClick={() => { setType(format.id); setPage(0); }}
+                className={`px-3.5 py-1.5 text-[10px] font-bold rounded-lg uppercase tracking-wider transition-all ${
+                  type === format.id
+                    ? 'bg-white dark:bg-dark-card text-brand-650 dark:text-white shadow-sm border border-slate-200/20'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                {format.name}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* ==================== DIRECTORY VIEW ==================== */}
@@ -326,20 +351,20 @@ export const ManageResourcesPage: React.FC = () => {
 
       {/* ==================== PAGINATION BOTTOM ==================== */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs font-bold text-slate-450 pt-6 border-t border-slate-200/50 dark:border-dark-border/40">
+        <div className="flex items-center justify-between text-sm font-bold text-slate-450 pt-6 border-t border-slate-200/50 dark:border-dark-border/40">
           <span>Showing page {page + 1} of {totalPages} ({totalElements} resources)</span>
           <div className="flex gap-2">
             <button
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0}
-              className="px-3 py-1.5 border border-slate-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-850 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 border border-slate-200 dark:border-dark-border rounded-xl bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-800 disabled:opacity-50 transition-colors"
             >
               Prev
             </button>
             <button
               onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
               disabled={page >= totalPages - 1}
-              className="px-3 py-1.5 border border-slate-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-850 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 border border-slate-200 dark:border-dark-border rounded-xl bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-800 disabled:opacity-50 transition-colors"
             >
               Next
             </button>
@@ -392,7 +417,12 @@ export const ManageResourcesPage: React.FC = () => {
                   disabled={folderCreateMutation.isPending || folderUpdateMutation.isPending}
                   className="inline-flex items-center gap-1.5 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-xs font-semibold disabled:opacity-75"
                 >
-                  <Save className="h-3.5 w-3.5" /> Save Folder
+                  {folderCreateMutation.isPending || folderUpdateMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Save className="h-3.5 w-3.5" />
+                  )}
+                  Save Folder
                 </button>
               </div>
             </form>
@@ -447,20 +477,23 @@ export const ManageResourcesPage: React.FC = () => {
                 error={errors.url?.message}
                 {...register('url')}
               />
-
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Format
-                  </label>
-                  <select
-                    {...register('type')}
-                    className="w-full h-[42px] px-3.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-zinc-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-750 dark:text-slate-200"
-                  >
-                    <option value="VIDEO">Video</option>
-                    <option value="ARTICLE">Article</option>
-                  </select>
-                </div>
+                <Controller
+                  control={control}
+                  name="type"
+                  render={({ field }) => (
+                    <Select
+                      label="Format"
+                      options={[
+                        { value: 'VIDEO', label: 'Video' },
+                        { value: 'ARTICLE', label: 'Article' }
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      className="w-full text-left"
+                    />
+                  )}
+                />
 
                 <Input
                   label="Est. Duration (Min)"
@@ -483,7 +516,12 @@ export const ManageResourcesPage: React.FC = () => {
                   disabled={resourceCreateMutation.isPending || resourceUpdateMutation.isPending}
                   className="inline-flex items-center gap-1.5 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-xs font-semibold disabled:opacity-75"
                 >
-                  <Save className="h-3.5 w-3.5" /> Save Resource
+                  {resourceCreateMutation.isPending || resourceUpdateMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Save className="h-3.5 w-3.5" />
+                  )}
+                  Save Resource
                 </button>
               </div>
             </form>

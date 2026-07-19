@@ -7,7 +7,7 @@ import { notificationService } from '../services/notificationService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Flame, LayoutDashboard, Milestone, CheckSquare, Library, User, Settings, 
-  LogOut, Sun, Moon, Laptop, Bell, Menu, X, Check, BookOpen
+  LogOut, Sun, Moon, Laptop, Bell, Menu, X, Check, BookOpen, MessageSquare
 } from 'lucide-react';
 
 export const StudentLayout: React.FC = () => {
@@ -46,6 +46,7 @@ export const StudentLayout: React.FC = () => {
     { to: '/student/sheets', label: 'Practice Sheets', icon: CheckSquare },
     { to: '/student/resources', label: 'Study Resources', icon: Library },
     { to: '/student/blogs', label: 'Placement Blogs', icon: BookOpen },
+    { to: '/student/suggestions', label: 'Suggestions', icon: MessageSquare },
     { to: '/student/profile', label: 'My Profile', icon: User },
     { to: '/student/settings', label: 'Settings', icon: Settings },
   ];

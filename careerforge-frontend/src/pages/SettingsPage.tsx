@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import toast from 'react-hot-toast';
@@ -9,6 +9,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { studentService } from '../services/studentService';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Input } from '../components/Input';
+import { Select } from '../components/Select';
 import { 
   Settings, Sun, Moon, Laptop, User, Loader2, Save 
 } from 'lucide-react';
@@ -37,7 +38,7 @@ export const SettingsPage: React.FC = () => {
     queryFn: studentService.getMyProfile,
   });
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProfileFormValues>({
+  const { register, handleSubmit, control, reset, formState: { errors } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema) as any,
     defaultValues: {
       firstName: '',
@@ -196,17 +197,25 @@ export const SettingsPage: React.FC = () => {
 
             {/* Academic details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-zinc-300">Branch / Major</label>
-                <select
-                  {...register('branch')}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-350"
-                >
-                  <option value="Computer Science (CSE)">Computer Science (CSE)</option>
-                  <option value="Information Technology (IT)">Information Technology (IT)</option>
-                  <option value="Electronics and Communication Engineering (ECE)">Electronics and Communication Engineering (ECE)</option>
-                  <option value="Electrical Engineering (EE)">Electrical Engineering (EE)</option>
-                </select>
+              <div className="space-y-1.5 w-full text-left">
+                <Controller
+                  control={control}
+                  name="branch"
+                  render={({ field }) => (
+                    <Select
+                      label="Branch / Major"
+                      options={[
+                        { value: 'Computer Science (CSE)', label: 'Computer Science (CSE)' },
+                        { value: 'Information Technology (IT)', label: 'Information Technology (IT)' },
+                        { value: 'Electronics and Communication Engineering (ECE)', label: 'Electronics and Communication Engineering (ECE)' },
+                        { value: 'Electrical Engineering (EE)', label: 'Electrical Engineering (EE)' }
+                      ]}
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      className="w-full text-left"
+                    />
+                  )}
+                />
                 {errors.branch && (
                   <p className="text-xs text-red-500 mt-1">{errors.branch.message}</p>
                 )}
@@ -237,35 +246,43 @@ export const SettingsPage: React.FC = () => {
 
             {/* Language & Placement target paths */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-200/50 dark:border-dark-border/40 pt-6">
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                  Preferred Language
-                </label>
-                <select
-                  {...register('preferredLanguage')}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-350"
-                >
-                  <option value="JAVA">Java (Core & OOPs)</option>
-                  <option value="CPP">C++ (STL & Core)</option>
-                  <option value="PYTHON">Python (Scripts & ML)</option>
-                </select>
-              </div>
+              <Controller
+                control={control}
+                name="preferredLanguage"
+                render={({ field }) => (
+                  <Select
+                    label="Preferred Language"
+                    options={[
+                      { value: 'JAVA', label: 'Java (Core & OOPs)' },
+                      { value: 'CPP', label: 'C++ (STL & Core)' },
+                      { value: 'PYTHON', label: 'Python (Scripts & ML)' }
+                    ]}
+                    value={field.value || 'JAVA'}
+                    onChange={field.onChange}
+                    className="w-full text-left"
+                  />
+                )}
+              />
 
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                  Placement Role Target
-                </label>
-                <select
-                  {...register('targetRole')}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-350"
-                >
-                  <option value="SDE">Software Development Engineer (SDE)</option>
-                  <option value="FULL_STACK">Full Stack Developer</option>
-                  <option value="WEB_DEVELOPER">Frontend Developer</option>
-                  <option value="AI_ML">Machine Learning Engineer</option>
-                  <option value="DEVOPS">DevOps & Cloud Engineer</option>
-                </select>
-              </div>
+              <Controller
+                control={control}
+                name="targetRole"
+                render={({ field }) => (
+                  <Select
+                    label="Placement Role Target"
+                    options={[
+                      { value: 'SDE', label: 'Software Development Engineer (SDE)' },
+                      { value: 'FULL_STACK', label: 'Full Stack Developer' },
+                      { value: 'WEB_DEVELOPER', label: 'Frontend Developer' },
+                      { value: 'AI_ML', label: 'Machine Learning Engineer' },
+                      { value: 'DEVOPS', label: 'DevOps & Cloud Engineer' }
+                    ]}
+                    value={field.value || 'SDE'}
+                    onChange={field.onChange}
+                    className="w-full text-left"
+                  />
+                )}
+              />
             </div>
 
 

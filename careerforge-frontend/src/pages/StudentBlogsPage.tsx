@@ -12,7 +12,7 @@ import { MarkdownPreview } from '../components/MarkdownPreview';
 import { Card, CardContent } from '../components/Card';
 import { Input } from '../components/Input';
 import {
-  BookOpen, Plus, X, ArrowLeft, ArrowRight, Eye, Send, AlertTriangle, FileText, CheckCircle2
+  BookOpen, Plus, X, ArrowLeft, ArrowRight, Eye, Send, AlertTriangle, FileText, CheckCircle2, Loader2
 } from 'lucide-react';
 import { Blog } from '../types/blog';
 
@@ -232,20 +232,20 @@ export const StudentBlogsPage: React.FC = () => {
 
       {/* ==================== PAGINATION BOTTOM ==================== */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs font-bold text-slate-450 pt-6 border-t border-slate-200/50 dark:border-dark-border/40">
+        <div className="flex items-center justify-between text-sm font-bold text-slate-450 pt-6 border-t border-slate-200/50 dark:border-dark-border/40">
           <span>Page {page + 1} of {totalPages}</span>
           <div className="flex gap-2">
             <button
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0}
-              className="px-3 py-1.5 border border-slate-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-850 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 border border-slate-200 dark:border-dark-border rounded-xl bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-800 disabled:opacity-50 transition-colors"
             >
               Prev
             </button>
             <button
               onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
               disabled={page >= totalPages - 1}
-              className="px-3 py-1.5 border border-slate-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-850 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 border border-slate-200 dark:border-dark-border rounded-xl bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-800 disabled:opacity-50 transition-colors"
             >
               Next
             </button>
@@ -340,7 +340,12 @@ export const StudentBlogsPage: React.FC = () => {
                   disabled={createBlogMutation.isPending || updateBlogMutation.isPending}
                   className="inline-flex items-center gap-1.5 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-xs font-semibold disabled:opacity-75"
                 >
-                  <Send className="h-3.5 w-3.5" /> Save Blog
+                  {createBlogMutation.isPending || updateBlogMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5" />
+                  )}
+                  Save Blog
                 </button>
               </div>
             </form>

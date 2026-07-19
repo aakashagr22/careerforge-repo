@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import toast from 'react-hot-toast';
 import { authService } from '../services/authService';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Select } from '../components/Select';
 
 const registerSchema = zod.object({
   firstName: zod.string().min(1, 'First name is required').max(50, 'Max 50 characters'),
@@ -22,7 +23,7 @@ export const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormValues>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       firstName: '',
@@ -143,16 +144,21 @@ export const RegisterPage: React.FC = () => {
 
         {/* Role Choice */}
         <div>
-          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
-            I want to register as a
-          </label>
-          <select
-            {...register('role')}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-300"
-          >
-            <option value="STUDENT">Student (Placement Prep)</option>
-            <option value="ADMIN">Administrator (Create content/stats)</option>
-          </select>
+          <Controller
+            control={control}
+            name="role"
+            render={({ field }) => (
+              <Select
+                label="I want to register as a"
+                options={[
+                  { value: 'STUDENT', label: 'Student (Placement Prep)' },
+                  { value: 'ADMIN', label: 'Administrator (Create content/stats)' }
+                ]}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
           {errors.role && (
             <p className="text-xs text-red-500 mt-1">{errors.role.message}</p>
           )}

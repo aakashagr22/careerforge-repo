@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import toast from 'react-hot-toast';
 import { adminService } from '../services/adminService';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Input } from '../components/Input';
+import { Select } from '../components/Select';
 import { 
   Compass, Plus, Trash2, Loader2, Settings, 
   ChevronDown, ChevronRight, X, Play, BookOpen, Link, Star, Save, Sparkles
@@ -372,6 +373,7 @@ export const ManageRoadmapsPage: React.FC = () => {
                   disabled={createRoadmapMutation.isPending}
                   className="w-full inline-flex items-center justify-center gap-2 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs transition-colors"
                 >
+                  {createRoadmapMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                   Publish Roadmap
                 </button>
               </form>
@@ -387,45 +389,44 @@ export const ManageRoadmapsPage: React.FC = () => {
             </CardHeader>
             <CardContent className="p-5">
               <form onSubmit={sectionForm.handleSubmit(onSectionSubmit)} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Select Target Roadmap
-                  </label>
-                  <select
-                    {...sectionForm.register('roadmapId', {
-                      onChange: (e) => {
-                        setSelectedRoadmapId(e.target.value);
-                      }
-                    })}
-                    value={sectionForm.watch('roadmapId')}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none text-slate-750 dark:text-slate-350"
-                  >
-                    <option value="">-- Choose Target Roadmap --</option>
-                    {roadmaps.map((r: any) => (
-                      <option key={r.id} value={r.id}>{r.title} (Sem {r.semester})</option>
-                    ))}
-                  </select>
-                  {sectionForm.formState.errors.roadmapId && (
-                    <p className="text-xs text-red-500">{sectionForm.formState.errors.roadmapId.message}</p>
+                <Controller
+                  control={sectionForm.control}
+                  name="roadmapId"
+                  render={({ field }) => (
+                    <Select
+                      label="Select Target Roadmap"
+                      options={roadmaps.map((r: any) => ({ value: r.id, label: `${r.title} (Sem ${r.semester})` }))}
+                      value={field.value || ''}
+                      onChange={(val) => {
+                        field.onChange(val);
+                        setSelectedRoadmapId(val);
+                      }}
+                      placeholder="-- Choose Target Roadmap --"
+                      className="w-full text-left"
+                    />
                   )}
-                </div>
+                />
+                {sectionForm.formState.errors.roadmapId && (
+                  <p className="text-xs text-red-500 mt-1">{sectionForm.formState.errors.roadmapId.message}</p>
+                )}
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Select Parent Section (Optional)
-                  </label>
-                  <select
-                    {...sectionForm.register('parentId')}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none text-slate-750 dark:text-slate-350"
-                  >
-                    <option value="">-- Root Section (No Parent) --</option>
-                    {flatSectionsList.map((sec: any) => (
-                      <option key={sec.id} value={sec.id}>
-                        {'- '.repeat(sec.depth)}{sec.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Controller
+                  control={sectionForm.control}
+                  name="parentId"
+                  render={({ field }) => (
+                    <Select
+                      label="Select Parent Section (Optional)"
+                      options={flatSectionsList.map((sec: any) => ({
+                        value: sec.id,
+                        label: `${'- '.repeat(sec.depth)}${sec.title}`
+                      }))}
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      placeholder="-- Root Section (No Parent) --"
+                      className="w-full text-left"
+                    />
+                  )}
+                />
 
                 <Input
                   label="Section Title"
@@ -446,6 +447,7 @@ export const ManageRoadmapsPage: React.FC = () => {
                   disabled={createSectionMutation.isPending}
                   className="w-full inline-flex items-center justify-center gap-2 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs transition-colors"
                 >
+                  {createSectionMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                   Publish Section
                 </button>
               </form>
@@ -486,21 +488,17 @@ export const ManageRoadmapsPage: React.FC = () => {
             <CardContent className="p-6">
               
               <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                    Choose a roadmap to view sections:
-                  </label>
-                  <select
+                  <Select
+                    label="Choose a roadmap to view sections:"
+                    options={roadmaps.map((r: any) => ({
+                      value: r.id,
+                      label: `${r.title} (Sem ${r.semester} - ${r.targetRoles?.join(', ')})`
+                    }))}
                     value={selectedRoadmapId}
-                    onChange={(e) => setSelectedRoadmapId(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-bg text-sm focus:outline-none text-slate-700 dark:text-slate-350"
-                  >
-                    <option value="">-- Choose Roadmap Track from Directory --</option>
-                    {roadmaps.map((r: any) => (
-                      <option key={r.id} value={r.id}>{r.title} (Sem {r.semester} - {r.targetRoles?.join(', ')})</option>
-                    ))}
-                  </select>
-                </div>
+                    onChange={(val) => setSelectedRoadmapId(val)}
+                    placeholder="-- Choose Roadmap Track from Directory --"
+                    className="w-full text-left"
+                  />
 
                 {selectedRoadmapId ? (
                   loadingSections ? (
@@ -627,19 +625,25 @@ export const ManageRoadmapsPage: React.FC = () => {
                   {...questionForm.register('description')}
                 />
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Difficulty Level</label>
-                  <select
-                    {...questionForm.register('difficulty')}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none"
-                  >
-                    <option value="BEGINNER">Beginner</option>
-                    <option value="EASY">Easy</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="HARD">Hard</option>
-                    <option value="ADVANCED">Advanced</option>
-                  </select>
-                </div>
+                <Controller
+                  control={questionForm.control}
+                  name="difficulty"
+                  render={({ field }) => (
+                    <Select
+                      label="Difficulty Level"
+                      options={[
+                        { value: 'BEGINNER', label: 'Beginner' },
+                        { value: 'EASY', label: 'Easy' },
+                        { value: 'MEDIUM', label: 'Medium' },
+                        { value: 'HARD', label: 'Hard' },
+                        { value: 'ADVANCED', label: 'Advanced' }
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      className="w-full text-left"
+                    />
+                  )}
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import toast from 'react-hot-toast';
@@ -9,6 +9,7 @@ import { roadmapService } from '../services/roadmapService';
 import { Card, CardContent } from '../components/Card';
 import { Input } from '../components/Input';
 import { Badge } from '../components/Badge';
+import { Select } from '../components/Select';
 import { 
   Milestone, Calendar, Award, 
   Loader2, ChevronDown, ChevronRight, 
@@ -312,7 +313,7 @@ export const RoadmapPage: React.FC = () => {
     enabled: isProfileConfigured && !editingProfile,
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm<ProfileSetupValues>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<ProfileSetupValues>({
     resolver: zodResolver(profileSetupSchema),
     values: profile ? {
       semester: profile.semester || 1,
@@ -532,56 +533,78 @@ export const RoadmapPage: React.FC = () => {
           <CardContent className="p-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Target Semester</label>
-                  <select
-                    {...register('semester', { valueAsNumber: true })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none"
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map(s => (
-                      <option key={s} value={s}>Semester {s}</option>
-                    ))}
-                  </select>
-                </div>
+                <Controller
+                  control={control}
+                  name="semester"
+                  render={({ field }) => (
+                    <Select
+                      label="Target Semester"
+                      options={[1, 2, 3, 4, 5, 6, 7, 8].map(s => ({ value: s.toString(), label: `Semester ${s}` }))}
+                      value={field.value?.toString() || '1'}
+                      onChange={(val) => field.onChange(parseInt(val, 10))}
+                      className="w-full text-left"
+                    />
+                  )}
+                />
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Preferred Lang</label>
-                  <select
-                    {...register('preferredLanguage')}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none"
-                  >
-                    <option value="JAVA">Java</option>
-                    <option value="CPP">C++</option>
-                    <option value="PYTHON">Python</option>
-                  </select>
-                </div>
+                <Controller
+                  control={control}
+                  name="preferredLanguage"
+                  render={({ field }) => (
+                    <Select
+                      label="Preferred Lang"
+                      options={[
+                        { value: 'JAVA', label: 'Java' },
+                        { value: 'CPP', label: 'C++' },
+                        { value: 'PYTHON', label: 'Python' }
+                      ]}
+                      value={field.value || 'JAVA'}
+                      onChange={field.onChange}
+                      className="w-full text-left"
+                    />
+                  )}
+                />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Target Domain Path</label>
-                <select
-                  {...register('targetRole')}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none"
-                >
-                  <option value="SDE">Software Development Engineer (SDE)</option>
-                  <option value="FULL_STACK">Full Stack Developer</option>
-                  <option value="WEB_DEVELOPER">Frontend / Web Specialist</option>
-                  <option value="AI_ML">Artificial Intelligence / Machine Learning</option>
-                  <option value="DEVOPS">DevOps & Cloud Infrastructure</option>
-                </select>
-              </div>
+              <Controller
+                control={control}
+                name="targetRole"
+                render={({ field }) => (
+                  <Select
+                    label="Target Domain Path"
+                    options={[
+                      { value: 'SDE', label: 'Software Development Engineer (SDE)' },
+                      { value: 'FULL_STACK', label: 'Full Stack Developer' },
+                      { value: 'WEB_DEVELOPER', label: 'Frontend / Web Specialist' },
+                      { value: 'AI_ML', label: 'Artificial Intelligence / Machine Learning' },
+                      { value: 'DEVOPS', label: 'DevOps & Cloud Infrastructure' }
+                    ]}
+                    value={field.value || 'SDE'}
+                    onChange={field.onChange}
+                    className="w-full text-left"
+                  />
+                )}
+              />
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Engineering Branch</label>
-                <select
-                  {...register('branch')}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-350"
-                >
-                  <option value="Computer Science (CSE)">Computer Science (CSE)</option>
-                  <option value="Information Technology (IT)">Information Technology (IT)</option>
-                  <option value="Electronics and Communication Engineering (ECE)">Electronics and Communication Engineering (ECE)</option>
-                  <option value="Electrical Engineering (EE)">Electrical Engineering (EE)</option>
-                </select>
+                <Controller
+                  control={control}
+                  name="branch"
+                  render={({ field }) => (
+                    <Select
+                      label="Engineering Branch"
+                      options={[
+                        { value: 'Computer Science (CSE)', label: 'Computer Science (CSE)' },
+                        { value: 'Information Technology (IT)', label: 'Information Technology (IT)' },
+                        { value: 'Electronics and Communication Engineering (ECE)', label: 'Electronics and Communication Engineering (ECE)' },
+                        { value: 'Electrical Engineering (EE)', label: 'Electrical Engineering (EE)' }
+                      ]}
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      className="w-full text-left"
+                    />
+                  )}
+                />
                 {errors.branch && (
                   <p className="text-xs text-red-500 mt-1">{errors.branch.message}</p>
                 )}
@@ -593,6 +616,7 @@ export const RoadmapPage: React.FC = () => {
                 disabled={updateProfileMutation.isPending}
                 className="w-full inline-flex items-center justify-center gap-2 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-colors mt-2"
               >
+                {updateProfileMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                 Save Preferences
               </button>
             </form>

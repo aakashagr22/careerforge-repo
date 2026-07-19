@@ -2,11 +2,11 @@ import { apiClient } from '../config/api';
 import { FolderDirectory, ResourceFolder } from '../types/resources';
 
 export const resourceFolderService = {
-  async getDirectory(isAdmin: boolean, folderId: string | null, page: number, size: number): Promise<FolderDirectory> {
+  async getDirectory(isAdmin: boolean, folderId: string | null, page: number, size: number, type?: string): Promise<FolderDirectory> {
     const rolePath = isAdmin ? 'admin' : 'student';
     const folderPath = folderId ? folderId : 'root';
     const response = await apiClient.get(`/api/${rolePath}/resource-folders/${folderPath}`, {
-      params: { page, size }
+      params: { page, size, type: type === 'ALL' ? undefined : type }
     });
     return response.data.data;
   },

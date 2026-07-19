@@ -7,6 +7,7 @@ import { FolderCard } from '../components/FolderCard';
 import { ResourceCard } from '../components/ResourceCard';
 import { YouTubePlayerModal } from '../components/YouTubePlayerModal';
 import { Input } from '../components/Input';
+import { Select } from '../components/Select';
 import { 
   Library, Search, ArrowLeft, ArrowRight, FolderOpen 
 } from 'lucide-react';
@@ -24,8 +25,8 @@ export const StudyResourcesPage: React.FC = () => {
 
   // Query 1: Directory Mode (no search query)
   const { data: directoryData, isLoading: loadingDirectory } = useQuery({
-    queryKey: ['resourceDirectory', activeFolderId, page, size],
-    queryFn: () => resourceFolderService.getDirectory(false, activeFolderId, page, size),
+    queryKey: ['resourceDirectory', activeFolderId, page, size, type],
+    queryFn: () => resourceFolderService.getDirectory(false, activeFolderId, page, size, type),
     enabled: !isSearching,
     staleTime: 5 * 60 * 1000, // Cache fresh directory pages for 5 mins
   });
@@ -101,31 +102,26 @@ export const StudyResourcesPage: React.FC = () => {
         {/* Filters Widget (Search & Formats) */}
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto items-end">
           {/* Format selection filter */}
-          {isSearching && (
-            <div className="space-y-1 w-full sm:w-40">
-              <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider">Format</label>
-              <select
-                value={type}
-                onChange={(e) => handleTypeChange(e.target.value as any)}
-                className="w-full h-[42px] px-3.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-xs font-semibold focus:outline-none text-slate-700 dark:text-slate-200"
-              >
-                {types.map(t => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          <Select
+            label="Format"
+            options={types.map(t => ({ value: t.id, label: t.name }))}
+            value={type}
+            onChange={(val) => handleTypeChange(val as any)}
+            className="w-full sm:w-40 text-left"
+          />
 
           {/* Search box input */}
-          <div className="w-full sm:w-72 relative">
-            <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider mb-1">Search</label>
-            <Input
-              placeholder="Search globally across library..."
-              value={query}
-              onChange={handleSearchChange}
-              className="pl-10"
-            />
-            <Search className="h-4.5 w-4.5 absolute left-3 top-9 text-slate-400 pointer-events-none" />
+          <div className="w-full sm:w-72">
+            <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider mb-1.5">Search</label>
+            <div className="relative">
+              <Input
+                placeholder="Search globally across library..."
+                value={query}
+                onChange={handleSearchChange}
+                className="pl-10"
+              />
+              <Search className="h-4.5 w-4.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </div>
           </div>
         </div>
       </div>
@@ -202,7 +198,7 @@ export const StudyResourcesPage: React.FC = () => {
 
       {/* ==================== PAGINATION BOTTOM ==================== */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs font-bold text-slate-450 pt-6 border-t border-slate-200/50 dark:border-dark-border/40">
+        <div className="flex items-center justify-between text-sm font-bold text-slate-450 pt-6 border-t border-slate-200/50 dark:border-dark-border/40">
           <span>
             Showing page {page + 1} of {totalPages} ({totalElements} resources)
           </span>

@@ -21,14 +21,26 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
 }) => {
   const isVideo = resource.type === 'VIDEO';
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (isVideo && onPlayVideo) {
+      onPlayVideo(resource.title, resource.url);
+    } else {
+      window.open(resource.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
-    <Card hoverEffect className="group relative flex flex-col justify-between h-48 bg-white dark:bg-dark-card border border-slate-200/80 dark:border-dark-border overflow-hidden">
+    <Card 
+      hoverEffect 
+      onClick={handleCardClick}
+      className="group relative flex flex-col justify-between h-48 bg-white dark:bg-dark-card border border-slate-200/80 dark:border-dark-border overflow-hidden cursor-pointer"
+    >
       {/* Admin Action Buttons top right corner */}
       {isAdmin && (
         <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
           {onEdit && (
             <button
-              onClick={() => onEdit(resource)}
+              onClick={(e) => { e.stopPropagation(); onEdit(resource); }}
               className="p-1.5 bg-white/90 dark:bg-zinc-800/90 text-slate-500 hover:text-brand-650 hover:bg-slate-100 dark:hover:bg-zinc-700 rounded-lg shadow-sm border border-slate-200/40 dark:border-zinc-700 transition-colors"
               title="Edit Resource"
             >
@@ -37,7 +49,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
           )}
           {onDelete && (
             <button
-              onClick={() => onDelete(resource.id)}
+              onClick={(e) => { e.stopPropagation(); onDelete(resource.id); }}
               className="p-1.5 bg-white/90 dark:bg-zinc-800/90 text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg shadow-sm border border-slate-200/40 dark:border-zinc-700 transition-colors"
               title="Delete Resource"
             >
@@ -76,12 +88,12 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
         {/* Action Trigger Row */}
         <div className="flex items-center justify-between border-t border-slate-200/50 dark:border-dark-border/40 pt-3 mt-3 text-xs font-semibold text-slate-400">
           <span>
-            {resource.durationMinutes ? `${resource.durationMinutes} Min Est.` : 'Study Material'}
+            {resource.durationMinutes ? `${resource.durationMinutes} Min Est.` : ''}
           </span>
 
           {isVideo && onPlayVideo ? (
             <button
-              onClick={() => onPlayVideo(resource.title, resource.url)}
+              onClick={(e) => { e.stopPropagation(); onPlayVideo(resource.title, resource.url); }}
               className="inline-flex items-center gap-1 text-red-500 hover:text-red-650 hover:underline focus:outline-none"
             >
               Play Video <Play className="h-3 w-3 fill-current" />
@@ -91,6 +103,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
               href={resource.url}
               target="_blank"
               rel="noreferrer"
+              onClick={(e) => e.stopPropagation()}
               className="inline-flex items-center gap-1 text-brand-600 dark:text-brand-400 hover:underline"
             >
               Read Article <ExternalLink className="h-3.5 w-3.5" />
