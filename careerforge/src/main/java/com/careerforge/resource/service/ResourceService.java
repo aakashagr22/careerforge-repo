@@ -14,5 +14,5 @@ public interface ResourceService {
     ResourceDto updateResource(UUID id, UpdateResourceRequest request);
     void deleteResource(UUID id);
     ResourceDto getResourceById(UUID id);
-    Page<ResourceDto> searchAndFilterResources(String query, String category, String type, Difficulty difficulty, Pageable pageable);
+    Page<ResourceDto> searchAndFilterResources(String query, UUID folderId, com.careerforge.resource.entity.ResourceType type, Pageable pageable);
 }

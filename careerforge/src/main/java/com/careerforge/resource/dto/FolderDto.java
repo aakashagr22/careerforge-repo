@@ -12,16 +12,10 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResourceDto {
+public class FolderDto {
     private UUID id;
-    private String title;
-    private String description;
-    private String type;
-    private String url;
-    private String thumbnail;
-    private UUID folderId;
-    private UUID createdById;
-    private String createdByName;
+    private String name;
+    private UUID parentId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

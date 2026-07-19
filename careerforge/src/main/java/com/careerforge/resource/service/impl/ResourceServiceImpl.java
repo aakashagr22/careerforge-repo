@@ -1,12 +1,14 @@
 package com.careerforge.resource.service.impl;
 
-import com.careerforge.common.entity.Difficulty;
 import com.careerforge.exception.ResourceNotFoundException;
 import com.careerforge.resource.dto.CreateResourceRequest;
 import com.careerforge.resource.dto.ResourceDto;
 import com.careerforge.resource.dto.UpdateResourceRequest;
 import com.careerforge.resource.entity.Resource;
+import com.careerforge.resource.entity.ResourceFolder;
+import com.careerforge.resource.entity.ResourceType;
 import com.careerforge.resource.mapper.ResourceMapper;
+import com.careerforge.resource.repository.ResourceFolderRepository;
 import com.careerforge.resource.repository.ResourceRepository;
 import com.careerforge.resource.service.ResourceService;
 import com.careerforge.user.entity.User;
@@ -25,13 +27,16 @@ import java.util.UUID;
 public class ResourceServiceImpl implements ResourceService {
 
     private final ResourceRepository resourceRepository;
+    private final ResourceFolderRepository resourceFolderRepository;
     private final UserRepository userRepository;
     private final ResourceMapper resourceMapper;
 
     public ResourceServiceImpl(ResourceRepository resourceRepository,
+                               ResourceFolderRepository resourceFolderRepository,
                                UserRepository userRepository,
                                ResourceMapper resourceMapper) {
         this.resourceRepository = resourceRepository;
+        this.resourceFolderRepository = resourceFolderRepository;
         this.userRepository = userRepository;
         this.resourceMapper = resourceMapper;
     }
@@ -41,14 +46,19 @@ public class ResourceServiceImpl implements ResourceService {
         User admin = userRepository.findById(adminUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Admin user not found with id: " + adminUserId));
 
+        ResourceFolder folder = null;
+        if (request.getFolderId() != null) {
+            folder = resourceFolderRepository.findById(request.getFolderId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Folder not found with id: " + request.getFolderId()));
+        }
+
         Resource resource = Resource.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .category(request.getCategory())
                 .type(request.getType())
-                .difficulty(request.getDifficulty())
                 .url(request.getUrl())
                 .thumbnail(request.getThumbnail())
+                .folder(folder)
                 .createdBy(admin)
                 .build();
 
@@ -62,13 +72,18 @@ public class ResourceServiceImpl implements ResourceService {
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
 
+        ResourceFolder folder = null;
+        if (request.getFolderId() != null) {
+            folder = resourceFolderRepository.findById(request.getFolderId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Folder not found with id: " + request.getFolderId()));
+        }
+
         resource.setTitle(request.getTitle());
         resource.setDescription(request.getDescription());
-        resource.setCategory(request.getCategory());
         resource.setType(request.getType());
-        resource.setDifficulty(request.getDifficulty());
         resource.setUrl(request.getUrl());
         resource.setThumbnail(request.getThumbnail());
+        resource.setFolder(folder);
 
         Resource updatedResource = resourceRepository.save(resource);
         log.info("Resource updated with ID: {}", updatedResource.getId());
@@ -93,9 +108,13 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ResourceDto> searchAndFilterResources(String query, String category, String type,
-                                                       Difficulty difficulty, Pageable pageable) {
-        return resourceRepository.searchAndFilter(query, category, type, difficulty, pageable)
-                .map(resourceMapper::toDto);
+    public Page<ResourceDto> searchAndFilterResources(String query, UUID folderId, ResourceType type, Pageable pageable) {
+        if (query != null && !query.trim().isEmpty()) {
+            return resourceRepository.searchAndFilterGlobal(query.trim(), type, pageable)
+                    .map(resourceMapper::toDto);
+        } else {
+            return resourceRepository.searchAndFilterByFolder(folderId, type, pageable)
+                    .map(resourceMapper::toDto);
+        }
     }
 }

@@ -5,71 +5,145 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import toast from 'react-hot-toast';
 import { adminService } from '../services/adminService';
-import { resourceService } from '../services/resourceService';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
+import { resourceFolderService } from '../services/resourceFolderService';
+import { Breadcrumbs } from '../components/Breadcrumbs';
+import { FolderCard } from '../components/FolderCard';
+import { ResourceCard } from '../components/ResourceCard';
+import { YouTubePlayerModal } from '../components/YouTubePlayerModal';
+import { Card, CardContent } from '../components/Card';
 import { Input } from '../components/Input';
-import { Badge } from '../components/Badge';
-import { Library, Plus, Trash2, Loader2, Play, FileText, BookOpen, Code } from 'lucide-react';
+import { 
+  Library, Plus, FolderPlus, X, Loader2, Save, FolderOpen 
+} from 'lucide-react';
+import { ResourceFolder, StudyResource } from '../types/resources';
 
 const resourceSchema = zod.object({
   title: zod.string().min(1, 'Title is required').max(100),
-  description: zod.string().min(1, 'Description is required').max(250),
+  description: zod.string().max(250).optional().or(zod.literal('')),
   url: zod.string().min(1, 'URL is required').url('Must be a valid URL'),
-  category: zod.string().min(1, 'Category is required'),
-  type: zod.enum(['VIDEO', 'ARTICLE', 'BOOK', 'DOCUMENTATION']),
-  difficulty: zod.enum(['EASY', 'MEDIUM', 'HARD']),
-  durationMinutes: zod.number().min(1, 'Est duration must be positive'),
+  type: zod.enum(['VIDEO', 'ARTICLE']),
+  durationMinutes: zod.number().min(1, 'Est duration must be positive').optional(),
 });
 
 type ResourceFormValues = zod.infer<typeof resourceSchema>;
 
 export const ManageResourcesPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
-  const size = 5;
+  const [activeVideo, setActiveVideo] = useState<{ title: string; url: string } | null>(null);
+  const size = 9; // Paginated files count
 
-  // Fetch paginated resources
-  const { data: resourcePage, isLoading: loadingList } = useQuery({
-    queryKey: ['adminResources', page],
-    queryFn: () => resourceService.getResources({
-      page,
-      size,
-    }),
+  // Modal States
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [editingFolder, setEditingFolder] = useState<ResourceFolder | null>(null);
+  const [folderName, setFolderName] = useState('');
+
+  const [isResourceModalOpen, setIsResourceModalOpen] = useState(false);
+  const [editingResource, setEditingResource] = useState<StudyResource | null>(null);
+
+  // Fetch Directory (folders + paginated resources)
+  const { data: directoryData, isLoading: loadingDirectory } = useQuery({
+    queryKey: ['adminDirectory', activeFolderId, page, size],
+    queryFn: () => resourceFolderService.getDirectory(true, activeFolderId, page, size),
+    staleTime: 5 * 60 * 1000,
   });
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ResourceFormValues>({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<ResourceFormValues>({
     resolver: zodResolver(resourceSchema),
     defaultValues: {
       title: '',
       description: '',
       url: '',
-      category: 'DSA',
       type: 'VIDEO',
-      difficulty: 'EASY',
       durationMinutes: 15,
     }
   });
 
-  // Create mutation
-  const createMutation = useMutation({
-    mutationFn: adminService.createResource,
+  // Mutate: Folder Actions
+  const folderCreateMutation = useMutation({
+    mutationFn: resourceFolderService.createFolder,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminResources'] });
-      queryClient.invalidateQueries({ queryKey: ['adminStats'] });
-      reset();
-      toast.success('Resource created successfully!');
+      queryClient.invalidateQueries({ queryKey: ['adminDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['resourceDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['globalSearchResources'] });
+      setIsFolderModalOpen(false);
+      setFolderName('');
+      toast.success('Folder created successfully!');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to create resource.');
+      toast.error(error.response?.data?.message || 'Failed to create folder.');
     }
   });
 
-  // Delete mutation
-  const deleteMutation = useMutation({
+  const folderUpdateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { name: string; parentId?: string } }) =>
+      resourceFolderService.updateFolder(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['resourceDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['globalSearchResources'] });
+      setEditingFolder(null);
+      setFolderName('');
+      toast.success('Folder renamed successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to rename folder.');
+    }
+  });
+
+  const folderDeleteMutation = useMutation({
+    mutationFn: resourceFolderService.deleteFolder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['resourceDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['globalSearchResources'] });
+      toast.success('Folder deleted successfully.');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to delete folder.');
+    }
+  });
+
+  // Mutate: Resource Actions
+  const resourceCreateMutation = useMutation({
+    mutationFn: adminService.createResource,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['resourceDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['globalSearchResources'] });
+      setIsResourceModalOpen(false);
+      reset();
+      toast.success('Resource published successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to publish resource.');
+    }
+  });
+
+  const resourceUpdateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      adminService.updateResource(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['resourceDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['globalSearchResources'] });
+      setEditingResource(null);
+      setIsResourceModalOpen(false);
+      reset();
+      toast.success('Resource updated successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to update resource.');
+    }
+  });
+
+  const resourceDeleteMutation = useMutation({
     mutationFn: adminService.deleteResource,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminResources'] });
-      queryClient.invalidateQueries({ queryKey: ['adminStats'] });
+      queryClient.invalidateQueries({ queryKey: ['adminDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['resourceDirectory'] });
+      queryClient.invalidateQueries({ queryKey: ['globalSearchResources'] });
       toast.success('Resource deleted successfully.');
     },
     onError: (error: any) => {
@@ -77,57 +151,280 @@ export const ManageResourcesPage: React.FC = () => {
     }
   });
 
-  const onSubmit = (values: ResourceFormValues) => {
-    createMutation.mutate(values);
+  const handleFolderSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!folderName.trim()) return;
+
+    if (editingFolder) {
+      folderUpdateMutation.mutate({
+        id: editingFolder.id,
+        data: { name: folderName.trim(), parentId: editingFolder.parentId }
+      });
+    } else {
+      folderCreateMutation.mutate({
+        name: folderName.trim(),
+        parentId: activeFolderId || undefined
+      });
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleResourceSubmit = (values: ResourceFormValues) => {
+    const payload = {
+      ...values,
+      folderId: activeFolderId || undefined
+    };
+
+    if (editingResource) {
+      resourceUpdateMutation.mutate({
+        id: editingResource.id,
+        data: payload
+      });
+    } else {
+      resourceCreateMutation.mutate(payload);
+    }
+  };
+
+  const handleRenameFolderClick = (folder: ResourceFolder) => {
+    setEditingFolder(folder);
+    setFolderName(folder.name);
+  };
+
+  const handleDeleteFolderClick = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this folder? The folder must be completely empty.')) {
+      folderDeleteMutation.mutate(id);
+    }
+  };
+
+  const handleEditResourceClick = (res: StudyResource) => {
+    setEditingResource(res);
+    setValue('title', res.title);
+    setValue('description', res.description);
+    setValue('url', res.url);
+    setValue('type', res.type);
+    setValue('durationMinutes', res.durationMinutes || 15);
+    setIsResourceModalOpen(true);
+  };
+
+  const handleDeleteResourceClick = (id: string) => {
     if (window.confirm('Are you sure you want to delete this resource?')) {
-      deleteMutation.mutate(id);
+      resourceDeleteMutation.mutate(id);
     }
   };
 
-  const getFormatIcon = (format: string) => {
-    switch (format) {
-      case 'VIDEO': return <Play className="h-4 w-4 text-red-500" />;
-      case 'ARTICLE': return <FileText className="h-4 w-4 text-indigo-500" />;
-      case 'BOOK': return <BookOpen className="h-4 w-4 text-amber-500" />;
-      case 'DOCUMENTATION': return <Code className="h-4 w-4 text-emerald-500" />;
-      default: return <Library className="h-4 w-4 text-slate-500" />;
-    }
+  const openCreateResourceModal = () => {
+    setEditingResource(null);
+    reset({
+      title: '',
+      description: '',
+      url: '',
+      type: 'VIDEO',
+      durationMinutes: 15,
+    });
+    setIsResourceModalOpen(true);
   };
 
-  const resources = resourcePage?.content || [];
+  const childFolders = directoryData?.childFolders || [];
+  const resources = directoryData?.resources?.content || [];
+  const totalPages = directoryData?.resources?.totalPages || 0;
+  const totalElements = directoryData?.resources?.totalElements || 0;
+
+  const hasContent = childFolders.length > 0 || resources.length > 0;
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
-          <Library className="h-7 w-7 text-rose-650" /> Manage Study Materials
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Publish external learning items or clean up outdated guides.
-        </p>
+    <div className="space-y-8 max-w-6xl mx-auto pb-16">
+      
+      {/* ==================== PAGE HEADER ==================== */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200/50 dark:border-dark-border/40 pb-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-extrabold font-heading text-slate-800 dark:text-white flex items-center gap-2">
+            <Library className="h-7 w-7 text-rose-650" /> Manage Study Materials
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Publish educational videos/articles or organize directories inside the study library.
+          </p>
+        </div>
+
+        {/* Directory action triggers */}
+        <div className="flex gap-3 shrink-0">
+          <button
+            onClick={() => { setEditingFolder(null); setFolderName(''); setIsFolderModalOpen(true); }}
+            className="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-xl font-bold text-xs transition-colors shadow-sm"
+          >
+            <FolderPlus className="h-4 w-4 text-amber-500" /> Create Folder
+          </button>
+          <button
+            onClick={openCreateResourceModal}
+            className="inline-flex items-center gap-1.5 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-colors shadow-sm"
+          >
+            <Plus className="h-4 w-4" /> Publish Resource
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Create Resource Card Form */}
-        <Card className="lg:col-span-1 h-fit">
-          <CardHeader>
-            <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-              <Plus className="h-4.5 w-4.5 text-brand-600" /> Create Resource
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-5">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* ==================== BREADCRUMB NAV ==================== */}
+      {!loadingDirectory && (
+        <Breadcrumbs
+          breadcrumbs={directoryData?.breadcrumbs || []}
+          onNavigate={(id) => { setActiveFolderId(id); setPage(0); }}
+        />
+      )}
+
+      {/* ==================== DIRECTORY VIEW ==================== */}
+      {loadingDirectory ? (
+        <div className="flex flex-col items-center justify-center py-32 gap-3 text-slate-500 font-semibold text-xs">
+          <Loader2 className="h-5 w-5 animate-spin text-rose-600" /> Syncing library assets...
+        </div>
+      ) : !hasContent ? (
+        <div className="text-center py-20 bg-white dark:bg-dark-card border border-slate-200/80 dark:border-dark-border rounded-3xl max-w-md mx-auto space-y-3">
+          <FolderOpen className="h-10 w-10 text-slate-350 mx-auto" />
+          <h3 className="text-sm font-bold text-slate-800 dark:text-white">This Folder is Empty</h3>
+          <p className="text-xs text-slate-500">
+            Publish your first resource or add a subfolder at this directory level using the actions above.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {/* Subfolders list */}
+          {childFolders.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider">Subfolders</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                {childFolders.map((folder) => (
+                  <FolderCard
+                    key={folder.id}
+                    folder={folder}
+                    isAdmin={true}
+                    onClick={(id) => { setActiveFolderId(id); setPage(0); }}
+                    onRename={handleRenameFolderClick}
+                    onDelete={handleDeleteFolderClick}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Resources list */}
+          {resources.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider">Resources</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {resources.map((res) => (
+                  <ResourceCard
+                    key={res.id}
+                    resource={res}
+                    isAdmin={true}
+                    onPlayVideo={(title, url) => setActiveVideo({ title, url })}
+                    onEdit={handleEditResourceClick}
+                    onDelete={handleDeleteResourceClick}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ==================== PAGINATION BOTTOM ==================== */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-xs font-bold text-slate-450 pt-6 border-t border-slate-200/50 dark:border-dark-border/40">
+          <span>Showing page {page + 1} of {totalPages} ({totalElements} resources)</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(p => Math.max(0, p - 1))}
+              disabled={page === 0}
+              className="px-3 py-1.5 border border-slate-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-850 disabled:opacity-50 transition-colors"
+            >
+              Prev
+            </button>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+              disabled={page >= totalPages - 1}
+              className="px-3 py-1.5 border border-slate-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-850 disabled:opacity-50 transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== CREATE/RENAME FOLDER MODAL ==================== */}
+      {(isFolderModalOpen || editingFolder) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-sm shadow-2xl">
+            <form onSubmit={handleFolderSubmit} className="p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                  {editingFolder ? 'Rename Folder' : 'Create Folder'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => { setIsFolderModalOpen(false); setEditingFolder(null); }}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                  Folder Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={folderName}
+                  onChange={(e) => setFolderName(e.target.value)}
+                  placeholder="e.g. Dynamic Programming"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-zinc-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-850 dark:text-slate-100"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setIsFolderModalOpen(false); setEditingFolder(null); }}
+                  className="px-4 py-2 border border-slate-200 dark:border-dark-border rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-zinc-800/40 text-slate-700 dark:text-slate-300 dark:hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={folderCreateMutation.isPending || folderUpdateMutation.isPending}
+                  className="inline-flex items-center gap-1.5 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-xs font-semibold disabled:opacity-75"
+                >
+                  <Save className="h-3.5 w-3.5" /> Save Folder
+                </button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
+
+      {/* ==================== CREATE/EDIT RESOURCE MODAL ==================== */}
+      {isResourceModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-md shadow-2xl">
+            <form onSubmit={handleSubmit(handleResourceSubmit)} className="p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                  {editingResource ? 'Edit Resource' : 'Publish Resource'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setIsResourceModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
               <Input
                 label="Resource Title"
                 placeholder="e.g., Intro to Graphs"
                 error={errors.title?.message}
                 {...register('title')}
               />
-              
+
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
                   Description
@@ -135,7 +432,7 @@ export const ManageResourcesPage: React.FC = () => {
                 <textarea
                   placeholder="Summarize content..."
                   {...register('description')}
-                  className={`w-full px-4 py-2 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none h-16 ${
+                  className={`w-full px-4 py-2 rounded-xl border bg-slate-50/50 dark:bg-zinc-800 text-xs font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none h-16 ${
                     errors.description ? 'border-red-500' : 'border-slate-200 dark:border-dark-border'
                   }`}
                 />
@@ -152,12 +449,19 @@ export const ManageResourcesPage: React.FC = () => {
               />
 
               <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Category Tag"
-                  placeholder="e.g., DSA, Dev"
-                  error={errors.category?.message}
-                  {...register('category')}
-                />
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                    Format
+                  </label>
+                  <select
+                    {...register('type')}
+                    className="w-full h-[42px] px-3.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-zinc-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-750 dark:text-slate-200"
+                  >
+                    <option value="VIDEO">Video</option>
+                    <option value="ARTICLE">Article</option>
+                  </select>
+                </div>
+
                 <Input
                   label="Est. Duration (Min)"
                   type="number"
@@ -166,126 +470,38 @@ export const ManageResourcesPage: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Format
-                  </label>
-                  <select
-                    {...register('type')}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-350"
-                  >
-                    <option value="VIDEO">Video</option>
-                    <option value="ARTICLE">Article</option>
-                    <option value="BOOK">Book</option>
-                    <option value="DOCUMENTATION">Documentation</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Difficulty
-                  </label>
-                  <select
-                    {...register('difficulty')}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-350"
-                  >
-                    <option value="EASY">Easy</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="HARD">Hard</option>
-                  </select>
-                </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsResourceModalOpen(false)}
+                  className="px-4 py-2 border border-slate-200 dark:border-dark-border rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-zinc-800/40 text-slate-700 dark:text-slate-300 dark:hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={resourceCreateMutation.isPending || resourceUpdateMutation.isPending}
+                  className="inline-flex items-center gap-1.5 bg-brand-650 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-xs font-semibold disabled:opacity-75"
+                >
+                  <Save className="h-3.5 w-3.5" /> Save Resource
+                </button>
               </div>
-
-              <button
-                type="submit"
-                disabled={createMutation.isPending}
-                className="w-full inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors disabled:opacity-75"
-              >
-                {createMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  'Publish Resource'
-                )}
-              </button>
             </form>
-          </CardContent>
-        </Card>
-
-        {/* Existing Resources List */}
-        <div className="lg:col-span-2 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-bold uppercase tracking-wider">
-                Existing Materials Directory
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              {loadingList ? (
-                <div className="flex items-center justify-center py-20 gap-2 text-slate-500 text-sm">
-                  <Loader2 className="h-5 w-5 animate-spin" /> Loading directories...
-                </div>
-              ) : resources.length === 0 ? (
-                <div className="text-center py-20 text-slate-500 text-sm">
-                  No resources published. Build your first curriculum item on the left panel!
-                </div>
-              ) : (
-                <div className="divide-y divide-slate-100 dark:divide-zinc-800/60">
-                  {resources.map((res) => (
-                    <div key={res.id} className="p-4 flex justify-between items-center gap-4 hover:bg-slate-50/20 dark:hover:bg-zinc-800/10 transition-colors">
-                      <div className="min-w-0 space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {getFormatIcon(res.type)}
-                          <span className="font-semibold text-sm text-slate-800 dark:text-slate-200 truncate">
-                            {res.title}
-                          </span>
-                          <Badge variant="slate">{res.category}</Badge>
-                          <Badge variant={res.difficulty === 'EASY' ? 'success' : res.difficulty === 'MEDIUM' ? 'warning' : 'error'} className="text-[8px] tracking-wider py-0 leading-none">
-                            {res.difficulty}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-slate-400 line-clamp-1 leading-normal">
-                          {res.description}
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={() => handleDelete(res.id)}
-                        className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-colors shrink-0"
-                      >
-                        <Trash2 className="h-4.5 w-4.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-            {resourcePage && resourcePage.totalPages > 1 && (
-              <div className="flex items-center justify-between p-4 border-t border-slate-100 dark:border-zinc-800 text-xs font-semibold text-slate-500">
-                <span>Page {page + 1} of {resourcePage.totalPages}</span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setPage(p => Math.max(0, p - 1))}
-                    disabled={page === 0}
-                    className="px-2.5 py-1 border border-slate-200 dark:border-zinc-800 rounded hover:bg-slate-50 dark:hover:bg-zinc-800/50 disabled:opacity-50"
-                  >
-                    Prev
-                  </button>
-                  <button
-                    onClick={() => setPage(p => Math.min(resourcePage.totalPages - 1, p + 1))}
-                    disabled={page >= resourcePage.totalPages - 1}
-                    className="px-2.5 py-1 border border-slate-200 dark:border-zinc-800 rounded hover:bg-slate-50 dark:hover:bg-zinc-800/50 disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
           </Card>
         </div>
+      )}
 
-      </div>
+      {/* ==================== VIDEO PLAYER MODAL ==================== */}
+      {activeVideo && (
+        <YouTubePlayerModal
+          title={activeVideo.title}
+          url={activeVideo.url}
+          onClose={() => setActiveVideo(null)}
+        />
+      )}
+
     </div>
   );
 };
+
 export default ManageResourcesPage;

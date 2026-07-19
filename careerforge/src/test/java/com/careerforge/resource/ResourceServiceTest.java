@@ -69,9 +69,7 @@ public class ResourceServiceTest {
                 .id(UUID.randomUUID())
                 .title("Two Pointers Technique")
                 .description("Learn the two pointers approach for arrays")
-                .category("DSA")
-                .type("ARTICLE")
-                .difficulty(Difficulty.MEDIUM)
+                .type(com.careerforge.resource.entity.ResourceType.ARTICLE)
                 .url("https://example.com/two-pointers")
                 .thumbnail("https://example.com/thumb.png")
                 .createdBy(admin)
@@ -81,9 +79,7 @@ public class ResourceServiceTest {
                 .id(resource.getId())
                 .title("Two Pointers Technique")
                 .description("Learn the two pointers approach for arrays")
-                .category("DSA")
                 .type("ARTICLE")
-                .difficulty(Difficulty.MEDIUM)
                 .url("https://example.com/two-pointers")
                 .createdById(adminId)
                 .createdByName("Admin User")
@@ -92,9 +88,7 @@ public class ResourceServiceTest {
         createRequest = CreateResourceRequest.builder()
                 .title("Two Pointers Technique")
                 .description("Learn the two pointers approach for arrays")
-                .category("DSA")
-                .type("ARTICLE")
-                .difficulty(Difficulty.MEDIUM)
+                .type(com.careerforge.resource.entity.ResourceType.ARTICLE)
                 .url("https://example.com/two-pointers")
                 .thumbnail("https://example.com/thumb.png")
                 .build();
@@ -102,9 +96,7 @@ public class ResourceServiceTest {
         updateRequest = UpdateResourceRequest.builder()
                 .title("Two Pointers Technique (Updated)")
                 .description("Updated description")
-                .category("DSA")
-                .type("VIDEO")
-                .difficulty(Difficulty.HARD)
+                .type(com.careerforge.resource.entity.ResourceType.VIDEO)
                 .url("https://example.com/two-pointers-v2")
                 .build();
     }
@@ -119,7 +111,6 @@ public class ResourceServiceTest {
 
         assertNotNull(result);
         assertEquals("Two Pointers Technique", result.getTitle());
-        assertEquals("DSA", result.getCategory());
         verify(resourceRepository, times(1)).save(any(Resource.class));
     }
 
@@ -141,7 +132,6 @@ public class ResourceServiceTest {
 
         assertNotNull(result);
         assertEquals("Two Pointers Technique (Updated)", resource.getTitle());
-        assertEquals(Difficulty.HARD, resource.getDifficulty());
         verify(resourceRepository, times(1)).save(resource);
     }
 
@@ -185,10 +175,10 @@ public class ResourceServiceTest {
     void searchAndFilterResources_ShouldReturnPagedResults() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Resource> resourcePage = new PageImpl<>(List.of(resource));
-        when(resourceRepository.searchAndFilter("pointers", "DSA", null, null, pageable)).thenReturn(resourcePage);
+        when(resourceRepository.searchAndFilterGlobal("pointers", null, pageable)).thenReturn(resourcePage);
         when(resourceMapper.toDto(resource)).thenReturn(resourceDto);
 
-        Page<ResourceDto> result = resourceService.searchAndFilterResources("pointers", "DSA", null, null, pageable);
+        Page<ResourceDto> result = resourceService.searchAndFilterResources("pointers", null, null, pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());

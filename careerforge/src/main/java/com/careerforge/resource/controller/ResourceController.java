@@ -1,7 +1,6 @@
 package com.careerforge.resource.controller;
 
 import com.careerforge.common.dto.ApiResponse;
-import com.careerforge.common.entity.Difficulty;
 import com.careerforge.resource.dto.CreateResourceRequest;
 import com.careerforge.resource.dto.ResourceDto;
 import com.careerforge.resource.dto.UpdateResourceRequest;
@@ -64,16 +63,15 @@ public class ResourceController {
     @Operation(summary = "Search and filter resources with pagination (Student)")
     public ResponseEntity<ApiResponse<Page<ResourceDto>>> getResources(
             @RequestParam(required = false) String query,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Difficulty difficulty,
+            @RequestParam(required = false) UUID folderId,
+            @RequestParam(required = false) com.careerforge.resource.entity.ResourceType type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ResourceDto> resources = resourceService.searchAndFilterResources(query, category, type, difficulty, pageable);
+        Page<ResourceDto> resources = resourceService.searchAndFilterResources(query, folderId, type, pageable);
         return ResponseEntity.ok(ApiResponse.success(resources, "Resources retrieved successfully"));
     }
 

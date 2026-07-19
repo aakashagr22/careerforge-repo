@@ -3,19 +3,43 @@ export interface StudyResource {
   title: string;
   description: string;
   url: string;
-  category: string;
-  type: 'VIDEO' | 'ARTICLE' | 'BOOK' | 'DOCUMENTATION';
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  type: 'VIDEO' | 'ARTICLE';
   durationMinutes?: number;
+  folderId?: string;
   createdBy?: string;
   createdAt?: string;
 }
 
 export interface ResourceFilters {
   query?: string;
-  category?: string;
+  folderId?: string;
   type?: string;
-  difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
   page: number;
   size: number;
+}
+
+export interface ResourceFolder {
+  id: string;
+  name: string;
+  parentId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FolderBreadcrumb {
+  id: string;
+  name: string;
+}
+
+export interface FolderDirectory {
+  currentFolder: ResourceFolder | null;
+  breadcrumbs: FolderBreadcrumb[];
+  childFolders: ResourceFolder[];
+  resources: {
+    content: StudyResource[];
+    totalPages: number;
+    totalElements: number;
+    size: number;
+    number: number;
+  };
 }

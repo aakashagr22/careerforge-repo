@@ -1,7 +1,6 @@
 package com.careerforge.resource.entity;
 
 import com.careerforge.common.entity.BaseEntity;
-import com.careerforge.common.entity.Difficulty;
 import com.careerforge.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,21 +27,22 @@ public class Resource extends BaseEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "category", nullable = false)
-    private String category;
-
-    @Column(name = "type", nullable = false)
-    private String type;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "difficulty", nullable = false)
-    private Difficulty difficulty;
+    @Column(name = "type", nullable = false)
+    private ResourceType type;
 
     @Column(name = "url", nullable = false)
     private String url;
 
     @Column(name = "thumbnail")
     private String thumbnail;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "folder_id")
+    private ResourceFolder folder;
+
+    @Column(name = "folder_id", insertable = false, updatable = false)
+    private UUID folderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)

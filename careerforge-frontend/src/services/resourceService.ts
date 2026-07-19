@@ -12,9 +12,8 @@ export const resourceService = {
     const response = await apiClient.get('/api/student/resources', {
       params: {
         query: filters.query || undefined,
-        category: filters.category === 'ALL' ? undefined : (filters.category || undefined),
+        folderId: filters.folderId || undefined,
         type: filters.type === 'ALL' ? undefined : (filters.type || undefined),
-        difficulty: filters.difficulty || undefined,
         page: filters.page,
         size: filters.size,
       }

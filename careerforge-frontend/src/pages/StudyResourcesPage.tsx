@@ -1,33 +1,46 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { resourceService } from '../services/resourceService';
-import { Card, CardContent } from '../components/Card';
-import { Badge } from '../components/Badge';
+import { resourceFolderService } from '../services/resourceFolderService';
+import { Breadcrumbs } from '../components/Breadcrumbs';
+import { FolderCard } from '../components/FolderCard';
+import { ResourceCard } from '../components/ResourceCard';
+import { YouTubePlayerModal } from '../components/YouTubePlayerModal';
 import { Input } from '../components/Input';
 import { 
-  Library, Search, Play, FileText, BookOpen, 
-  ExternalLink, Code, ArrowLeft, ArrowRight 
+  Library, Search, ArrowLeft, ArrowRight, FolderOpen 
 } from 'lucide-react';
 
 export const StudyResourcesPage: React.FC = () => {
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('ALL');
-  const [type, setType] = useState('ALL');
-  const [difficulty, setDifficulty] = useState<'ALL' | 'EASY' | 'MEDIUM' | 'HARD'>('ALL');
+  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+  const [type, setType] = useState<'ALL' | 'VIDEO' | 'ARTICLE'>('ALL');
   const [page, setPage] = useState(0);
-  const size = 6; // Grid pagination size
+  const [activeVideo, setActiveVideo] = useState<{ title: string; url: string } | null>(null);
+  const size = 9; // Grid page size
 
-  // Fetch paginated resources
-  const { data, isLoading } = useQuery({
-    queryKey: ['studyResources', query, category, type, difficulty, page],
+  // If a search query is active, perform a global search. Otherwise, fetch folder directory.
+  const isSearching = query.trim().length > 0;
+
+  // Query 1: Directory Mode (no search query)
+  const { data: directoryData, isLoading: loadingDirectory } = useQuery({
+    queryKey: ['resourceDirectory', activeFolderId, page, size],
+    queryFn: () => resourceFolderService.getDirectory(false, activeFolderId, page, size),
+    enabled: !isSearching,
+    staleTime: 5 * 60 * 1000, // Cache fresh directory pages for 5 mins
+  });
+
+  // Query 2: Search Mode (active search query)
+  const { data: searchData, isLoading: loadingSearch } = useQuery({
+    queryKey: ['globalSearchResources', query, type, page, size],
     queryFn: () => resourceService.getResources({
-      query,
-      category: category === 'ALL' ? undefined : category,
+      query: query.trim(),
       type: type === 'ALL' ? undefined : type,
-      difficulty: difficulty === 'ALL' ? undefined : difficulty,
       page,
       size,
     }),
+    enabled: isSearching,
+    staleTime: 5 * 60 * 1000, // Cache fresh search queries for 5 mins
   });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,224 +48,176 @@ export const StudyResourcesPage: React.FC = () => {
     setPage(0); // Reset page on query modify
   };
 
-  const handleCategoryChange = (cat: string) => {
-    setCategory(cat);
-    setPage(0);
-  };
-
-  const handleTypeChange = (t: string) => {
+  const handleTypeChange = (t: 'ALL' | 'VIDEO' | 'ARTICLE') => {
     setType(t);
     setPage(0);
   };
 
-  const handleDifficultyChange = (diff: 'ALL' | 'EASY' | 'MEDIUM' | 'HARD') => {
-    setDifficulty(diff);
+  const handleNavigateFolder = (folderId: string | null) => {
+    setActiveFolderId(folderId);
     setPage(0);
   };
 
-  // Icon mapping helper
-  const getFormatIcon = (format: string) => {
-    switch (format) {
-      case 'VIDEO':
-        return <Play className="h-5 w-5 text-red-500" />;
-      case 'ARTICLE':
-        return <FileText className="h-5 w-5 text-indigo-500" />;
-      case 'BOOK':
-        return <BookOpen className="h-5 w-5 text-amber-500" />;
-      case 'DOCUMENTATION':
-        return <Code className="h-5 w-5 text-emerald-500" />;
-      default:
-        return <Library className="h-5 w-5 text-slate-500" />;
-    }
-  };
+  const isLoading = isSearching ? loadingSearch : loadingDirectory;
 
-  const categories = [
-    { id: 'ALL', name: 'All Categories' },
-    { id: 'DSA', name: 'DSA Curriculum' },
-    { id: 'WEB_DEVELOPER', name: 'Web Development' },
-    { id: 'SYSTEM_DESIGN', name: 'System Design' },
-    { id: 'MACHINE_LEARNING', name: 'Machine Learning' },
-  ];
+  // Pull elements based on current mode
+  const childFolders = !isSearching ? (directoryData?.childFolders || []) : [];
+  const resources = isSearching ? (searchData?.content || []) : (directoryData?.resources?.content || []);
+  const totalPages = isSearching ? (searchData?.totalPages || 0) : (directoryData?.resources?.totalPages || 0);
+  const totalElements = isSearching ? (searchData?.totalElements || 0) : (directoryData?.resources?.totalElements || 0);
+
+  const hasContent = childFolders.length > 0 || resources.length > 0;
 
   const types = [
     { id: 'ALL', name: 'All Formats' },
     { id: 'VIDEO', name: 'Videos' },
     { id: 'ARTICLE', name: 'Articles' },
-    { id: 'BOOK', name: 'Books / Guides' },
-    { id: 'DOCUMENTATION', name: 'Docs' },
   ];
 
-  const difficulties: ('ALL' | 'EASY' | 'MEDIUM' | 'HARD')[] = ['ALL', 'EASY', 'MEDIUM', 'HARD'];
-
-  const resources = data?.content || [];
-  const totalElements = data?.totalElements || 0;
-  const totalPages = data?.totalPages || 0;
-
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-8 max-w-6xl mx-auto pb-16">
       
       {/* ==================== PAGE HEADER ==================== */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
-            <Library className="h-7 w-7 text-brand-600" /> Study Library
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-slate-200/50 dark:border-dark-border/40 pb-6">
+        <div className="space-y-3">
+          <h1 className="text-3xl font-extrabold font-heading text-slate-800 dark:text-white flex items-center gap-2.5">
+            <Library className="h-7 w-7 text-brand-650" /> Study Library
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Access handpicked tutorials, video playlists, and reference manuals.
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-lg leading-relaxed">
+            Navigate subject folders or search directly for curated YouTube tutorials and editorial guides.
           </p>
+
+          {/* Breadcrumbs (only visible if browsing) */}
+          {!isSearching && (
+            <div className="pt-2">
+              <Breadcrumbs
+                breadcrumbs={directoryData?.breadcrumbs || []}
+                onNavigate={handleNavigateFolder}
+              />
+            </div>
+          )}
         </div>
 
-        {/* Search bar widget */}
-        <div className="w-full md:w-80 relative">
-          <Input
-            placeholder="Search topic or title..."
-            value={query}
-            onChange={handleSearchChange}
-            className="pl-10"
-          />
-          <Search className="h-4.5 w-4.5 absolute left-3 top-3 text-slate-400 pointer-events-none" />
+        {/* Filters Widget (Search & Formats) */}
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto items-end">
+          {/* Format selection filter */}
+          {isSearching && (
+            <div className="space-y-1 w-full sm:w-40">
+              <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider">Format</label>
+              <select
+                value={type}
+                onChange={(e) => handleTypeChange(e.target.value as any)}
+                className="w-full h-[42px] px-3.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card text-xs font-semibold focus:outline-none text-slate-700 dark:text-slate-200"
+              >
+                {types.map(t => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Search box input */}
+          <div className="w-full sm:w-72 relative">
+            <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider mb-1">Search</label>
+            <Input
+              placeholder="Search globally across library..."
+              value={query}
+              onChange={handleSearchChange}
+              className="pl-10"
+            />
+            <Search className="h-4.5 w-4.5 absolute left-3 top-9 text-slate-400 pointer-events-none" />
+          </div>
         </div>
       </div>
 
-      {/* ==================== FILTERS ROW ==================== */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white dark:bg-dark-card border border-slate-200/80 dark:border-dark-border p-5 rounded-2xl shadow-sm">
-        
-        {/* Category selector */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-            Subject Category
-          </label>
-          <select
-            value={category}
-            onChange={(e) => handleCategoryChange(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-bg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-350"
-          >
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
+      {/* ==================== CONTENT DISPLAY ==================== */}
+      {isLoading ? (
+        <div className="space-y-8 animate-pulse">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-16 bg-slate-200 dark:bg-zinc-800 rounded-2xl" />
             ))}
-          </select>
-        </div>
-
-        {/* Type Format selector */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-            Resource Type
-          </label>
-          <select
-            value={type}
-            onChange={(e) => handleTypeChange(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-bg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-700 dark:text-slate-350"
-          >
-            {types.map(t => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Difficulty Selector */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-            Target Level
-          </label>
-          <div className="flex border border-slate-200 dark:border-dark-border rounded-xl p-1 bg-slate-50/50 dark:bg-dark-bg h-[42px] items-center">
-            {difficulties.map(diff => (
-              <button
-                key={diff}
-                onClick={() => handleDifficultyChange(diff)}
-                className={`flex-1 text-center py-1 rounded-lg text-xs font-bold transition-all capitalize ${
-                  difficulty === diff
-                    ? 'bg-white dark:bg-zinc-800 text-brand-600 dark:text-white shadow-sm border border-slate-200/50 dark:border-zinc-800'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
-              >
-                {diff.toLowerCase()}
-              </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-44 bg-slate-200 dark:bg-zinc-800 rounded-2xl" />
             ))}
           </div>
         </div>
-
-      </div>
-
-      {/* ==================== RESOURCES GRID ==================== */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-44 bg-slate-200 dark:bg-zinc-800 rounded-2xl" />
-          ))}
-        </div>
-      ) : resources.length === 0 ? (
-        <div className="text-center py-20 bg-white dark:bg-dark-card border border-slate-200/80 dark:border-dark-border rounded-2xl space-y-4">
-          <Library className="h-10 w-10 text-slate-400 mx-auto" />
-          <h3 className="text-lg font-bold font-heading text-slate-800 dark:text-white">No Resources Found</h3>
-          <p className="text-sm text-slate-500 max-w-xs mx-auto">
-            Try adjusting your search query or filters.
+      ) : !hasContent ? (
+        <div className="text-center py-24 bg-white dark:bg-dark-card border border-slate-200/80 dark:border-dark-border rounded-3xl space-y-4 shadow-sm max-w-lg mx-auto">
+          <div className="h-14 w-14 bg-slate-50 dark:bg-zinc-800/20 text-slate-400 rounded-full flex items-center justify-center mx-auto border border-slate-100 dark:border-zinc-800/10">
+            <FolderOpen className="h-6 w-6" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-800 dark:text-white">This Folder is Empty</h3>
+          <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+            There are no subfolders or resources uploaded in this directory level yet.
           </p>
+          {!isSearching && activeFolderId && (
+            <button
+              onClick={() => handleNavigateFolder(null)}
+              className="inline-flex items-center gap-1.5 text-xs text-brand-650 hover:underline font-bold"
+            >
+              Return to Root
+            </button>
+          )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {resources.map((res) => (
-            <Card key={res.id} hoverEffect className="flex flex-col justify-between h-48">
-              <CardContent className="p-5 flex flex-col justify-between h-full">
-                
-                {/* Header title & icon format */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    {getFormatIcon(res.type)}
-                    <div className="flex gap-1.5">
-                      <Badge variant={res.difficulty === 'EASY' ? 'success' : res.difficulty === 'MEDIUM' ? 'warning' : 'error'} className="text-[8px] uppercase tracking-wider py-0">
-                        {res.difficulty}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <h3 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1">
-                    {res.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                    {res.description}
-                  </p>
-                </div>
+        <div className="space-y-8">
+          {/* Subfolders Grid */}
+          {childFolders.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider">Subfolders</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                {childFolders.map((folder) => (
+                  <FolderCard
+                    key={folder.id}
+                    folder={folder}
+                    onClick={handleNavigateFolder}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
-                {/* Duration/Format badge & CTA anchor */}
-                <div className="flex items-center justify-between border-t border-slate-200/50 dark:border-dark-border/40 pt-3 mt-4 text-xs font-semibold text-slate-400">
-                  <span>
-                    {res.durationMinutes ? `${res.durationMinutes} Min Est.` : 'Free Guide'}
-                  </span>
-                  
-                  <a
-                    href={res.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-brand-600 dark:text-brand-400 hover:underline"
-                  >
-                    Open Link <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                </div>
-
-              </CardContent>
-            </Card>
-          ))}
+          {/* Resources Grid */}
+          {resources.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider">
+                {isSearching ? 'Search Results' : 'Resources'}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {resources.map((res) => (
+                  <ResourceCard
+                    key={res.id}
+                    resource={res}
+                    onPlayVideo={(title, url) => setActiveVideo({ title, url })}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       {/* ==================== PAGINATION BOTTOM ==================== */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm font-semibold text-slate-500 dark:text-slate-400 pt-4 border-t border-slate-200/50 dark:border-dark-border/40">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-450 pt-6 border-t border-slate-200/50 dark:border-dark-border/40">
           <span>
-            Showing Page {page + 1} of {totalPages} ({totalElements} resources)
+            Showing page {page + 1} of {totalPages} ({totalElements} resources)
           </span>
           <div className="flex gap-2">
             <button
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0 || isLoading}
-              className="h-9 w-9 rounded-xl border border-slate-200 dark:border-dark-border flex items-center justify-center hover:bg-slate-100 dark:hover:bg-zinc-800/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="h-9 w-9 rounded-xl border border-slate-200 dark:border-dark-border flex items-center justify-center bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-800/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
               disabled={page >= totalPages - 1 || isLoading}
-              className="h-9 w-9 rounded-xl border border-slate-200 dark:border-dark-border flex items-center justify-center hover:bg-slate-100 dark:hover:bg-zinc-800/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="h-9 w-9 rounded-xl border border-slate-200 dark:border-dark-border flex items-center justify-center bg-white dark:bg-dark-card hover:bg-slate-50 dark:hover:bg-zinc-800/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ArrowRight className="h-4 w-4" />
             </button>
@@ -260,7 +225,17 @@ export const StudyResourcesPage: React.FC = () => {
         </div>
       )}
 
+      {/* ==================== VIDEO MODAL ==================== */}
+      {activeVideo && (
+        <YouTubePlayerModal
+          title={activeVideo.title}
+          url={activeVideo.url}
+          onClose={() => setActiveVideo(null)}
+        />
+      )}
+
     </div>
   );
 };
+
 export default StudyResourcesPage;

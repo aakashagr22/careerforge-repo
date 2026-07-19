@@ -26,6 +26,11 @@ export const adminService = {
     return response.data.data;
   },
 
+  async updateResource(id: string, data: any): Promise<any> {
+    const response = await apiClient.put(`/api/admin/resources/${id}`, data);
+    return response.data.data;
+  },
+
   async deleteResource(id: string): Promise<any> {
     const response = await apiClient.delete(`/api/admin/resources/${id}`);
     return response.data;
