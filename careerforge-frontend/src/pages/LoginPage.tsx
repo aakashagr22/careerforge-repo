@@ -89,7 +89,7 @@ export const LoginPage: React.FC = () => {
             type="email"
             placeholder="name@example.com"
             {...register('email')}
-            className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+            className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-slate-800 dark:text-slate-200 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
               errors.email 
                 ? 'border-red-500 dark:border-red-900/50 focus:border-red-500' 
                 : 'border-slate-200 dark:border-dark-border focus:border-brand-500 dark:focus:border-brand-500'
@@ -118,7 +118,7 @@ export const LoginPage: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('password')}
-              className={`w-full pl-4 pr-10 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+              className={`w-full pl-4 pr-10 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-slate-800 dark:text-slate-200 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
                 errors.password 
                   ? 'border-red-500 dark:border-red-900/50 focus:border-red-500' 
                   : 'border-slate-200 dark:border-dark-border focus:border-brand-500 dark:focus:border-brand-500'

@@ -5,7 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShieldAlert, LayoutDashboard, Users, Library, CheckSquare, Milestone, 
-  LogOut, Sun, Moon, Laptop, Menu, X, Check
+  LogOut, Sun, Moon, Laptop, Menu, X, Check, BookOpen
 } from 'lucide-react';
 
 export const AdminLayout: React.FC = () => {
@@ -27,6 +27,7 @@ export const AdminLayout: React.FC = () => {
     { to: '/admin/resources', label: 'Manage Resources', icon: Library },
     { to: '/admin/sheets', label: 'Manage Sheets', icon: CheckSquare },
     { to: '/admin/roadmaps', label: 'Configure Roadmaps', icon: Milestone },
+    { to: '/admin/blogs', label: 'Manage Articles', icon: BookOpen },
   ];
 
   return (

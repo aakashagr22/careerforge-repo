@@ -70,7 +70,7 @@ export const RegisterPage: React.FC = () => {
               type="text"
               placeholder="Akash"
               {...register('firstName')}
-              className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+              className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-slate-800 dark:text-slate-200 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
                 errors.firstName ? 'border-red-500' : 'border-slate-200 dark:border-dark-border'
               }`}
             />
@@ -86,7 +86,7 @@ export const RegisterPage: React.FC = () => {
               type="text"
               placeholder="Kumar"
               {...register('lastName')}
-              className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+              className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-slate-800 dark:text-slate-200 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
                 errors.lastName ? 'border-red-500' : 'border-slate-200 dark:border-dark-border'
               }`}
             />
@@ -105,7 +105,7 @@ export const RegisterPage: React.FC = () => {
             type="email"
             placeholder="akash@example.com"
             {...register('email')}
-            className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+            className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-slate-800 dark:text-slate-200 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
               errors.email ? 'border-red-500' : 'border-slate-200 dark:border-dark-border'
             }`}
           />
@@ -124,7 +124,7 @@ export const RegisterPage: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('password')}
-              className={`w-full pl-4 pr-10 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+              className={`w-full pl-4 pr-10 py-2.5 rounded-xl border bg-slate-50/50 dark:bg-zinc-800/10 text-slate-800 dark:text-slate-200 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
                 errors.password ? 'border-red-500' : 'border-slate-200 dark:border-dark-border'
               }`}
             />

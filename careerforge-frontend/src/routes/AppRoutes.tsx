@@ -19,6 +19,8 @@ import { StudentDashboard } from '../pages/StudentDashboard';
 import { RoadmapPage } from '../pages/RoadmapPage';
 import { PracticeSheetsPage } from '../pages/PracticeSheetsPage';
 import { StudyResourcesPage } from '../pages/StudyResourcesPage';
+import { StudentBlogsPage } from '../pages/StudentBlogsPage';
+import { BlogDetailPage } from '../pages/BlogDetailPage';
 import { ProfilePage } from '../pages/ProfilePage';
 import { SettingsPage } from '../pages/SettingsPage';
 
@@ -28,6 +30,7 @@ import { ManageStudentsPage } from '../pages/ManageStudentsPage';
 import { ManageResourcesPage } from '../pages/ManageResourcesPage';
 import { ManageSheetsPage } from '../pages/ManageSheetsPage';
 import { ManageRoadmapsPage } from '../pages/ManageRoadmapsPage';
+import { ManageBlogsPage } from '../pages/ManageBlogsPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -57,6 +60,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="roadmap" element={<RoadmapPage />} />
         <Route path="sheets" element={<PracticeSheetsPage />} />
         <Route path="resources" element={<StudyResourcesPage />} />
+        <Route path="blogs" element={<StudentBlogsPage />} />
+        <Route path="blogs/:id" element={<BlogDetailPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="" element={<Navigate to="dashboard" replace />} />
@@ -76,6 +81,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="resources" element={<ManageResourcesPage />} />
         <Route path="sheets" element={<ManageSheetsPage />} />
         <Route path="roadmaps" element={<ManageRoadmapsPage />} />
+        <Route path="blogs" element={<ManageBlogsPage />} />
+        <Route path="blogs/:id" element={<BlogDetailPage />} />
         <Route path="" element={<Navigate to="dashboard" replace />} />
       </Route>
 
