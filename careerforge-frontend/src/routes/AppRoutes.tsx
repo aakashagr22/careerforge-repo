@@ -35,6 +35,10 @@ import { ManageRoadmapsPage } from '../pages/ManageRoadmapsPage';
 import { ManageBlogsPage } from '../pages/ManageBlogsPage';
 import { ManageSuggestionsPage } from '../pages/ManageSuggestionsPage';
 
+// Chat Feature Pages
+import { StudentChatPage } from '../features/chat/pages/StudentChatPage';
+import { AdminChatPage } from '../features/chat/pages/AdminChatPage';
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -67,6 +71,9 @@ export const AppRoutes: React.FC = () => {
         <Route path="blogs" element={<StudentBlogsPage />} />
         <Route path="blogs/:id" element={<BlogDetailPage />} />
         <Route path="suggestions" element={<StudentSuggestionsPage />} />
+        <Route path="chat" element={<StudentChatPage />} />
+        <Route path="chat/:roomId" element={<StudentChatPage />} />
+        <Route path="chat/direct/:conversationId" element={<StudentChatPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="" element={<Navigate to="dashboard" replace />} />
@@ -86,6 +93,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="resources" element={<ManageResourcesPage />} />
         <Route path="sheets" element={<ManageSheetsPage />} />
         <Route path="roadmaps" element={<ManageRoadmapsPage />} />
+        <Route path="chat" element={<AdminChatPage />} />
         <Route path="blogs" element={<ManageBlogsPage />} />
         <Route path="blogs/:id" element={<BlogDetailPage />} />
         <Route path="suggestions" element={<ManageSuggestionsPage />} />
