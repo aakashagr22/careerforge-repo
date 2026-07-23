@@ -161,9 +161,16 @@ export const JourneyPage: React.FC = () => {
                               <div className="h-8 w-8 rounded-lg bg-brand-100 dark:bg-brand-900/30 grid place-items-center shrink-0">
                                 <Icon className="h-4 w-4 text-brand-600" />
                               </div>
-                              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex-1 min-w-0">
-                                {track.name}
-                              </span>
+                              <div className="flex-1 min-w-0">
+                                <span className="block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                  {track.name}
+                                </span>
+                                {track.progressHint && (
+                                  <span className="block text-xs font-medium text-brand-600 dark:text-brand-400 mt-0.5">
+                                    {track.progressHint}
+                                  </span>
+                                )}
+                              </div>
                               <ArrowRight className="h-4 w-4 text-brand-400 group-hover:text-brand-600 transition-colors shrink-0" />
                             </Link>
                           );
@@ -177,9 +184,16 @@ export const JourneyPage: React.FC = () => {
                             <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-zinc-800 grid place-items-center shrink-0">
                               <Icon className="h-4 w-4 text-slate-500" />
                             </div>
-                            <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">
-                              {track.name}
-                            </span>
+                            <div className="flex-1 min-w-0">
+                              <span className="block text-sm font-semibold text-slate-600 dark:text-slate-400">
+                                {track.name}
+                              </span>
+                              {track.progressHint && (
+                                <span className="block text-xs font-medium text-slate-500 mt-0.5">
+                                  {track.progressHint}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         );
                       })}

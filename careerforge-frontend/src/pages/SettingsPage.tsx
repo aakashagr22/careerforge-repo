@@ -24,7 +24,7 @@ const profileSchema = zod.object({
   preferredLanguage: zod.enum(['JAVA', 'CPP', 'PYTHON']),
   targetRole: zod.enum(['SDE', 'FULL_STACK', 'AI_ML', 'DATA_SCIENTIST']),
   startingSemester: zod.number().min(1, 'Starting semester must be 1-5').max(5),
-  framework: zod.enum(['SPRING_BOOT', 'NODE_JS', 'PYTHON_FASTAPI', 'PYTHON']),
+  framework: zod.enum(['SPRING_BOOT', 'NODE_JS', 'PYTHON_FASTAPI', 'PYTHON', 'CPP', 'CP']),
 });
 
 type ProfileFormValues = zod.infer<typeof profileSchema>;
@@ -81,6 +81,8 @@ export const SettingsPage: React.FC = () => {
         { value: 'SPRING_BOOT', label: 'Spring Boot' },
         { value: 'NODE_JS', label: 'Node.js' },
         { value: 'PYTHON_FASTAPI', label: 'Python FastAPI' },
+        { value: 'CPP', label: 'C++ Basics' },
+        { value: 'CP', label: 'Competitive Programming (CP-31)' },
       ];
 
   useEffect(() => {

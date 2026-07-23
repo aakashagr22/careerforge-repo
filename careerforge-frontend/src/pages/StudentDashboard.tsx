@@ -1,13 +1,13 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
 import { progressService } from '../services/progressService';
-import { ProgressBar } from '../components/ProgressBar';
+import { studentService } from '../services/studentService';
 import { Card, CardContent } from '../components/Card';
 import { 
   Flame, CheckCircle, Layers, Play, 
-  Milestone, Award, Calendar, ChevronRight, BookOpen 
+  Milestone, Award, Calendar, ChevronRight, BookOpen, Clock, Compass
 } from 'lucide-react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
@@ -17,9 +17,16 @@ export const StudentDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
+  // Query dashboard statistics
   const { data, isLoading, error } = useQuery({
     queryKey: ['studentDashboard'],
     queryFn: progressService.getDashboardData,
+  });
+
+  // Query student profile details for semester and target role info
+  const { data: profile } = useQuery({
+    queryKey: ['studentProfile'],
+    queryFn: studentService.getMyProfile,
   });
 
   const handleResume = () => {
@@ -39,7 +46,10 @@ export const StudentDashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Charts & Actions Skeleton */}
+        {/* Circular Progress Skeleton */}
+        <div className="h-36 bg-slate-200 dark:bg-zinc-800 rounded-2xl w-full" />
+
+        {/* Charts Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 h-72 bg-slate-200 dark:bg-zinc-800 rounded-2xl" />
           <div className="h-72 bg-slate-200 dark:bg-zinc-800 rounded-2xl" />
@@ -56,17 +66,48 @@ export const StudentDashboard: React.FC = () => {
         </div>
         <h2 className="text-xl font-bold font-heading">Unable to load dashboard</h2>
         <p className="text-sm text-slate-500 max-w-sm">
-          Please make sure your profile details are fully configured in the Profile tab to enable roadmap tracking.
+          Please make sure your profile details are fully configured in the Settings tab to enable roadmap tracking.
         </p>
         <button
-          onClick={() => navigate('/student/profile')}
+          onClick={() => navigate('/student/settings')}
           className="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
         >
-          Configure Profile
+          Configure Settings
         </button>
       </div>
     );
   }
+
+  // Calculate days remaining in current semester
+  // Even Semester: Jan 15 -> July 14 (6 months)
+  // Odd Semester:  July 15 -> Jan 14 (6 months)
+  const getSemesterStatus = (): { days: number; targetLabel: string } => {
+    const now = new Date();
+    const year = now.getFullYear();
+
+    const evenStart = new Date(year, 0, 15, 0, 0, 0); // Jan 15
+    const evenEnd = new Date(year, 6, 14, 23, 59, 59); // July 14
+
+    let targetDate: Date;
+    let targetLabel: string;
+
+    if (now >= evenStart && now <= evenEnd) {
+      targetDate = evenEnd;
+      targetLabel = 'July 14 (Even Sem)';
+    } else if (now > evenEnd) {
+      targetDate = new Date(year + 1, 0, 14, 23, 59, 59); // Jan 14 next year
+      targetLabel = 'Jan 14 (Odd Sem)';
+    } else {
+      targetDate = new Date(year, 0, 14, 23, 59, 59); // Jan 14 current year
+      targetLabel = 'Jan 14 (Odd Sem)';
+    }
+
+    const diffMs = Math.max(0, targetDate.getTime() - now.getTime());
+    const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return { days, targetLabel };
+  };
+
+  const semStatus = getSemesterStatus();
 
   // Quick Stats config mapping
   const stats = [
@@ -91,10 +132,19 @@ export const StudentDashboard: React.FC = () => {
       icon: Layers,
       color: 'bg-violet-500/10 text-violet-500',
     },
+    {
+      title: 'Semester Deadline',
+      value: `${semStatus.days} Days`,
+      description: `Ends ${semStatus.targetLabel}`,
+      icon: Clock,
+      color: 'bg-sky-500/10 text-sky-500',
+    },
   ];
 
+  const roadmapPercent = Math.round(data.roadmapCompletionPercentage || 0);
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-12">
       
       {/* ==================== HEADING & GREETING CARD ==================== */}
       <div className="relative overflow-hidden bg-brand-600 dark:bg-brand-900/30 border border-brand-500/20 rounded-2xl p-6 md:p-8 text-white shadow-xl shadow-brand-500/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -106,7 +156,7 @@ export const StudentDashboard: React.FC = () => {
             Hello, {user?.firstName}!
           </h1>
           <p className="text-brand-100 dark:text-slate-350 text-sm md:text-base max-w-lg leading-relaxed">
-            Ready for today's coding target? Update your checklists to keep your streak streak alive.
+            Semester {profile?.semester || 1} Target: {semStatus.days} days remaining ({semStatus.targetLabel}) to complete your preparation goals.
           </p>
         </div>
         <button
@@ -144,24 +194,71 @@ export const StudentDashboard: React.FC = () => {
             </Card>
           );
         })}
+      </div>
 
-        {/* Roadmap Completion Progress Card */}
-        <Card hoverEffect className="lg:col-span-1">
-          <CardContent className="p-6 flex flex-col justify-between h-full">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                Roadmap Progress
-              </span>
-              <span className="text-sm font-bold text-brand-600 dark:text-brand-400">
-                {Math.round(data.roadmapCompletionPercentage)}%
-              </span>
-            </div>
-            <ProgressBar value={data.roadmapCompletionPercentage} className="my-2" />
-            <span className="text-[10px] text-slate-400 mt-2 block">
-              milestones achieved
+      {/* ==================== CIRCULAR ROADMAP PROGRESS CARD ==================== */}
+      <div className="bg-white dark:bg-dark-card border border-slate-200/80 dark:border-dark-border rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-8">
+        <div className="relative h-28 w-28 shrink-0 flex items-center justify-center bg-slate-50 dark:bg-zinc-800/10 rounded-full border border-slate-100 dark:border-zinc-800/20">
+          <svg className="absolute w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+            <circle
+              className="text-slate-100 dark:text-zinc-800/40"
+              strokeWidth="8"
+              stroke="currentColor"
+              fill="transparent"
+              r="40"
+              cx="50"
+              cy="50"
+            />
+            <circle
+              className="text-brand-600 transition-all duration-500"
+              strokeWidth="8"
+              strokeDasharray={251.2}
+              strokeDashoffset={251.2 - (251.2 * roadmapPercent) / 100}
+              strokeLinecap="round"
+              stroke="currentColor"
+              fill="transparent"
+              r="40"
+              cx="50"
+              cy="50"
+            />
+          </svg>
+          <div className="text-center">
+            <span className="text-2xl font-black text-slate-800 dark:text-white block leading-none">
+              {roadmapPercent}%
             </span>
-          </CardContent>
-        </Card>
+            <span className="text-[9px] font-bold text-slate-400 block mt-1 uppercase tracking-wider">
+              Solved
+            </span>
+          </div>
+        </div>
+
+        <div className="flex-1 w-full space-y-3 text-center md:text-left">
+          <div>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-brand-600 dark:text-brand-400">
+              Personalized Roadmap Progress
+            </span>
+            <h3 className="text-xl font-bold font-heading text-slate-800 dark:text-white mt-0.5">
+              {profile?.targetRole ? `${profile.targetRole.replace('_', ' ')} (${profile.framework || 'General'})` : 'Roadmap Progress'}
+            </h3>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            You have solved {roadmapPercent}% of your overall roadmap targets. Complete topics and checklists to advance your placement preparation.
+          </p>
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-1">
+            <button
+              onClick={handleResume}
+              className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors shadow-sm"
+            >
+              <Play className="h-3.5 w-3.5 fill-current" /> Resume Roadmap
+            </button>
+            <Link
+              to="/student/resources"
+              className="inline-flex items-center gap-2 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
+            >
+              <BookOpen className="h-3.5 w-3.5 text-violet-500" /> Study Resources
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* ==================== CHARTS & QUICK ACTIONS ==================== */}
@@ -236,7 +333,7 @@ export const StudentDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Quick Actions & Recommendations */}
+        {/* Quick Navigation & Recommendations */}
         <div className="space-y-6">
           <Card>
             <CardContent className="p-6 space-y-4">
@@ -251,6 +348,16 @@ export const StudentDashboard: React.FC = () => {
                 >
                   <span className="flex items-center gap-3">
                     <Milestone className="h-5 w-5 text-indigo-500" /> View Personalized Roadmap
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+
+                <button
+                  onClick={() => navigate('/student/journey')}
+                  className="w-full flex items-center justify-between p-3.5 bg-slate-50 dark:bg-zinc-800/10 border border-slate-100 dark:border-zinc-800/40 rounded-xl hover:bg-slate-100/50 dark:hover:bg-zinc-800/30 transition-all text-left text-sm font-medium group"
+                >
+                  <span className="flex items-center gap-3">
+                    <Compass className="h-5 w-5 text-brand-500" /> View Preparation Journey
                   </span>
                   <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -283,4 +390,6 @@ export const StudentDashboard: React.FC = () => {
     </div>
   );
 };
+
 export default StudentDashboard;
+

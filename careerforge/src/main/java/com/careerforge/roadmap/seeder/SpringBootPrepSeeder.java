@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SpringBootPrepSeeder {
 
-    4// ─── Spring Boot Video Links ─────────────────────────────────────────────────
+    // ─── Spring Boot Video Links ─────────────────────────────────────────────────
 // Channels: Telusko (Navin Reddy), Amigoscode, Bouali Ali, Daily Code Buffer, Java Guides
 
 // CORE SPRING BOOT
