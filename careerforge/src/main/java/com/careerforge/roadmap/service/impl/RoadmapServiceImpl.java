@@ -753,4 +753,87 @@ public class RoadmapServiceImpl implements RoadmapService {
                 roadmapSectionQuestionRepository
         );
     }
+
+    @Override
+    public void seedPythonRoadmap(UUID roadmapId) {
+        Roadmap roadmap = roadmapRepository.findById(roadmapId)
+                .orElseThrow(() -> new ResourceNotFoundException("Roadmap not found with ID: " + roadmapId));
+
+        // Clear existing sections first to prevent constraint violations
+        List<RoadmapSection> existing = roadmapSectionRepository.findByRoadmapIdOrderByPositionAsc(roadmapId);
+        roadmapSectionRepository.deleteAll(existing);
+        roadmapSectionRepository.flush();
+
+        // Delegate to the comprehensive PythonPrepSeeder
+        com.careerforge.roadmap.seeder.PythonPrepSeeder.seed(
+                roadmap,
+                roadmapSectionRepository,
+                questionRepository,
+                questionLinkRepository,
+                roadmapSectionQuestionRepository
+        );
+    }
+
+    @Override
+    public void seedCppRoadmap(UUID roadmapId) {
+        Roadmap roadmap = roadmapRepository.findById(roadmapId)
+                .orElseThrow(() -> new ResourceNotFoundException("Roadmap not found with ID: " + roadmapId));
+
+        // Clear existing sections first to prevent constraint violations
+        List<RoadmapSection> existing = roadmapSectionRepository.findByRoadmapIdOrderByPositionAsc(roadmapId);
+        roadmapSectionRepository.deleteAll(existing);
+        roadmapSectionRepository.flush();
+
+        // Delegate to the comprehensive CppPrepSeeder
+        com.careerforge.roadmap.seeder.CppPrepSeeder.seed(
+                roadmap,
+                roadmapSectionRepository,
+                questionRepository,
+                questionLinkRepository,
+                roadmapSectionQuestionRepository
+        );
+    }
+
+    @Override
+    public void seedJavaRoadmap(UUID roadmapId) {
+        Roadmap roadmap = roadmapRepository.findById(roadmapId)
+                .orElseThrow(() -> new ResourceNotFoundException("Roadmap not found with ID: " + roadmapId));
+
+        // Clear existing sections first to prevent constraint violations
+        List<RoadmapSection> existing = roadmapSectionRepository.findByRoadmapIdOrderByPositionAsc(roadmapId);
+        roadmapSectionRepository.deleteAll(existing);
+        roadmapSectionRepository.flush();
+
+        // Delegate to the comprehensive JavaBasicsPrepSeeder
+        com.careerforge.roadmap.seeder.JavaBasicsPrepSeeder.seed(
+                roadmap,
+                roadmapSectionRepository,
+                questionRepository,
+                questionLinkRepository,
+                roadmapSectionQuestionRepository
+        );
+    }
+
+    @Override
+    public void seedCpSheetRoadmap(UUID roadmapId) {
+        Roadmap roadmap = roadmapRepository.findById(roadmapId)
+                .orElseThrow(() -> new ResourceNotFoundException("Roadmap not found with ID: " + roadmapId));
+
+        // Clear existing sections first to prevent constraint violations
+        List<RoadmapSection> existing = roadmapSectionRepository.findByRoadmapIdOrderByPositionAsc(roadmapId);
+        roadmapSectionRepository.deleteAll(existing);
+        roadmapSectionRepository.flush();
+
+        // Delegate to the TLE CP-31 Sheet Seeder
+        com.careerforge.roadmap.seeder.CpSheetSeeder.seed(
+                roadmap,
+                roadmapSectionRepository,
+                questionRepository,
+                questionLinkRepository,
+                roadmapSectionQuestionRepository
+        );
+    }
 }
+
+
+

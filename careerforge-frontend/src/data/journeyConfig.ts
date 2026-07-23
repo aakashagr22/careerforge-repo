@@ -29,12 +29,12 @@ export interface JourneyConfig {
 //  Known roadmap UUIDs  (update whenever new roadmaps are seeded)
 // ─────────────────────────────────────────────────────────────────
 const ROADMAP_IDS = {
-  DSA:            '678147d4-7a2b-4881-aeea-b7b93bbd6620',
-  SPRING_BOOT:    'bb65912f-f26c-4435-a34f-3245665896b9',
-  FRONTEND:       'fbd6a424-8f9d-48c5-af3c-00a61026937b',
-  MERN:           'b6a9bc46-c137-441b-b3d2-694146302cd3',
-  FASTAPI:        'eab547d3-2704-4733-8959-5189537f2152',
-  AIML:           'c4b75718-e191-4a66-940b-eeb592a075dd',
+  DSA: '678147d4-7a2b-4881-aeea-b7b93bbd6620',
+  SPRING_BOOT: '26841a73-9c79-4100-8524-9d7db22a0e4d',
+  FRONTEND: 'fbd6a424-8f9d-48c5-af3c-00a61026937b',
+  MERN: 'b6a9bc46-c137-441b-b3d2-694146302cd3',
+  FASTAPI: 'eab547d3-2704-4733-8959-5189537f2152',
+  AIML: 'c4b75718-e191-4a66-940b-eeb592a075dd',
   DATA_SCIENTIST: '62f180b5-f911-42f0-a367-a1499e4ac6cb',
 };
 
@@ -859,7 +859,7 @@ const fullStackSpringBoot: Record<number, JourneyConfig> = {
         monthsHint: 'Months 1–6',
         tracks: [
           { name: 'React + Spring Boot', roadmapId: ROADMAP_IDS.SPRING_BOOT, icon: 'layout' },
-            { name: 'React Frontend', roadmapId: ROADMAP_IDS.FRONTEND, icon: 'layout' },
+          { name: 'React Frontend', roadmapId: ROADMAP_IDS.FRONTEND, icon: 'layout' },
           { name: 'DSA Bootcamp', roadmapId: ROADMAP_IDS.DSA, icon: 'code' },
         ],
       },
@@ -1882,13 +1882,13 @@ const dataScientistPython: Record<number, JourneyConfig> = {
 // Keyed: journeyConfigs[role][framework][startingSemester]
 export const journeyConfigs: Record<string, Record<string, Record<number, JourneyConfig>>> = {
   SDE: {
-    SPRING_BOOT:   sdeSpringBoot,
-    NODE_JS:       sdeNodeJs,
+    SPRING_BOOT: sdeSpringBoot,
+    NODE_JS: sdeNodeJs,
     PYTHON_FASTAPI: sdePythonFastApi,
   },
   FULL_STACK: {
-    SPRING_BOOT:   fullStackSpringBoot,
-    NODE_JS:       fullStackNodeJs,
+    SPRING_BOOT: fullStackSpringBoot,
+    NODE_JS: fullStackNodeJs,
     PYTHON_FASTAPI: fullStackPythonFastApi,
   },
   AI_ML: {

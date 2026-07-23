@@ -154,5 +154,27 @@ export const adminService = {
     const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-datascientist`);
     return response.data;
   },
+
+  async seedRoadmapJava(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-java`);
+    return response.data;
+  },
+
+  async seedRoadmapPython(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-python`);
+    return response.data;
+  },
+
+  async seedRoadmapCpp(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-cpp`);
+    return response.data;
+  },
+
+  async seedRoadmapCpSheet(roadmapId: string): Promise<any> {
+    const response = await apiClient.post(`/api/admin/roadmaps/${roadmapId}/seed-cpsheet`);
+    return response.data;
+  },
 };
+
 export default adminService;
+

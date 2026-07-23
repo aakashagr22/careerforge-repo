@@ -50,4 +50,11 @@ public interface RoadmapService {
     void seedFrontendRoadmap(UUID roadmapId);
     void seedAiMlRoadmap(UUID roadmapId);
     void seedDataScientistRoadmap(UUID roadmapId);
+    void seedPythonRoadmap(UUID roadmapId);
+    void seedCppRoadmap(UUID roadmapId);
+    void seedJavaRoadmap(UUID roadmapId);
+    void seedCpSheetRoadmap(UUID roadmapId);
 }
+
+
+

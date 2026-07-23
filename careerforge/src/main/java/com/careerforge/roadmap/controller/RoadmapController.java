@@ -228,7 +228,39 @@ public class RoadmapController {
         return ResponseEntity.ok(ApiResponse.success("Sample Data Scientist roadmap seeded successfully"));
     }
 
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-python")
+    @Operation(summary = "Seed sample Python Programming roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedPythonRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedPythonRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample Python Programming roadmap seeded successfully"));
+    }
+
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-cpp")
+    @Operation(summary = "Seed sample C++ Programming roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedCppRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedCppRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample C++ Programming roadmap seeded successfully"));
+    }
+
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-java")
+    @Operation(summary = "Seed sample Java Basics & Master roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedJavaRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedJavaRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample Java Master roadmap seeded successfully"));
+    }
+
+    @PostMapping("/api/admin/roadmaps/{roadmapId}/seed-cpsheet")
+    @Operation(summary = "Seed sample TLE Eliminators CP-31 Sheet roadmap (Admin)")
+    public ResponseEntity<ApiResponse<Void>> seedCpSheetRoadmap(@PathVariable UUID roadmapId) {
+        roadmapService.seedCpSheetRoadmap(roadmapId);
+        return ResponseEntity.ok(ApiResponse.success("Sample TLE Eliminators CP-31 Sheet seeded successfully"));
+    }
+
+
+
+
     // ======================== Student Endpoints ========================
+
 
     @GetMapping("/api/student/roadmap")
     @Operation(summary = "Get personalized nested roadmap tree with progress (Student)")

@@ -10,8 +10,10 @@ import { Input } from '../components/Input';
 import { Select } from '../components/Select';
 import { 
   Compass, Plus, Trash2, Loader2, Settings, 
-  ChevronDown, ChevronRight, X, Play, BookOpen, Link, Star, Save, Sparkles
+  X, Save
 } from 'lucide-react';
+
+
 
 const roadmapSchema = zod.object({
   title: zod.string().min(1, 'Title is required').max(100),
@@ -235,6 +237,80 @@ export const ManageRoadmapsPage: React.FC = () => {
       seedDataScientistMutation.mutate(id);
     }
   };
+
+  // Seed Java Mutation
+  const seedJavaMutation = useMutation({
+    mutationFn: adminService.seedRoadmapJava,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('Java Master Sheet roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed Java Master data.');
+    }
+  });
+
+  const handleSeedJava = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedJavaMutation.mutate(id);
+    }
+  };
+
+  // Seed Python Mutation
+  const seedPythonMutation = useMutation({
+    mutationFn: adminService.seedRoadmapPython,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('Python Master Sheet roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed Python Master data.');
+    }
+  });
+
+  const handleSeedPython = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedPythonMutation.mutate(id);
+    }
+  };
+
+  // Seed C++ Mutation
+  const seedCppMutation = useMutation({
+    mutationFn: adminService.seedRoadmapCpp,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('C++ Master Sheet roadmap seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed C++ Master data.');
+    }
+  });
+
+  const handleSeedCpp = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedCppMutation.mutate(id);
+    }
+  };
+
+  // Seed TLE CP-31 Sheet Mutation
+  const seedCpSheetMutation = useMutation({
+    mutationFn: adminService.seedRoadmapCpSheet,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminRoadmapSections', selectedRoadmapId] });
+      toast.success('TLE Eliminators CP-31 Sheet seeded successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to seed TLE CP-31 Sheet data.');
+    }
+  });
+
+  const handleSeedCpSheet = (id: string) => {
+    if (window.confirm('WARNING: Seeding will clear all existing sections on this roadmap track. Proceed?')) {
+      seedCpSheetMutation.mutate(id);
+    }
+  };
+
+
 
   // Create Section Mutation
   const createSectionMutation = useMutation({
@@ -570,99 +646,54 @@ export const ManageRoadmapsPage: React.FC = () => {
                 <Settings className="h-4.5 w-4.5 text-brand-650" /> Sections & Tracks Preview
               </CardTitle>
               {selectedRoadmapId && (
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => handleSeedSampleDsa(selectedRoadmapId)}
-                    disabled={seedDsaMutation.isPending}
-                    className="text-xs font-bold text-amber-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
-                  >
-                    {seedDsaMutation.isPending ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-3.5 w-3.5" />
-                    )}
-                    Seed Sample DSA Template
-                  </button>
-                  <button
-                    onClick={() => handleSeedSpringBoot(selectedRoadmapId)}
-                    disabled={seedSpringBootMutation.isPending}
-                    className="text-xs font-bold text-emerald-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
-                  >
-                    {seedSpringBootMutation.isPending ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-3.5 w-3.5" />
-                    )}
-                    Seed Spring Boot Prep
-                  </button>
-                  <button
-                    onClick={() => handleSeedMern(selectedRoadmapId)}
-                    disabled={seedMernMutation.isPending}
-                    className="text-xs font-bold text-sky-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
-                  >
-                    {seedMernMutation.isPending ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-3.5 w-3.5" />
-                    )}
-                    Seed MERN Stack
-                  </button>
-                  <button
-                    onClick={() => handleSeedFastApi(selectedRoadmapId)}
-                    disabled={seedFastApiMutation.isPending}
-                    className="text-xs font-bold text-teal-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
-                  >
-                    {seedFastApiMutation.isPending ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-3.5 w-3.5" />
-                    )}
-                    Seed FastAPI
-                  </button>
-                  <button
-                    onClick={() => handleSeedFrontend(selectedRoadmapId)}
-                    disabled={seedFrontendMutation.isPending}
-                    className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
-                  >
-                    {seedFrontendMutation.isPending ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-3.5 w-3.5" />
-                    )}
-                    Seed Frontend (React)
-                  </button>
-                  <button
-                    onClick={() => handleSeedAiMl(selectedRoadmapId)}
-                    disabled={seedAiMlMutation.isPending}
-                    className="text-xs font-bold text-purple-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
-                  >
-                    {seedAiMlMutation.isPending ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-3.5 w-3.5" />
-                    )}
-                    Seed AI/ML
-                  </button>
-                  <button
-                    onClick={() => handleSeedDataScientist(selectedRoadmapId)}
-                    disabled={seedDataScientistMutation.isPending}
-                    className="text-xs font-bold text-rose-600 hover:underline flex items-center gap-1.5 disabled:opacity-70"
-                  >
-                    {seedDataScientistMutation.isPending ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-3.5 w-3.5" />
-                    )}
-                    Seed Data Scientist
-                  </button>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <select
+                      id="template-seed-select"
+                      className="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-800 dark:text-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      defaultValue=""
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (!val) return;
+                        if (val === 'dsa') handleSeedSampleDsa(selectedRoadmapId);
+                        if (val === 'cpsheet') handleSeedCpSheet(selectedRoadmapId);
+                        if (val === 'java') handleSeedJava(selectedRoadmapId);
+                        if (val === 'python') handleSeedPython(selectedRoadmapId);
+                        if (val === 'cpp') handleSeedCpp(selectedRoadmapId);
+                        if (val === 'springboot') handleSeedSpringBoot(selectedRoadmapId);
+                        if (val === 'fastapi') handleSeedFastApi(selectedRoadmapId);
+                        if (val === 'mern') handleSeedMern(selectedRoadmapId);
+                        if (val === 'frontend') handleSeedFrontend(selectedRoadmapId);
+                        if (val === 'aiml') handleSeedAiMl(selectedRoadmapId);
+                        if (val === 'datascientist') handleSeedDataScientist(selectedRoadmapId);
+                        e.target.value = '';
+                      }}
+                    >
+                      <option value="" disabled>✨ Seed Roadmap Template...</option>
+                      <option value="cpsheet">🏆 Seed TLE Eliminators CP-31 Sheet</option>
+                      <option value="dsa">⚡ Seed DSA A2Z Sheet (Striver)</option>
+                      <option value="cpp">⚡ Seed C++ Master Sheet (Love Babbar/Striver)</option>
+                      <option value="python">⚡ Seed Python Master Sheet (CampusX/Krish Naik)</option>
+                      <option value="java">⚡ Seed Java Master Sheet (Baeldung/Telusko)</option>
+                      <option value="springboot">⚡ Seed Spring Boot Prep Sheet</option>
+                      <option value="fastapi">⚡ Seed Python FastAPI Sheet</option>
+                      <option value="mern">⚡ Seed MERN Stack Roadmap</option>
+                      <option value="frontend">⚡ Seed Frontend (React) Roadmap</option>
+                      <option value="aiml">⚡ Seed AI/ML Prep Roadmap</option>
+                      <option value="datascientist">⚡ Seed Data Scientist Roadmap</option>
+
+                    </select>
+                  </div>
+
                   <button
                     onClick={() => handleDeleteRoadmap(selectedRoadmapId)}
-                    className="text-xs font-semibold text-red-500 hover:underline flex items-center gap-1"
+                    className="text-xs font-semibold text-red-500 hover:text-red-700 hover:underline flex items-center gap-1"
                   >
-                    <Trash2 className="h-3.5 w-3.5" /> Delete Selected Roadmap
+                    <Trash2 className="h-3.5 w-3.5" /> Delete Roadmap
                   </button>
                 </div>
               )}
+
             </CardHeader>
             <CardContent className="p-6">
               

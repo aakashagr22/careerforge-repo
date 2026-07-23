@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { studentService } from '../services/studentService';
 import { roadmapService } from '../services/roadmapService';
-import { Card, CardContent } from '../components/Card';
+import { Card } from '../components/Card';
+
 import { Badge } from '../components/Badge';
 import { 
   Milestone, Calendar, Award, 
@@ -202,12 +203,14 @@ const RoadmapSectionNode: React.FC<RoadmapSectionNodeProps> = ({
                               className="text-blue-500 hover:text-blue-600 transition-colors inline-block"
                               title={articleLink.label || 'Read Article'}
                             >
-                              <BookOpen className="h-5 w-5" />
+                              <BookOpen className="h-5 w-5 hover:scale-110 transition-transform" />
                             </a>
                           ) : (
                             <span className="text-slate-400">-</span>
                           )}
                         </td>
+
+
 
                         <td className="p-3 text-center">
                           {practiceLink ? (
