@@ -6,9 +6,11 @@ import { useTheme } from '../contexts/ThemeContext';
 import { notificationService } from '../services/notificationService';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Flame, LayoutDashboard, Library, User, Settings, Compass,
-  LogOut, Sun, Moon, Laptop, Bell, Menu, X, Check, BookOpen, MessageSquare, MessageCircle
+  Flame, LayoutDashboard, Library, User, Settings, Compass, Megaphone,
+  LogOut, Sun, Moon, Laptop, Bell, Menu, X, Check, BookOpen, MessageSquare, MessageCircle, CircleHelp
+  
 } from 'lucide-react';
+// Q&A icon is used by the student community link.
 
 
 export const StudentLayout: React.FC = () => {
@@ -47,7 +49,9 @@ export const StudentLayout: React.FC = () => {
     // { to: '/student/roadmap', label: 'My Roadmap', icon: Milestone },
     // { to: '/student/sheets', label: 'Practice Sheets', icon: CheckSquare },
     { to: '/student/resources', label: 'Study Resources', icon: Library },
+    { to: '/student/community', label: 'Q&A Community', icon: CircleHelp },
     { to: '/student/chat', label: 'Chat', icon: MessageCircle },
+    { to: '/student/announcements', label: 'Announcements', icon: Megaphone },
     { to: '/student/blogs', label: 'Placement Blogs', icon: BookOpen },
     { to: '/student/suggestions', label: 'Suggestions', icon: MessageSquare },
     { to: '/student/profile', label: 'My Profile', icon: User },
