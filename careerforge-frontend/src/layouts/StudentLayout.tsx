@@ -8,8 +8,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Flame, LayoutDashboard, Library, User, Settings, Compass, Megaphone,
   LogOut, Sun, Moon, Laptop, Bell, Menu, X, Check, BookOpen, MessageSquare, MessageCircle, CircleHelp,
-  Trophy, ExternalLink
+  Trophy, ExternalLink, Sparkles
 } from 'lucide-react';
+import { ChatbotWidget } from '../components/chatbot/ChatbotWidget';
 // Q&A icon is used by the student community link.
 
 
@@ -387,6 +388,9 @@ export const StudentLayout: React.FC = () => {
           </>
         )}
       </AnimatePresence>
+
+      {/* Floating AI Career & Tech Mentor */}
+      <ChatbotWidget />
 
     </div>
   );

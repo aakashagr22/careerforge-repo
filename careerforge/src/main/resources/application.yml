@@ -69,6 +69,16 @@ app:
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
     refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
 
+  groq:
+    api-key-1: ${GROQ_API_KEY_1:}
+    api-key-2: ${GROQ_API_KEY_2:}
+    model: ${GROQ_MODEL:llama-3.3-70b-versatile}
+    fallback-model: ${GROQ_FALLBACK_MODEL:llama-3.1-8b-instant}
+
+  chatbot:
+    daily-limit: ${CHATBOT_DAILY_LIMIT:20}
+    cooldown-seconds: ${CHATBOT_COOLDOWN_SECONDS:10}
+
 springdoc:
   api-docs:
     path: /v3/api-docs
