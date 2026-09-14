@@ -40,4 +40,32 @@ public class AuthController {
         JwtAuthResponse response = authService.login(loginRequest);
         return ResponseEntity.ok(ApiResponse.success(response, "User authenticated successfully"));
     }
+
+    @PostMapping("/verify-otp")
+    @Operation(summary = "Verify 6-digit OTP for email verification or action")
+    public ResponseEntity<ApiResponse<JwtAuthResponse>> verifyOtp(@Valid @RequestBody com.careerforge.auth.dto.VerifyOtpRequest request) {
+        JwtAuthResponse response = authService.verifyOtp(request);
+        return ResponseEntity.ok(ApiResponse.success(response, "OTP verified successfully"));
+    }
+
+    @PostMapping("/resend-otp")
+    @Operation(summary = "Resend a fresh 6-digit OTP")
+    public ResponseEntity<ApiResponse<Void>> resendOtp(@Valid @RequestBody com.careerforge.auth.dto.ResendOtpRequest request) {
+        authService.resendOtp(request);
+        return ResponseEntity.ok(ApiResponse.success("A fresh verification code has been dispatched to your email"));
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Request a 6-digit password reset OTP")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody com.careerforge.auth.dto.ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("If an account exists with this email, a reset code has been sent."));
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Reset password using 6-digit OTP")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody com.careerforge.auth.dto.ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("Password reset successfully. You can now log in with your new password."));
+    }
 }

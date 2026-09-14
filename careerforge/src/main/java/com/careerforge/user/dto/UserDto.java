@@ -20,6 +20,7 @@ public class UserDto {
     private String email;
     private Role role;
     private boolean active;
+    private boolean emailVerified;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

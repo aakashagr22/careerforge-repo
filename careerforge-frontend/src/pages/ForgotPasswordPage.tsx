@@ -6,6 +6,8 @@ import * as zod from 'zod';
 import toast from 'react-hot-toast';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
+import { authService } from '../services/authService';
+
 const forgotSchema = zod.object({
   email: zod.string().min(1, 'Email is required').email('Invalid email address'),
 });
@@ -20,14 +22,18 @@ export const ForgotPasswordPage: React.FC = () => {
     resolver: zodResolver(forgotSchema),
   });
 
-  const onSubmit = (data: ForgotFormValues) => {
+  const onSubmit = async (data: ForgotFormValues) => {
     setLoading(true);
-    // Simulate API request to reset password
-    setTimeout(() => {
+    try {
+      await authService.forgotPassword({ email: data.email });
+      toast.success(`If an account exists, a 6-digit reset code was sent to ${data.email}`);
+      navigate(`/reset-password?email=${encodeURIComponent(data.email)}`);
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to send reset code.';
+      toast.error(errorMessage);
+    } finally {
       setLoading(false);
-      toast.success(`Password reset link dispatched to ${data.email}`);
-      navigate('/login');
-    }, 1500);
+    }
   };
 
   return (

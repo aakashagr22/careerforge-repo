@@ -32,6 +32,7 @@ public class AdminSeeder implements CommandLineRunner {
             existingAdmin.setRole(Role.ADMIN);
             existingAdmin.setPassword(passwordEncoder.encode("Admin@123"));
             existingAdmin.setActive(true);
+            existingAdmin.setEmailVerified(true);
             userRepository.save(existingAdmin);
             log.info("Default administrator account verified & updated: {}", adminEmail);
         } else {
@@ -42,6 +43,7 @@ public class AdminSeeder implements CommandLineRunner {
                     .password(passwordEncoder.encode("Admin@123"))
                     .role(Role.ADMIN)
                     .active(true)
+                    .emailVerified(true)
                     .build();
             userRepository.save(admin);
             log.info("Default super administrator created: {}", adminEmail);
