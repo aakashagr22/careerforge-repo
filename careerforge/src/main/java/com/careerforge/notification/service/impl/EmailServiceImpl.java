@@ -48,7 +48,7 @@ public class EmailServiceImpl implements EmailService {
         log.info("🔑 [OTP-DISPATCH] {} for {}: {}", type, toEmail, otpCode);
 
         if (mailSender == null || mailHost == null || mailHost.isBlank() || "localhost".equalsIgnoreCase(mailHost)) {
-            log.info("📧 [OTP-NOTICE] SMTP host is not configured. Use OTP [{}] to verify {} in development.", otpCode, toEmail);
+            log.warn("📧 [SMTP-DISABLED] SPRING_MAIL_HOST is not configured in .env or environment variables. Email was NOT dispatched to {}. Development OTP is: [{}]", toEmail, otpCode);
             return;
         }
 
@@ -56,7 +56,8 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(fromEmail.isBlank() ? "noreply@careerforge.com" : fromEmail);
+            String sender = (fromEmail != null && !fromEmail.isBlank()) ? fromEmail : "noreply@careerforge.com";
+            helper.setFrom(sender, "CareerForge");
             helper.setTo(toEmail);
             helper.setSubject(subject);
 
@@ -66,7 +67,7 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(message);
             log.info("📧 Verification email sent successfully to {}", toEmail);
         } catch (Exception e) {
-            log.warn("Failed to dispatch email via SMTP to {}: {}. (OTP is: {})", toEmail, e.getMessage(), otpCode);
+            log.error("Failed to dispatch email via SMTP to {}: {}. (OTP code: {})", toEmail, e.getMessage(), otpCode, e);
         }
     }
 

@@ -302,6 +302,15 @@ export const RegisterPage: React.FC = () => {
               </button>
             </div>
           </div>
+
+          <div className="mt-5 p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center text-xs text-amber-700 dark:text-amber-400">
+            <p className="font-semibold flex items-center justify-center gap-1.5">
+              <span>Testing locally or in development?</span>
+            </p>
+            <p className="mt-1 text-[11px] text-amber-800/80 dark:text-amber-300/80 leading-relaxed">
+              If an SMTP mail server is not configured in your <code className="font-mono bg-amber-500/20 px-1 py-0.5 rounded">.env</code>, check your backend console logs for <code className="font-mono bg-amber-500/20 px-1 py-0.5 rounded font-bold">[OTP-DISPATCH]</code> to copy your 6-digit code.
+            </p>
+          </div>
         </div>
       )}
     </div>
