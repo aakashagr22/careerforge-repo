@@ -47,9 +47,10 @@ public class MailConfig {
             props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.smtp.starttls.required", "true");
             props.put("mail.smtp.ssl.trust", "*");
-            props.put("mail.smtp.connectiontimeout", "7000");
-            props.put("mail.smtp.timeout", "7000");
-            props.put("mail.smtp.writetimeout", "7000");
+            props.put("mail.smtp.ssl.protocols", "TLSv1.2 TLSv1.3");
+            props.put("mail.smtp.connectiontimeout", "4000");
+            props.put("mail.smtp.timeout", "4000");
+            props.put("mail.smtp.writetimeout", "4000");
 
             log.info("📧 JavaMailSender configured successfully for host [{}] on port [{}] with username [{}]",
                     sanitizedHost, port, sanitizedUsername);

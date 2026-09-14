@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Transactional
@@ -113,9 +114,17 @@ public class AuthServiceImpl implements AuthService {
 
         // Generate and dispatch 6-digit verification OTP
         String otpCode = createAndSaveOtp(savedUser.getEmail(), OtpType.EMAIL_VERIFICATION);
-        emailService.sendOtpEmail(savedUser.getEmail(), otpCode, OtpType.EMAIL_VERIFICATION);
+        CompletableFuture.runAsync(() -> {
+            try {
+                emailService.sendOtpEmail(savedUser.getEmail(), otpCode, OtpType.EMAIL_VERIFICATION);
+            } catch (Exception e) {
+                log.warn("SMTP email dispatch failed: {}", e.getMessage());
+            }
+        });
 
-        return userMapper.toDto(savedUser);
+        UserDto userDto = userMapper.toDto(savedUser);
+        userDto.setPreviewOtp(otpCode);
+        return userDto;
     }
 
     @Override
@@ -164,7 +173,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void resendOtp(ResendOtpRequest request) {
+    public String resendOtp(ResendOtpRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadRequestException("Account not found with email: " + request.getEmail()));
 
@@ -186,19 +195,33 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String otpCode = createAndSaveOtp(request.getEmail(), request.getType());
-        emailService.sendOtpEmail(request.getEmail(), otpCode, request.getType());
+        CompletableFuture.runAsync(() -> {
+            try {
+                emailService.sendOtpEmail(request.getEmail(), otpCode, request.getType());
+            } catch (Exception e) {
+                log.warn("SMTP email dispatch failed: {}", e.getMessage());
+            }
+        });
+        return otpCode;
     }
 
     @Override
-    public void forgotPassword(ForgotPasswordRequest request) {
+    public String forgotPassword(ForgotPasswordRequest request) {
         var userOpt = userRepository.findByEmail(request.getEmail());
         if (userOpt.isEmpty()) {
             log.info("Password reset requested for non-existent email: {}", request.getEmail());
-            return; // Return silently to prevent user enumeration
+            return null; // Return silently to prevent user enumeration
         }
 
         String otpCode = createAndSaveOtp(request.getEmail(), OtpType.PASSWORD_RESET);
-        emailService.sendOtpEmail(request.getEmail(), otpCode, OtpType.PASSWORD_RESET);
+        CompletableFuture.runAsync(() -> {
+            try {
+                emailService.sendOtpEmail(request.getEmail(), otpCode, OtpType.PASSWORD_RESET);
+            } catch (Exception e) {
+                log.warn("SMTP email dispatch failed: {}", e.getMessage());
+            }
+        });
+        return otpCode;
     }
 
     @Override

@@ -21,6 +21,7 @@ public class UserDto {
     private Role role;
     private boolean active;
     private boolean emailVerified;
+    private String previewOtp;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

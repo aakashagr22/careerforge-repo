@@ -50,11 +50,15 @@ export const RegisterPage: React.FC = () => {
   const onRegisterSubmit = async (data: RegisterFormValues) => {
     setLoading(true);
     try {
-      await authService.register(data);
+      const response: any = await authService.register(data);
+      const user = response?.data || response;
+      if (user?.previewOtp) {
+        setOtp(user.previewOtp);
+      }
       setRegisteredEmail(data.email);
       setStep('OTP');
       setResendCooldown(60);
-      toast.success('6-digit verification code sent to your email!');
+      toast.success('6-digit verification code generated!');
     } catch (error: any) {
       console.error('Registration error detailed:', error);
       const isNetworkError = error.message === 'Network Error' || error.code === 'ERR_NETWORK';
@@ -99,12 +103,16 @@ export const RegisterPage: React.FC = () => {
     if (resendCooldown > 0 || !registeredEmail) return;
     setLoading(true);
     try {
-      await authService.resendOtp({
+      const res: any = await authService.resendOtp({
         email: registeredEmail,
         type: 'EMAIL_VERIFICATION',
       });
+      const preview = res?.data?.previewOtp || res?.previewOtp;
+      if (preview) {
+        setOtp(preview);
+      }
       setResendCooldown(60);
-      toast.success('A fresh 6-digit code has been sent to your email.');
+      toast.success('A fresh 6-digit code has been dispatched.');
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Failed to resend code.';
       toast.error(errorMessage);
@@ -246,6 +254,16 @@ export const RegisterPage: React.FC = () => {
               <span className="font-semibold text-slate-700 dark:text-slate-200">{registeredEmail}</span>
             </p>
           </div>
+
+          {otp && otp.length === 6 && (
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center text-xs text-emerald-400">
+              <span className="font-semibold">Verification Code: </span>
+              <span className="font-mono font-bold text-sm tracking-widest text-emerald-300 ml-1">{otp}</span>
+              <p className="text-[11px] text-emerald-400/80 mt-0.5">
+                Auto-detected for demo / cloud free-tier testing.
+              </p>
+            </div>
+          )}
 
           <form onSubmit={onVerifyOtpSubmit} className="space-y-5">
             <div>

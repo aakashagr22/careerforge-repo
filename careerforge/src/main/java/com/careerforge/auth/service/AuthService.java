@@ -7,7 +7,7 @@ public interface AuthService {
     UserDto register(RegisterRequest request);
     JwtAuthResponse login(LoginRequest request);
     JwtAuthResponse verifyOtp(VerifyOtpRequest request);
-    void resendOtp(ResendOtpRequest request);
-    void forgotPassword(ForgotPasswordRequest request);
+    String resendOtp(ResendOtpRequest request);
+    String forgotPassword(ForgotPasswordRequest request);
     void resetPassword(ResetPasswordRequest request);
 }
