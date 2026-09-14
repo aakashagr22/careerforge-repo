@@ -53,8 +53,9 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     const { status } = error.response || {};
+    const isAuthEndpoint = error.config?.url?.includes('/auth/');
 
-    if (status === 401) {
+    if (status === 401 && !isAuthEndpoint) {
       // Clear local credentials on token expiration
       useAuthStore.getState().logout();
       window.location.href = '/login?expired=true';

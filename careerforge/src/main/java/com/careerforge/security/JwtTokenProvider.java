@@ -31,13 +31,17 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        return generateTokenFromUsernameAndId(userPrincipal.getUsername(), userPrincipal.getId(), jwtExpirationInMs);
+        if (authentication.getPrincipal() instanceof UserPrincipal userPrincipal) {
+            return generateTokenFromUsernameAndId(userPrincipal.getUsername(), userPrincipal.getId(), jwtExpirationInMs);
+        }
+        return generateTokenFromUsernameAndId(authentication.getName(), null, jwtExpirationInMs);
     }
 
     public String generateRefreshToken(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        return generateTokenFromUsernameAndId(userPrincipal.getUsername(), userPrincipal.getId(), jwtRefreshExpirationInMs);
+        if (authentication.getPrincipal() instanceof UserPrincipal userPrincipal) {
+            return generateTokenFromUsernameAndId(userPrincipal.getUsername(), userPrincipal.getId(), jwtRefreshExpirationInMs);
+        }
+        return generateTokenFromUsernameAndId(authentication.getName(), null, jwtRefreshExpirationInMs);
     }
 
     private String generateTokenFromUsernameAndId(String username, java.util.UUID userId, long expirationMs) {
@@ -45,7 +49,9 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId.toString());
+        if (userId != null) {
+            claims.put("userId", userId.toString());
+        }
 
         return Jwts.builder()
                 .claims(claims)

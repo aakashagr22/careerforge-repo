@@ -9,6 +9,7 @@ import com.careerforge.exception.BadRequestException;
 import com.careerforge.exception.ResourceNotFoundException;
 import com.careerforge.notification.service.EmailService;
 import com.careerforge.security.JwtTokenProvider;
+import com.careerforge.security.UserPrincipal;
 import com.careerforge.student.entity.StudentProfile;
 import com.careerforge.student.repository.StudentProfileRepository;
 import com.careerforge.user.dto.UserDto;
@@ -145,10 +146,11 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // Create authentication to generate access & refresh tokens
+        UserPrincipal userPrincipal = UserPrincipal.create(user);
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                user.getEmail(),
+                userPrincipal,
                 null,
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+                userPrincipal.getAuthorities()
         );
 
         String jwt = tokenProvider.generateToken(auth);
