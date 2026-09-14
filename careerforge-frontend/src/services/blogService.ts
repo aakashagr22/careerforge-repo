@@ -1,6 +1,5 @@
 import { apiClient } from '../config/api';
 import { Blog, CreateBlogRequest, UpdateBlogRequest, RejectBlogRequest } from '../types/blog';
-import { PageResponse } from '../types/common'; // Assuming PageResponse is the standard wrapper for paginated items. Wait, let's just use a custom promise return or standard Axios mapping.
 
 // We will return the data property directly from the backend's ResponseEntity wrapper
 export const blogService = {

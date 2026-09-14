@@ -111,8 +111,7 @@ public class ProgressServiceTest {
                 .build();
         when(roadmapRepository.findBySemesterAndTargetRole(5, "SDE")).thenReturn(Optional.of(mockRoadmap));
         
-        List mockList = mock(List.class);
-        when(mockList.size()).thenReturn(10);
+        List<com.careerforge.roadmap.entity.RoadmapSectionQuestion> mockList = java.util.Collections.nCopies(10, new com.careerforge.roadmap.entity.RoadmapSectionQuestion());
         when(roadmapSectionQuestionRepository.findByRoadmapSectionRoadmapId(mockRoadmap.getId())).thenReturn(mockList);
         when(studentRoadmapQuestionProgressRepository.countByStudentIdAndRoadmapSectionQuestionRoadmapSectionRoadmapIdAndCompletedTrue(student.getId(), mockRoadmap.getId())).thenReturn(5L);
 

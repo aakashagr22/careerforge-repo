@@ -9,4 +9,5 @@ public interface UserService {
     UserDto updateUser(UUID id, UserDto userDto);
     void deactivateUser(UUID id);
     void activateUser(UUID id);
+    UserDto updateUserRole(UUID id, com.careerforge.user.entity.Role newRole);
 }

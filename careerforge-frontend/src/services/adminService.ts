@@ -20,6 +20,11 @@ export const adminService = {
     return response.data;
   },
 
+  async updateUserRole(userId: string, role: string): Promise<any> {
+    const response = await apiClient.patch(`/api/admin/users/${userId}/role`, { role });
+    return response.data.data;
+  },
+
   // Resources CRUD
   async createResource(data: any): Promise<any> {
     const response = await apiClient.post('/api/admin/resources', data);

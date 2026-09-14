@@ -67,4 +67,13 @@ public class UserServiceImpl implements UserService {
         user.setActive(true);
         userRepository.save(user);
     }
+
+    @Override
+    public UserDto updateUserRole(UUID id, com.careerforge.user.entity.Role newRole) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        user.setRole(newRole);
+        User updatedUser = userRepository.save(user);
+        return userMapper.toDto(updatedUser);
+    }
 }

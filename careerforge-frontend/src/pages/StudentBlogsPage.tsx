@@ -40,7 +40,7 @@ export const StudentBlogsPage: React.FC = () => {
   });
 
   const semester = profile?.semester;
-  const isEligible = semester !== undefined && semester >= 3 && semester <= 8;
+  const isEligible = typeof semester === 'number' && semester >= 3 && semester <= 8;
 
   // 2. Fetch Published Blogs
   const { data: publishedPage, isLoading: loadingFeed } = useQuery({

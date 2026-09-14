@@ -10,5 +10,8 @@ export interface RegisterRequest {
   lastName: string;
   email: string;
   password: string;
+}
+
+export interface UpdateUserRoleRequest {
   role: Role;
 }

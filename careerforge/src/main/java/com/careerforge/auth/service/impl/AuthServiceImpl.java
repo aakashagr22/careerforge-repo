@@ -55,33 +55,29 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequestException("Email already exists: " + request.getEmail());
         }
 
-        Role assignedRole = request.getRole() != null ? request.getRole() : Role.STUDENT;
-
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(assignedRole)
+                .role(Role.STUDENT)
                 .active(true)
                 .build();
 
         User savedUser = userRepository.save(user);
 
-        // If the registered user is a Student, initialize a blank student profile
-        if (assignedRole == Role.STUDENT) {
-            StudentProfile profile = StudentProfile.builder()
-                    .user(savedUser)
-                    .streak(0)
-                    .build();
-            StudentProfile savedProfile = studentProfileRepository.save(profile);
-            
-            eventPublisher.publishEvent(new com.careerforge.notification.event.NotificationEvent(
-                    this,
-                    savedProfile,
-                    "Welcome to CareerForge, " + savedUser.getFirstName() + "! Complete your profile details to generate your personalized placement roadmap."
-            ));
-        }
+        // Initialize a blank student profile for newly registered students
+        StudentProfile profile = StudentProfile.builder()
+                .user(savedUser)
+                .streak(0)
+                .build();
+        StudentProfile savedProfile = studentProfileRepository.save(profile);
+        
+        eventPublisher.publishEvent(new com.careerforge.notification.event.NotificationEvent(
+                this,
+                savedProfile,
+                "Welcome to CareerForge, " + savedUser.getFirstName() + "! Complete your profile details to generate your personalized placement roadmap."
+        ));
 
         return userMapper.toDto(savedUser);
     }

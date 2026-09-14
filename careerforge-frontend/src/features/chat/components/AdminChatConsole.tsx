@@ -30,7 +30,7 @@ export const AdminChatConsole: React.FC = () => {
 
   // Create room mutation
   const createRoomMutation = useMutation({
-    mutationFn: (data: { name: string; description: string; roomType: RoomType }) =>
+    mutationFn: (data: CreateRoomRequest) =>
       roomService.createRoom(data),
     onSuccess: () => {
       toast.success('Chat room created successfully');

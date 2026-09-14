@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import toast from 'react-hot-toast';
 import { authService } from '../services/authService';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import { Select } from '../components/Select';
 
 const registerSchema = zod.object({
   firstName: zod.string().min(1, 'First name is required').max(50, 'Max 50 characters'),
   lastName: zod.string().min(1, 'Last name is required').max(50, 'Max 50 characters'),
   email: zod.string().min(1, 'Email is required').email('Invalid email address').max(100, 'Max 100 characters'),
   password: zod.string().min(6, 'Password must be at least 6 characters').max(100),
-  role: zod.enum(['STUDENT', 'ADMIN']),
 });
 
 type RegisterFormValues = zod.infer<typeof registerSchema>;
@@ -23,14 +21,13 @@ export const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, control, formState: { errors } } = useForm<RegisterFormValues>({
+  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
       email: '',
       password: '',
-      role: 'STUDENT',
     }
   });
 
@@ -139,28 +136,6 @@ export const RegisterPage: React.FC = () => {
           </div>
           {errors.password && (
             <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
-          )}
-        </div>
-
-        {/* Role Choice */}
-        <div>
-          <Controller
-            control={control}
-            name="role"
-            render={({ field }) => (
-              <Select
-                label="I want to register as a"
-                options={[
-                  { value: 'STUDENT', label: 'Student (Placement Prep)' },
-                  { value: 'ADMIN', label: 'Administrator (Create content/stats)' }
-                ]}
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-          {errors.role && (
-            <p className="text-xs text-red-500 mt-1">{errors.role.message}</p>
           )}
         </div>
 

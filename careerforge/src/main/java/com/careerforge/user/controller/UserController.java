@@ -1,11 +1,14 @@
 package com.careerforge.user.controller;
 
 import com.careerforge.common.dto.ApiResponse;
+import com.careerforge.user.dto.UpdateUserRoleRequest;
 import com.careerforge.user.dto.UserDto;
 import com.careerforge.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -47,5 +50,13 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> activateUser(@PathVariable UUID id) {
         userService.activateUser(id);
         return ResponseEntity.ok(ApiResponse.success("User account activated successfully"));
+    }
+
+    @PatchMapping("/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Promote or change user role (Admin only)")
+    public ResponseEntity<ApiResponse<UserDto>> updateUserRole(@PathVariable UUID id, @Valid @RequestBody UpdateUserRoleRequest request) {
+        UserDto updatedUser = userService.updateUserRole(id, request.getRole());
+        return ResponseEntity.ok(ApiResponse.success(updatedUser, "User role updated successfully"));
     }
 }

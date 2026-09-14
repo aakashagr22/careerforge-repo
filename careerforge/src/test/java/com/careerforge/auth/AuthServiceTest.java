@@ -69,7 +69,6 @@ public class AuthServiceTest {
                 .lastName("Doe")
                 .email("john.doe@example.com")
                 .password("password123")
-                .role(Role.STUDENT)
                 .build();
 
         user = User.builder()

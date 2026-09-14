@@ -6,1130 +6,1037 @@ import java.util.List;
 public class JavaBasicsPrepSeeder {
 
     public static void seed(
-        com.careerforge.roadmap.entity.Roadmap dbRoadmap,
-        com.careerforge.roadmap.repository.RoadmapSectionRepository roadmapSectionRepository,
-        com.careerforge.roadmap.repository.QuestionRepository questionRepository,
-        com.careerforge.roadmap.repository.QuestionLinkRepository questionLinkRepository,
-        com.careerforge.roadmap.repository.RoadmapSectionQuestionRepository roadmapSectionQuestionRepository
+            com.careerforge.roadmap.entity.Roadmap dbRoadmap,
+            com.careerforge.roadmap.repository.RoadmapSectionRepository roadmapSectionRepository,
+            com.careerforge.roadmap.repository.QuestionRepository questionRepository,
+            com.careerforge.roadmap.repository.QuestionLinkRepository questionLinkRepository,
+            com.careerforge.roadmap.repository.RoadmapSectionQuestionRepository roadmapSectionQuestionRepository
     ) {
-        System.out.println("Seeding Roadmap: Java Language Basics for 1st Semester Students");
+        System.out.println("Seeding Roadmap: Core Java by Durga Sir (OCJP/SCJP)");
         Roadmap.sections.clear();
 
         RoadmapSection s;
         Topic t;
 
         // ==========================================
-        // Section 1: Introduction to Java
+        // Section 1: Language Fundamentals
         // ==========================================
-        s = createSection("Introduction to Java");
+        s = createSection("Language Fundamentals");
 
-        t = createTopic(s, "What is Java?");
-        addQ(t, "History and Evolution of Java", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/intro/definition.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Features of Java (Platform Independent, Secure, Robust)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/intro/definition.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Java vs Other Programming Languages (C++, Python)", "EASY",
-            "ARTICLE", "https://www.baeldung.com/c-plus-plus-vs-java",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Applications of Java (Web, Mobile, Enterprise)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/intro/definition.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
+        t = createTopic(s, "Identifiers and Reserved Words");
+        addQ(t, "Java Identifiers - Rules and Examples", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
+                "VIDEO", "https://www.youtube.com/watch?v=eTXd89t8ngI");
+        addQ(t, "Reserved Words in Java (53 Keywords)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
+                "VIDEO", "https://www.youtube.com/watch?v=eTXd89t8ngI");
+        addQ(t, "Keywords vs Literals (true, false, null)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
+                "VIDEO", "https://www.youtube.com/watch?v=eTXd89t8ngI");
 
-        t = createTopic(s, "Java Architecture");
-        addQ(t, "JDK, JRE and JVM Deep Dive", "EASY",
-            "ARTICLE", "https://www.baeldung.com/jvm-vs-jre-vs-jdk",
-            "VIDEO", "https://www.youtube.com/watch?v=bm0OyhwFDuY");
-        addQ(t, "How Java Code Gets Compiled and Executed (JIT Compiler)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/jit-compiler-java",
-            "VIDEO", "https://www.youtube.com/watch?v=bm0OyhwFDuY");
-        addQ(t, "Bytecode and Platform Independence", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/intro/definition.html",
-            "VIDEO", "https://www.youtube.com/watch?v=bm0OyhwFDuY");
-        addQ(t, "ClassLoader Hierarchy and Memory Areas in JVM", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-classloaders",
-            "VIDEO", "https://www.youtube.com/watch?v=bm0OyhwFDuY");
+        t = createTopic(s, "Data Types");
+        addQ(t, "Primitive Data Types - byte, short, int, long", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/watch?v=njy7NGYzsvM");
+        addQ(t, "Primitive Data Types - float, double, char, boolean", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/watch?v=HYAosZptldA");
+        addQ(t, "Size and Range of Each Data Type", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/watch?v=njy7NGYzsvM");
+        addQ(t, "Java is Not Purely Object Oriented - Why?", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/watch?v=HYAosZptldA");
 
-        t = createTopic(s, "Setting Up Java Environment");
-        addQ(t, "Installing JDK and Verifying Java Version", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/cupojava/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Setting up PATH and JAVA_HOME Environment Variables", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/cupojava/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "IDEs - IntelliJ IDEA and Eclipse Setup", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/cupojava/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Writing, Compiling, and Running First Java Program via CLI", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/application/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
+        t = createTopic(s, "Literals");
+        addQ(t, "Integral Literals (Decimal, Octal, Hexadecimal, Binary)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Floating Point Literals", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Char Literals and Unicode Representation", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "String Literals and Boolean Literals", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Underscore in Numeric Literals (Java 7)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
 
-        t = createTopic(s, "Hello World Program");
-        addQ(t, "Structure of a Java Program", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/application/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "public static void main(String[] args) Explained", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/application/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "System.out.println() vs System.out.print() vs System.err", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/application/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "Comments in Java (Single line, Multi-line, Javadoc)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
+        t = createTopic(s, "Arrays");
+        addQ(t, "Array Declaration and Creation", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Multi-Dimensional Array Creation", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Array Initialization and Anonymous Arrays", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "length vs length() Method", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Array Element Assignments and Variable Assignments", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
 
+        t = createTopic(s, "Types of Variables");
+        addQ(t, "Instance Variables", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Static Variables (Class Variables)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Local Variables", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Uninitialized Variable Behavior (Instance, Static, Local)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
 
-        // ==========================================
-        // Section 2: Variables and Data Types
-        // ==========================================
-        s = createSection("Variables and Data Types");
-
-        t = createTopic(s, "Variables in Java");
-        addQ(t, "What is a Variable?", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Declaring and Initializing Variables", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Types of Variables - Local, Instance, Static", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Variable Scope, Lifetime, and Memory Allocation (Stack vs Heap)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-stack-heap",
-            "VIDEO", "https://www.youtube.com/watch?v=7uRtdHa7sEU");
-        addQ(t, "Naming Conventions and Identifier Rules", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-
-        t = createTopic(s, "Primitive Data Types");
-        addQ(t, "Integer Types (byte, short, int, long) & Bit Sizes", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Floating-Point Types (float, double) & IEEE 754 Precision", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-floating-point-arithmetic",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "char and boolean Data Types", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Default Values of Primitive Types", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Literals in Java (Binary, Hexadecimal, Underscores in Numeric Literals)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-
-        t = createTopic(s, "Type Conversion");
-        addQ(t, "Implicit Type Casting (Widening)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Explicit Type Casting (Narrowing) and Overflow/Underflow", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-type-casting",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Type Promotion in Arithmetic Expressions", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-
-        t = createTopic(s, "Wrapper Classes");
-        addQ(t, "What are Wrapper Classes?", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Autoboxing, Unboxing, and Performance Overhead", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/autoboxing.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Integer Caching (-128 to 127) in Wrapper Classes", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-integer-cache",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Useful Methods in Wrapper Classes (parseInt, valueOf, toString)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
+        t = createTopic(s, "Var-Arg Methods and Main Method");
+        addQ(t, "Var-Arg Methods (Variable Arguments)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/arguments.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Single Dimensional Array vs Var-Arg Method", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/arguments.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "main() Method - All Variations", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/getStarted/application/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Command Line Arguments", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/environment/cmdLineArgs.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
+        addQ(t, "Java Coding Standards (Classes, Methods, Variables, Constants)", "EASY",
+                "ARTICLE", "https://www.oracle.com/java/technologies/javase/codeconventions-namingconventions.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkWWJd8flj3echGYm3y5dXo");
 
 
         // ==========================================
-        // Section 3: Operators
+        // Section 2: Operators and Assignments
         // ==========================================
-        s = createSection("Operators");
+        s = createSection("Operators and Assignments");
 
-        t = createTopic(s, "Arithmetic and Assignment Operators");
-        addQ(t, "Arithmetic Operators (+, -, *, /, %)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Assignment Operators (=, +=, -=, *=, /=) & Implicit Casting", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Prefix vs Postfix Increment and Decrement (++i vs i++)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
+        t = createTopic(s, "Increment and Decrement Operators");
+        addQ(t, "Pre-Increment and Post-Increment", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "Increment/Decrement Applied to byte, short", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
 
-        t = createTopic(s, "Relational and Logical Operators");
-        addQ(t, "Relational Operators (==, !=, >, <, >=, <=)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Logical Operators (&&, ||, !)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Short-Circuit Evaluation (&& vs & and || vs |)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-operators",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
+        t = createTopic(s, "Arithmetic Operators");
+        addQ(t, "Arithmetic Operators and Infinity", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "NaN (Not a Number)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "String Concatenation using + Operator", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
 
-        t = createTopic(s, "Bitwise and Shift Operators");
-        addQ(t, "Bitwise Operators (&, |, ^, ~)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op3.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Left Shift (<<) and Right Shift (>>) Operators", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op3.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Unsigned Right Shift Operator (>>>)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-unsigned-right-shift-operator",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Ternary Operator (?:) & Nested Ternary", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "instanceof Operator & Operator Precedence Table", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
+        t = createTopic(s, "Relational and Equality Operators");
+        addQ(t, "Relational Operators (<, >, <=, >=)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "Equality Operators (== and !=) for Primitives and Objects", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "instanceof Operator", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+
+        t = createTopic(s, "Bitwise Operators");
+        addQ(t, "Bitwise AND (&), OR (|), XOR (^)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op3.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "Bitwise Complement (~)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op3.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "Short-Circuit Operators (&& and ||)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+
+        t = createTopic(s, "Shift Operators");
+        addQ(t, "Left Shift (<<)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op3.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "Right Shift (>>) and Unsigned Right Shift (>>>)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op3.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+
+        t = createTopic(s, "Assignment Operators and Type Casting");
+        addQ(t, "Compound Assignment Operators (+=, -=, *=, /=, %=)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "Implicit Type Casting in Compound Assignments", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "Ternary Operator (?:)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "Operator Precedence Table", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
+        addQ(t, "new Operator", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl8wA1uxYRjiHPaDcnEuYGF");
 
 
         // ==========================================
-        // Section 4: Control Flow Statements
+        // Section 3: Flow Control
         // ==========================================
-        s = createSection("Control Flow Statements");
+        s = createSection("Flow Control");
 
-        t = createTopic(s, "Conditional Statements");
-        addQ(t, "if Statement", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/if.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "if-else Statement and else-if Ladder", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/if.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Nested if-else Statements", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/if.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-
-        t = createTopic(s, "Switch Statement");
-        addQ(t, "Traditional switch-case Syntax & break", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/switch.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Fall-through Behavior and default Case", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/switch.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Enhanced Switch Expressions with Arrow Syntax & yield (Java 14+)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-switch",
-            "VIDEO", "https://www.youtube.com/watch?v=aKaw9W789wU");
+        t = createTopic(s, "if-else and switch");
+        addQ(t, "if-else Statement", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/if.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
+        addQ(t, "switch-case Statement", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/switch.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
+        addQ(t, "Allowed Data Types in switch (Including String in Java 7)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/switch.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
+        addQ(t, "Fall-Through in switch and break Statement", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/switch.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
 
         t = createTopic(s, "Loops");
-        addQ(t, "while Loop vs do-while Loop", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/while.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Standard for Loop and Loop Counters", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Enhanced for-each Loop", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Nested Loops & Infinite Loop Prevention", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
+        addQ(t, "while Loop", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/while.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
+        addQ(t, "do-while Loop", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/while.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
+        addQ(t, "for Loop", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
+        addQ(t, "Enhanced for-each Loop (for-each)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
+        addQ(t, "Nested Loops", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
 
-        t = createTopic(s, "Jump Statements");
-        addQ(t, "break and continue Statements", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/branch.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "return Statement in Methods", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/branch.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Labeled break and continue in Nested Loops", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-labeled-statements",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-
-
-        // ==========================================
-        // Section 5: Methods in Java
-        // ==========================================
-        s = createSection("Methods in Java");
-
-        t = createTopic(s, "Defining and Calling Methods");
-        addQ(t, "What is a Method & Method Signature", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Return Types, Parameters, and Void Methods", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-
-        t = createTopic(s, "Method Parameters and Arguments");
-        addQ(t, "Pass by Value in Java (Primitives vs Object References)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-pass-by-value-or-pass-by-reference",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Varargs (Variable-Length Arguments)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/arguments.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-
-        t = createTopic(s, "Method Overloading");
-        addQ(t, "Method Overloading Rules and Ambiguity", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "Overloading with Type Promotion Quirks", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-method-overloading-type-promotion",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-
-        t = createTopic(s, "Recursion");
-        addQ(t, "Base Case and Recursive Case Breakdown", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Tail Recursion vs Head Recursion", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-tail-recursion",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-        addQ(t, "Call Stack Visualization & StackOverflowError", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-stack-overflow-error",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
+        t = createTopic(s, "Transfer Statements");
+        addQ(t, "break Statement (Labeled and Unlabeled)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/branch.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
+        addQ(t, "continue Statement (Labeled and Unlabeled)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/branch.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
+        addQ(t, "return Statement", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/branch.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMrf2NOEA61tXwCXdbvoi4");
 
 
         // ==========================================
-        // Section 6: Arrays
+        // Section 4: Declarations and Access Modifiers
         // ==========================================
-        s = createSection("Arrays");
+        s = createSection("Declarations and Access Modifiers");
 
-        t = createTopic(s, "Introduction to Arrays");
-        addQ(t, "Declaring, Instantiating, and Accessing Arrays", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "Memory Representation of Arrays in Heap", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-array-memory-layout",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "ArrayIndexOutOfBoundsException and Bounds Checking", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
+        t = createTopic(s, "Java Source File Structure");
+        addQ(t, "package Statement", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/package/packages.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "import Statement - Explicit vs Wildcard", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/package/usepkgs.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "Class Definition Rules in a Source File", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/package/packages.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "Static Import", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/package/usepkgs.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
 
-        t = createTopic(s, "Working with Arrays");
-        addQ(t, "Sorting Arrays (Arrays.sort) & Binary Search (Arrays.binarySearch)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/util/Arrays.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "Shallow Copy vs Deep Copy of Arrays (System.arraycopy vs Arrays.copyOf)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-array-copy",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "Arrays.equals() vs Arrays.deepEquals()", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-array-compare",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
+        t = createTopic(s, "Access Modifiers");
+        addQ(t, "public Access Modifier", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "private Access Modifier", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "protected Access Modifier", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "Default (Package-Private) Access", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
 
-        t = createTopic(s, "Multidimensional Arrays");
-        addQ(t, "2D Arrays Declaration and Matrix Representation", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "Jagged (Ragged) Arrays in Java", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-jagged-arrays",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
+        t = createTopic(s, "Modifiers");
+        addQ(t, "final Modifier (Variables, Methods, Classes)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/final.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "abstract Modifier", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/abstract.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "static Modifier", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/classvars.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "native, synchronized, transient, volatile, strictfp", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/syncmeth.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "Modifier Combinations - What is Legal?", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
 
-
-        // ==========================================
-        // Section 7: Strings
-        // ==========================================
-        s = createSection("Strings");
-
-        t = createTopic(s, "Introduction to Strings");
-        addQ(t, "String Class & String Literal vs new Keyword", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/strings.html",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "String Immutability Design Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-string-immutable",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "String Constant Pool (SCP) & intern() Method", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-string-pool",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-
-        t = createTopic(s, "String Methods & Manipulation");
-        addQ(t, "Essential String Methods (length, charAt, substring, indexOf)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/manipstrings.html",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "equals() vs == for String Comparison", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-compare-strings",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "split(), join(), and String.format()", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/manipstrings.html",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-
-        t = createTopic(s, "StringBuilder and StringBuffer");
-        addQ(t, "Why StringBuilder over String for Mutations", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/buffers.html",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "StringBuilder Internal Capacity and Resizing", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-string-builder-capacity",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "StringBuilder vs StringBuffer (Thread Safety & Synchronization)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-string-builder-string-buffer",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
+        t = createTopic(s, "Interfaces and Abstract Classes - Declarations");
+        addQ(t, "Interface Declarations and Implicit Modifiers", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/createinterface.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
+        addQ(t, "Abstract Class Declarations", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/abstract.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnMH-BdI3A39-8v7m9xMP2z");
 
 
         // ==========================================
-        // Section 8: Object Oriented Programming
+        // Section 5: OOPs Concepts
         // ==========================================
-        s = createSection("Object Oriented Programming");
+        s = createSection("OOPs Concepts");
 
-        t = createTopic(s, "Classes and Objects");
-        addQ(t, "Class Definition, Fields, and Instantiation", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/classdecl.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "Memory Representation of Objects in Heap", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-stack-heap",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "null Reference and NullPointerException", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-
-        t = createTopic(s, "Constructors & Initialization");
-        addQ(t, "Default, Parameterized Constructors & Constructor Overloading", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/constructors.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "Constructor Chaining using this() and super()", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/thiskey.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "Instance Initialization Blocks (IIB) vs Static Initialization Blocks (SIB)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-initialization-blocks",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-
-        t = createTopic(s, "this and static Keywords");
-        addQ(t, "this Keyword - Shadowing and Returning Instance", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/thiskey.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "static Variables, Methods, and Static Import", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/classvars.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-
-
-        // ==========================================
-        // Section 9: OOP Principles
-        // ==========================================
-        s = createSection("OOP Principles");
+        t = createTopic(s, "Data Hiding and Abstraction");
+        addQ(t, "Data Hiding using private", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/concepts/object.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Abstraction - Abstract Classes and Interfaces", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/abstract.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
 
         t = createTopic(s, "Encapsulation");
-        addQ(t, "Data Hiding, Access Modifiers, and Getters/Setters", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
+        addQ(t, "Encapsulation with Getters and Setters", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Tightly Encapsulated Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
 
         t = createTopic(s, "Inheritance");
-        addQ(t, "extends Keyword, super Keyword, and Class Hierarchy", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/subclasses.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "Why Java Does Not Support Multiple Inheritance for Classes", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/multipleinheritance.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "Method Overriding, @Override, & Covariant Return Types", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-covariant-return-type",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "Composition vs Inheritance (HAS-A vs IS-A)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-composition-vs-inheritance",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
+        addQ(t, "IS-A Relationship (extends keyword)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/subclasses.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "HAS-A Relationship (Composition)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/subclasses.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Method Overriding Rules", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/override.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "super Keyword in Inheritance", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/super.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Why Java Does Not Support Multiple Inheritance", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/multipleinheritance.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
 
         t = createTopic(s, "Polymorphism");
-        addQ(t, "Compile-time vs Runtime Polymorphism", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/polymorphism.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "Upcasting, Downcasting, and ClassCastException", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-type-casting",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "Dynamic Method Dispatch Internals (Virtual Method Table)", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-dynamic-method-dispatch",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
+        addQ(t, "Overloading - Compile-Time Polymorphism", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Overriding - Runtime Polymorphism", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/polymorphism.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Dynamic Method Dispatch", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/polymorphism.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Upcasting and Downcasting", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/polymorphism.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
 
-        t = createTopic(s, "Abstraction");
-        addQ(t, "Abstract Classes vs Interfaces", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/abstract.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
-        addQ(t, "Default and Static Methods in Interfaces (Java 8+)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-static-default-methods",
-            "VIDEO", "https://www.youtube.com/watch?v=BSVKUk58K6U");
+        t = createTopic(s, "Constructors");
+        addQ(t, "Constructor Rules and Default Constructor", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/constructors.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Constructor Overloading", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/constructors.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Constructor Chaining - this() and super()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/thiskey.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+
+        t = createTopic(s, "Interfaces");
+        addQ(t, "Interface Declaration and Implementation", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/createinterface.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Extending Interfaces", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/nogrow.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Default and Static Methods in Interfaces (Java 8)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "Abstract Class vs Interface - When to Use Which", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/abstract.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+
+        t = createTopic(s, "Object Class Methods");
+        addQ(t, "toString() Method", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "equals() Method", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "hashCode() Method", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "finalize() Method", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
+        addQ(t, "clone() Method", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn7zNVRm_ZjnWqnf5osnKxq");
 
 
         // ==========================================
-        // Section 10: Exception Handling
+        // Section 6: Exception Handling
         // ==========================================
         s = createSection("Exception Handling");
 
         t = createTopic(s, "Introduction to Exceptions");
-        addQ(t, "Exception Hierarchy (Throwable, Error, Exception, RuntimeException)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/catchOrDeclare.html",
-            "VIDEO", "https://www.youtube.com/watch?v=1XAfapkBQjk");
+        addQ(t, "What is an Exception and Exception Handling", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/definition.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "Exception Hierarchy - Throwable, Error, Exception", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/catchOrDeclare.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
         addQ(t, "Checked vs Unchecked Exceptions", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html",
-            "VIDEO", "https://www.youtube.com/watch?v=1XAfapkBQjk");
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "Fully Checked vs Partially Checked Exceptions", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
 
-        t = createTopic(s, "Handling Exceptions");
-        addQ(t, "try-catch, Multi-catch, and finally Block Quirks", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/finally.html",
-            "VIDEO", "https://www.youtube.com/watch?v=1XAfapkBQjk");
-        addQ(t, "try-with-resources Statement & AutoCloseable Interface", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-try-with-resources",
-            "VIDEO", "https://www.youtube.com/watch?v=1XAfapkBQjk");
+        t = createTopic(s, "try-catch-finally");
+        addQ(t, "try-catch Block", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/try.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "Multiple catch Blocks", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/catch.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "finally Block - When Does It Execute?", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/finally.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "try-with-resources (Java 7)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "Multi-catch Block (Java 7)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/catch.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
 
-        t = createTopic(s, "Throwing and Declaring Exceptions");
-        addQ(t, "throw vs throws Keyword & Custom Exceptions", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/creating.html",
-            "VIDEO", "https://www.youtube.com/watch?v=1XAfapkBQjk");
-        addQ(t, "Exception Chaining & Suppressed Exceptions", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-suppressed-exceptions",
-            "VIDEO", "https://www.youtube.com/watch?v=1XAfapkBQjk");
+        t = createTopic(s, "throw and throws");
+        addQ(t, "throw Keyword", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/throwing.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "throws Keyword", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/declaring.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "Exception Propagation", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/declaring.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
 
-
-        // ==========================================
-        // Section 11: Packages and Access Modifiers
-        // ==========================================
-        s = createSection("Packages and Access Modifiers");
-
-        t = createTopic(s, "Packages in Java");
-        addQ(t, "Creating, Using Packages, and import / static import", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/package/usepkgs.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-
-        t = createTopic(s, "Access Modifiers");
-        addQ(t, "Access Level Matrix (public, protected, default, private)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-
-
-        // ==========================================
-        // Section 12: File Handling & NIO.2
-        // ==========================================
-        s = createSection("File Handling and NIO.2");
-
-        t = createTopic(s, "Legacy File I/O");
-        addQ(t, "File Class, FileReader, FileWriter, BufferedReader, BufferedWriter", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/charstreams.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "FileInputStream, FileOutputStream, and Byte Streams", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/bytestreams.html",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "Scanner Class for Console & File Input", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/scanning.html",
-            "VIDEO", "https://www.youtube.com/watch?v=BGTx91t8q50");
-
-        t = createTopic(s, "Modern Java NIO.2");
-        addQ(t, "Path, Paths, and Files API (NIO.2 Introduced in Java 7)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-nio-2-file-api",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "Reading/Writing Files with Files.readAllLines & Files.write", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-read-file",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-
-        t = createTopic(s, "Serialization & Object Streams");
-        addQ(t, "ObjectInputStream, ObjectOutputStream, & Serializable Interface", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-serialization",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
-        addQ(t, "transient Keyword and serialVersionUID", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-transient-keyword",
-            "VIDEO", "https://www.youtube.com/watch?v=eIrMbAQSU34");
+        t = createTopic(s, "Custom Exceptions and Overriding Rules");
+        addQ(t, "Creating Custom (User-Defined) Exceptions", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/creating.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "Exception Handling in Method Overriding", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/declaring.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
+        addQ(t, "Top 10 Exceptions in Java", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnSkaum39zWYI6bPb3i7liz");
 
 
         // ==========================================
-        // Section 13: Multithreading & Concurrency
+        // Section 7: Multithreading
         // ==========================================
-        s = createSection("Multithreading and Concurrency");
+        s = createSection("Multithreading");
 
         t = createTopic(s, "Introduction to Threads");
-        addQ(t, "Process vs Thread & Thread Lifecycle", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/procthread.html",
-            "VIDEO", "https://www.youtube.com/watch?v=WldMTtUWqTg");
-        addQ(t, "Extending Thread vs Implementing Runnable vs Callable", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-runnable-callable",
-            "VIDEO", "https://www.youtube.com/watch?v=WldMTtUWqTg");
+        addQ(t, "What is Multitasking? Process-Based vs Thread-Based", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/procthread.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "Thread Lifecycle (New, Runnable, Running, Waiting/Blocked, Dead)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/procthread.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
 
-        t = createTopic(s, "Synchronization & Thread Safety");
-        addQ(t, "Race Conditions, synchronized Keyword, & Deadlock Avoidance", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/deadlock.html",
-            "VIDEO", "https://www.youtube.com/watch?v=WldMTtUWqTg");
-        addQ(t, "volatile Keyword & Memory Visibility", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-volatile",
-            "VIDEO", "https://www.youtube.com/watch?v=WldMTtUWqTg");
-        addQ(t, "wait(), notify(), and notifyAll() Communication", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-wait-notify",
-            "VIDEO", "https://www.youtube.com/watch?v=WldMTtUWqTg");
+        t = createTopic(s, "Creating Threads");
+        addQ(t, "Extending Thread Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/runthread.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "Implementing Runnable Interface", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/runthread.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "Thread Class vs Runnable Interface", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/runthread.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
 
-        t = createTopic(s, "Executor Framework & Atomics");
-        addQ(t, "ExecutorService, ThreadPools, & Future Interface", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-executor-service-tutorial",
-            "VIDEO", "https://www.youtube.com/watch?v=WldMTtUWqTg");
-        addQ(t, "Atomic Variables (AtomicInteger, AtomicLong) & CAS Operation", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-atomic-variables",
-            "VIDEO", "https://www.youtube.com/watch?v=WldMTtUWqTg");
+        t = createTopic(s, "Thread Methods");
+        addQ(t, "start(), run(), sleep(), join()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/sleep.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "yield(), setPriority(), getPriority()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/procthread.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "setDaemon() and isDaemon() - Daemon Threads", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/procthread.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "interrupt() Method", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+
+        t = createTopic(s, "Synchronization");
+        addQ(t, "Synchronized Methods", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/syncmeth.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "Synchronized Block", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/locksync.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "Class-Level Lock vs Object-Level Lock", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/locksync.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+
+        t = createTopic(s, "Inter-Thread Communication and Deadlock");
+        addQ(t, "wait(), notify(), notifyAll()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/guardmeth.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "Producer-Consumer Problem", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/guardmeth.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "Deadlock - Definition and Example", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/deadlock.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
+        addQ(t, "Starvation and Livelock", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/starvelive.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlHj_fVVjUIVHjD5uEy2kk4");
 
 
         // ==========================================
-        // Section 14: Generics
+        // Section 8: Multithreading Enhancements
+        // ==========================================
+        s = createSection("Multithreading Enhancements");
+
+        t = createTopic(s, "Thread Pool and Executor Framework");
+        addQ(t, "ThreadPool Concept", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/pools.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlSrYBSaCc7KBEXtaLWt_u5");
+        addQ(t, "Executor, ExecutorService, Executors", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/exinter.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlSrYBSaCc7KBEXtaLWt_u5");
+        addQ(t, "Callable and Future", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/exinter.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlSrYBSaCc7KBEXtaLWt_u5");
+
+        t = createTopic(s, "Locks and Atomic Classes");
+        addQ(t, "ReentrantLock - Lock and Unlock", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/newlocks.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlSrYBSaCc7KBEXtaLWt_u5");
+        addQ(t, "tryLock() and lockInterruptibly()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/newlocks.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlSrYBSaCc7KBEXtaLWt_u5");
+        addQ(t, "Atomic Classes (AtomicInteger, AtomicLong)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/atomicvars.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlSrYBSaCc7KBEXtaLWt_u5");
+
+        t = createTopic(s, "Thread-Safe Classes");
+        addQ(t, "volatile Keyword", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/atomic.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlSrYBSaCc7KBEXtaLWt_u5");
+        addQ(t, "ThreadLocal Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadLocal.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlSrYBSaCc7KBEXtaLWt_u5");
+
+
+        // ==========================================
+        // Section 9: Inner Classes
+        // ==========================================
+        s = createSection("Inner Classes");
+
+        t = createTopic(s, "Types of Inner Classes");
+        addQ(t, "Regular (Member) Inner Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnubQH6Gt8O8Dg-115U0ftk");
+        addQ(t, "Method-Local Inner Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/localclasses.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnubQH6Gt8O8Dg-115U0ftk");
+        addQ(t, "Anonymous Inner Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnubQH6Gt8O8Dg-115U0ftk");
+        addQ(t, "Static Nested Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnubQH6Gt8O8Dg-115U0ftk");
+
+        t = createTopic(s, "Inner Class Details");
+        addQ(t, "Accessing Outer Class Members from Inner Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnubQH6Gt8O8Dg-115U0ftk");
+        addQ(t, "Anonymous Inner Class with Interface and Abstract Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnubQH6Gt8O8Dg-115U0ftk");
+        addQ(t, ".class Files Generated for Inner Classes", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnubQH6Gt8O8Dg-115U0ftk");
+
+
+        // ==========================================
+        // Section 10: java.lang Package
+        // ==========================================
+        s = createSection("java.lang Package");
+
+        t = createTopic(s, "Object Class");
+        addQ(t, "Object Class Methods Overview", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+        addQ(t, "equals() and hashCode() Contract", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+
+        t = createTopic(s, "String Class");
+        addQ(t, "String Immutability and String Pool", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/strings.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+        addQ(t, "Important String Methods", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/manipstrings.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+        addQ(t, "String Comparison (== vs equals() vs compareTo())", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/comparestrings.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+
+        t = createTopic(s, "StringBuffer and StringBuilder");
+        addQ(t, "StringBuffer vs String (Mutable vs Immutable)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/buffers.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+        addQ(t, "StringBuilder vs StringBuffer (Thread Safety)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/buffers.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+        addQ(t, "Important Methods - append(), insert(), delete(), reverse()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/buffers.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+
+        t = createTopic(s, "Wrapper Classes");
+        addQ(t, "Wrapper Classes Overview (Integer, Double, Character, etc.)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+        addQ(t, "Autoboxing and Unboxing", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/autoboxing.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+        addQ(t, "parseInt(), valueOf(), toString() in Wrapper Classes", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+
+        t = createTopic(s, "Math Class");
+        addQ(t, "Math Class Methods (abs, ceil, floor, round, pow, sqrt)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/beyondmath.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+        addQ(t, "Math.random()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/beyondmath.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlEa6-58nC6bnpx43VZiTnN");
+
+
+        // ==========================================
+        // Section 11: Collections
+        // ==========================================
+        s = createSection("Collections");
+
+        t = createTopic(s, "Introduction to Collections");
+        addQ(t, "Arrays vs Collections", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/intro/index.html",
+                "VIDEO", "https://www.youtube.com/watch?v=Bqv4At5vHVQ");
+        addQ(t, "Collection Interface Hierarchy", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/index.html",
+                "VIDEO", "https://www.youtube.com/watch?v=Bqv4At5vHVQ");
+        addQ(t, "Collection vs Collections (class vs interface)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/intro/index.html",
+                "VIDEO", "https://www.youtube.com/watch?v=Bqv4At5vHVQ");
+
+        t = createTopic(s, "List Interface");
+        addQ(t, "ArrayList - Internals and Usage", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/list.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "LinkedList - Doubly Linked List Implementation", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/list.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "Vector vs ArrayList", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/list.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "Stack Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/util/Stack.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+
+        t = createTopic(s, "Set Interface");
+        addQ(t, "HashSet - No Order, No Duplicates", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/set.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "LinkedHashSet - Insertion Order", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/set.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "TreeSet - Sorted Order and Comparable", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/sortedset.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+
+        t = createTopic(s, "Map Interface");
+        addQ(t, "HashMap - Key-Value Pairs", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/map.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "LinkedHashMap - Insertion Order Map", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/map.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "TreeMap - Sorted Map", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/sortedmap.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "Hashtable vs HashMap", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/map.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+
+        t = createTopic(s, "Queue and Deque");
+        addQ(t, "PriorityQueue", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/queue.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "ArrayDeque", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/deque.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+
+        t = createTopic(s, "Comparable and Comparator");
+        addQ(t, "Comparable Interface (compareTo())", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/order.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "Comparator Interface (compare())", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/order.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "Comparable vs Comparator", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/order.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+
+        t = createTopic(s, "Collections Utility Class");
+        addQ(t, "sort(), binarySearch(), reverse(), shuffle()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/algorithms/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "unmodifiableList(), synchronizedList()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/wrapper.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+        addQ(t, "Cursors - Enumeration, Iterator, ListIterator", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/collection.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOklywocjGz7Z02rqbLegX22");
+
+
+        // ==========================================
+        // Section 12: Generics
         // ==========================================
         s = createSection("Generics");
 
         t = createTopic(s, "Introduction to Generics");
-        addQ(t, "What are Generics and Why Use Them?", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/why.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
+        addQ(t, "Why Generics? Type Safety at Compile Time", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/extra/generics/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn4AAHRh5lmOXhoU0tZwTfU");
         addQ(t, "Generic Classes", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/types.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/extra/generics/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn4AAHRh5lmOXhoU0tZwTfU");
         addQ(t, "Generic Methods", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/methods.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-        addQ(t, "Generic Interfaces", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/types.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-        addQ(t, "Type Parameters and Naming Conventions (T, E, K, V)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/types.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/extra/generics/methods.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn4AAHRh5lmOXhoU0tZwTfU");
 
         t = createTopic(s, "Bounded Type Parameters and Wildcards");
-        addQ(t, "Upper Bounded Type Parameters (extends)", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/bounded.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-        addQ(t, "Lower Bounded Wildcards (? super T)", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/lowerBounded.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-        addQ(t, "Upper Bounded Wildcards (? extends T)", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/upperBounded.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-        addQ(t, "Unbounded Wildcards (?)", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/unboundedWildcards.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-        addQ(t, "PECS Principle (Producer Extends, Consumer Super)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-generics-pecs",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-
-        t = createTopic(s, "Type Erasure and Restrictions");
-        addQ(t, "What is Type Erasure?", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/erasure.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-        addQ(t, "Erasure of Generic Types", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/genTypes.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-        addQ(t, "Restrictions on Generics", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/restrictions.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
-        addQ(t, "Heap Pollution and Reifiable Types", "HARD",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/generics/nonReifiableVarargsType.html",
-            "VIDEO", "https://www.youtube.com/watch?v=K1iu1kXkVoA");
+        addQ(t, "Bounded Type Parameters (extends)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/extra/generics/bounded.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn4AAHRh5lmOXhoU0tZwTfU");
+        addQ(t, "Wildcard (?) - Upper and Lower Bounded Wildcards", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/extra/generics/wildcards.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn4AAHRh5lmOXhoU0tZwTfU");
+        addQ(t, "Generic Interoperability with Collections", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/extra/generics/legacy.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn4AAHRh5lmOXhoU0tZwTfU");
+        addQ(t, "Type Erasure", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/extra/generics/erasure.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOn4AAHRh5lmOXhoU0tZwTfU");
 
 
         // ==========================================
-        // Section 15: Collections Framework
+        // Section 13: Concurrent Collections
         // ==========================================
-        s = createSection("Collections Framework");
+        s = createSection("Concurrent Collections");
 
-        t = createTopic(s, "Collections Overview");
-        addQ(t, "Collections Framework Hierarchy and Core Interfaces", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "Collection vs Collections Utility Class", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/algorithms/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "Iterable and Iterator Interface", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/collection.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "Comparable vs Comparator", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/order.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
+        t = createTopic(s, "Need for Concurrent Collections");
+        addQ(t, "Problems with Traditional Collections in Multithreading", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/collections.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlrFicu7spv8Z772MgGbXfQ");
+        addQ(t, "ConcurrentModificationException", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/collections.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlrFicu7spv8Z772MgGbXfQ");
 
-        t = createTopic(s, "List Interface");
-        addQ(t, "ArrayList - Internal Working and Resizing", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/list.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "LinkedList - Doubly Linked List Implementation", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/list.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "ArrayList vs LinkedList - When to Use Which", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-arraylist-linkedlist",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "Vector and Stack (Legacy)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/list.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "CopyOnWriteArrayList", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/list.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-
-        t = createTopic(s, "Set Interface");
-        addQ(t, "HashSet - Hash Table Backed Set", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/set.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "LinkedHashSet - Insertion Order Preservation", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/set.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "TreeSet - Sorted Set using Red-Black Tree", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/set.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "EnumSet", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-enumset",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "equals() and hashCode() Contract in Sets", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-equals-hashcode-contracts",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-
-        t = createTopic(s, "Map Interface");
-        addQ(t, "HashMap - Hashing Internals and Collision Handling", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/map.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "LinkedHashMap - Insertion and Access Order", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/map.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "TreeMap - Sorted Map using Red-Black Tree", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/map.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "Hashtable vs HashMap (Legacy)", "EASY",
-            "ARTICLE", "https://www.baeldung.com/hashmap-hashtable-differences",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "EnumMap", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-enum-map",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "WeakHashMap and IdentityHashMap", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-weakhashmap",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "Map.Entry and Iterating Over a Map", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/map.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "Map.computeIfAbsent, merge, getOrDefault", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-map-computeifabsent",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-
-        t = createTopic(s, "Queue and Deque Interface");
-        addQ(t, "Queue Interface and PriorityQueue", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/queue.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "Deque Interface - ArrayDeque", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/interfaces/deque.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "ArrayDeque as Stack Replacement", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-array-deque",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-
-        t = createTopic(s, "Concurrent Collections");
-        addQ(t, "ConcurrentHashMap", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/collections.html",
-            "VIDEO", "https://www.youtube.com/watch?v=VE_AAUxTUCY");
-        addQ(t, "CopyOnWriteArrayList and CopyOnWriteArraySet", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-copy-on-write-arraylist",
-            "VIDEO", "https://www.youtube.com/watch?v=VE_AAUxTUCY");
-        addQ(t, "BlockingQueue - ArrayBlockingQueue and LinkedBlockingQueue", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/collections.html",
-            "VIDEO", "https://www.youtube.com/watch?v=VE_AAUxTUCY");
-        addQ(t, "ConcurrentLinkedQueue and ConcurrentLinkedDeque", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-concurrent-queues",
-            "VIDEO", "https://www.youtube.com/watch?v=VE_AAUxTUCY");
-
-        t = createTopic(s, "Collections Utility Methods");
-        addQ(t, "sort(), binarySearch(), reverse(), shuffle()", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/algorithms/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "unmodifiableList/Set/Map - Immutable Views", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/implementations/wrapper.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "frequency(), disjoint(), nCopies()", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/collections/algorithms/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
-        addQ(t, "List.of(), Set.of(), Map.of() - Immutable Factory Methods (Java 9+)", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-9-collections-factory-methods",
-            "VIDEO", "https://www.youtube.com/watch?v=OQvOx5q0D2A");
+        t = createTopic(s, "Concurrent Collection Classes");
+        addQ(t, "ConcurrentHashMap", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlrFicu7spv8Z772MgGbXfQ");
+        addQ(t, "CopyOnWriteArrayList", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CopyOnWriteArrayList.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlrFicu7spv8Z772MgGbXfQ");
+        addQ(t, "CopyOnWriteArraySet", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CopyOnWriteArraySet.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlrFicu7spv8Z772MgGbXfQ");
+        addQ(t, "BlockingQueue (ArrayBlockingQueue, LinkedBlockingQueue)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/concurrency/collections.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOlrFicu7spv8Z772MgGbXfQ");
 
 
         // ==========================================
-        // Section 16: Functional Programming and Streams
+        // Section 14: File I/O
         // ==========================================
-        s = createSection("Functional Programming and Streams");
+        s = createSection("File IO");
 
-        t = createTopic(s, "Lambda Expressions");
-        addQ(t, "Lambda Expression Syntax and Rules", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Effectively Final Variables in Lambdas", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-lambda-effectively-final-local-variables",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Method References (Static, Instance, Constructor)", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
+        t = createTopic(s, "File Class");
+        addQ(t, "Creating, Deleting, Renaming Files using File Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/file.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
+        addQ(t, "Checking File Properties (exists, isFile, isDirectory, length)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/fileAttr.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
+        addQ(t, "Listing Files in a Directory", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/dirs.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
 
-        t = createTopic(s, "Functional Interfaces");
-        addQ(t, "What is a Functional Interface?", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Predicate<T> - test(), and(), or(), negate()", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-predicate-chain",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Function<T,R> - apply(), andThen(), compose()", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-8-functional-interfaces",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Consumer<T> and BiConsumer<T,U>", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-8-functional-interfaces",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Supplier<T>", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-8-functional-interfaces",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "UnaryOperator<T> and BinaryOperator<T>", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-8-functional-interfaces",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Creating Custom Functional Interfaces with @FunctionalInterface", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-8-functional-interfaces",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
+        t = createTopic(s, "Streams - Byte and Character");
+        addQ(t, "FileInputStream and FileOutputStream (Byte Streams)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/bytestreams.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
+        addQ(t, "FileReader and FileWriter (Character Streams)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/charstreams.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
+        addQ(t, "BufferedReader and BufferedWriter", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/buffers.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
+        addQ(t, "PrintWriter", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/charstreams.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
+        addQ(t, "InputStreamReader and OutputStreamWriter (Bridges)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/converting.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
 
-        t = createTopic(s, "Stream API");
-        addQ(t, "What is a Stream? Stream vs Collection", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html",
-            "VIDEO", "https://www.youtube.com/watch?v=t1-YZ6bF-g0");
-        addQ(t, "Creating Streams - of(), generate(), iterate(), from Collections", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-8-streams",
-            "VIDEO", "https://www.youtube.com/watch?v=t1-YZ6bF-g0");
-        addQ(t, "Intermediate Operations - filter(), map(), flatMap(), sorted(), distinct(), peek()", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-8-streams",
-            "VIDEO", "https://www.youtube.com/watch?v=t1-YZ6bF-g0");
-        addQ(t, "Terminal Operations - collect(), forEach(), reduce(), count(), findFirst(), anyMatch()", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-8-streams",
-            "VIDEO", "https://www.youtube.com/watch?v=t1-YZ6bF-g0");
-        addQ(t, "Collectors - toList(), toSet(), toMap(), groupingBy(), partitioningBy(), joining()", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-8-collectors",
-            "VIDEO", "https://www.youtube.com/watch?v=t1-YZ6bF-g0");
-        addQ(t, "Lazy Evaluation in Streams", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-stream-lazy-evaluation",
-            "VIDEO", "https://www.youtube.com/watch?v=t1-YZ6bF-g0");
-        addQ(t, "Parallel Streams and ForkJoinPool", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-when-to-use-parallel-stream",
-            "VIDEO", "https://www.youtube.com/watch?v=t1-YZ6bF-g0");
-        addQ(t, "Primitive Streams - IntStream, LongStream, DoubleStream", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-8-primitive-streams",
-            "VIDEO", "https://www.youtube.com/watch?v=t1-YZ6bF-g0");
-        addQ(t, "Stream.of() vs Arrays.stream() vs Collection.stream()", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-stream-of-vs-collection-stream",
-            "VIDEO", "https://www.youtube.com/watch?v=t1-YZ6bF-g0");
-
-        t = createTopic(s, "Optional Class");
-        addQ(t, "What is Optional and Why Use It?", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Creating Optional - of(), ofNullable(), empty()", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-optional",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "isPresent(), ifPresent(), get(), orElse(), orElseGet(), orElseThrow()", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-optional",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "map(), flatMap(), filter() on Optional", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-optional",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Optional Anti-Patterns and Best Practices", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-optional-uses",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
+        t = createTopic(s, "Scanning and Formatting");
+        addQ(t, "Scanner Class for Reading Input", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/scanning.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
+        addQ(t, "Formatter and printf()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/io/formatting.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkEwNL3uI7PSS-FDAxhtXJ3");
 
 
         // ==========================================
-        // Section 17: Enums and Annotations
+        // Section 15: Serialization
         // ==========================================
-        s = createSection("Enums and Annotations");
+        s = createSection("Serialization");
 
-        t = createTopic(s, "Enums in Depth");
-        addQ(t, "What is an Enum?", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html",
-            "VIDEO", "https://www.youtube.com/watch?v=wHSRDCLQtgY");
-        addQ(t, "Enums with Fields, Constructors and Methods", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/a-guide-to-java-enums",
-            "VIDEO", "https://www.youtube.com/watch?v=wHSRDCLQtgY");
-        addQ(t, "Abstract Methods in Enums", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-enum-abstract-method",
-            "VIDEO", "https://www.youtube.com/watch?v=wHSRDCLQtgY");
-        addQ(t, "Enum Implementing an Interface", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-enum-implementing-interface",
-            "VIDEO", "https://www.youtube.com/watch?v=wHSRDCLQtgY");
-        addQ(t, "EnumSet and EnumMap", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-enumset",
-            "VIDEO", "https://www.youtube.com/watch?v=wHSRDCLQtgY");
-        addQ(t, "Enum in switch Expressions", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-enum-switch",
-            "VIDEO", "https://www.youtube.com/watch?v=wHSRDCLQtgY");
-        addQ(t, "values(), valueOf(), ordinal(), name()", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html",
-            "VIDEO", "https://www.youtube.com/watch?v=wHSRDCLQtgY");
+        t = createTopic(s, "Introduction to Serialization");
+        addQ(t, "What is Serialization?", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/jndi/objects/serial.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkE3etrqOSPgkUdcxrEc0Y1");
+        addQ(t, "Serializable Interface", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/jndi/objects/serial.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkE3etrqOSPgkUdcxrEc0Y1");
+        addQ(t, "ObjectOutputStream and ObjectInputStream", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/jndi/objects/serial.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkE3etrqOSPgkUdcxrEc0Y1");
 
-        t = createTopic(s, "Annotations");
-        addQ(t, "What are Annotations?", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/annotations/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=DkZr7_c9ry8");
-        addQ(t, "Built-in Annotations (@Override, @Deprecated, @SuppressWarnings, @FunctionalInterface)", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/annotations/predefined.html",
-            "VIDEO", "https://www.youtube.com/watch?v=DkZr7_c9ry8");
-        addQ(t, "Creating Custom Annotations", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/annotations/declaring.html",
-            "VIDEO", "https://www.youtube.com/watch?v=DkZr7_c9ry8");
-        addQ(t, "Meta-Annotations (@Retention, @Target, @Documented, @Inherited)", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/annotations/predefined.html",
-            "VIDEO", "https://www.youtube.com/watch?v=DkZr7_c9ry8");
-        addQ(t, "Processing Annotations at Runtime using Reflection", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-custom-annotation",
-            "VIDEO", "https://www.youtube.com/watch?v=DkZr7_c9ry8");
-        addQ(t, "Repeatable Annotations (@Repeatable)", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/annotations/repeating.html",
-            "VIDEO", "https://www.youtube.com/watch?v=DkZr7_c9ry8");
+        t = createTopic(s, "Serialization Details");
+        addQ(t, "transient Keyword", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/jndi/objects/serial.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkE3etrqOSPgkUdcxrEc0Y1");
+        addQ(t, "serialVersionUID", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/jndi/objects/serial.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkE3etrqOSPgkUdcxrEc0Y1");
+        addQ(t, "Externalization (Externalizable Interface)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/io/Externalizable.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkE3etrqOSPgkUdcxrEc0Y1");
+        addQ(t, "Serialization with Inheritance", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/jndi/objects/serial.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkE3etrqOSPgkUdcxrEc0Y1");
 
 
         // ==========================================
-        // Section 18: Reflection and Inner Classes
+        // Section 16: Garbage Collection
         // ==========================================
-        s = createSection("Reflection and Inner Classes");
+        s = createSection("Garbage Collection");
 
-        t = createTopic(s, "Inner and Nested Classes");
-        addQ(t, "Static Nested Classes", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html",
-            "VIDEO", "https://www.youtube.com/watch?v=9nOSQFDFYCU");
-        addQ(t, "Non-Static Inner Classes", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/innerclasses.html",
-            "VIDEO", "https://www.youtube.com/watch?v=9nOSQFDFYCU");
-        addQ(t, "Local Classes", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/localclasses.html",
-            "VIDEO", "https://www.youtube.com/watch?v=9nOSQFDFYCU");
-        addQ(t, "Anonymous Classes", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html",
-            "VIDEO", "https://www.youtube.com/watch?v=9nOSQFDFYCU");
-        addQ(t, "When to Use Inner vs Static Nested Classes", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-nested-classes",
-            "VIDEO", "https://www.youtube.com/watch?v=9nOSQFDFYCU");
-
-        t = createTopic(s, "Reflection API");
-        addQ(t, "What is Reflection?", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/reflect/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=bhhMJSKNCQY");
-        addQ(t, "Getting Class Object - getClass(), .class, Class.forName()", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/reflect/class/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=bhhMJSKNCQY");
-        addQ(t, "Inspecting Fields, Methods and Constructors at Runtime", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/reflect/member/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=bhhMJSKNCQY");
-        addQ(t, "Invoking Methods Dynamically using invoke()", "HARD",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/reflect/member/methodInvocation.html",
-            "VIDEO", "https://www.youtube.com/watch?v=bhhMJSKNCQY");
-        addQ(t, "Accessing Private Members with setAccessible()", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-reflection",
-            "VIDEO", "https://www.youtube.com/watch?v=bhhMJSKNCQY");
-        addQ(t, "Performance Costs and Use Cases of Reflection", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-reflection",
-            "VIDEO", "https://www.youtube.com/watch?v=bhhMJSKNCQY");
-
-
-        // ==========================================
-        // Section 19: String Handling In-Depth
-        // ==========================================
-        s = createSection("String Handling In-Depth");
-
-        t = createTopic(s, "String Internals");
-        addQ(t, "String Immutability and String Pool", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-string-pool",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "String vs StringBuilder vs StringBuffer", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-string-builder-string-buffer",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "String Comparison - == vs equals() vs compareTo()", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-compare-strings",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "intern() Method", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/string-pool-java-vs-c",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-
-        t = createTopic(s, "String Methods");
-        addQ(t, "charAt(), indexOf(), substring(), length()", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/strings.html",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "split(), join(), replace(), replaceAll()", "EASY",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/data/manipstrings.html",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "trim(), strip(), isBlank(), isEmpty() (Java 11+)", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-strip-vs-trim",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "String.format() and Formatted Strings", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-string-format",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "toCharArray(), chars() Stream", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-string-to-char-array",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-        addQ(t, "Text Blocks (Java 13+)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-text-blocks",
-            "VIDEO", "https://www.youtube.com/watch?v=Bj9Mx_Lx3q4");
-
-        t = createTopic(s, "Regular Expressions in Java");
-        addQ(t, "Pattern and Matcher Classes", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/regex/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=s_3Ob4sJeBk");
-        addQ(t, "Common Regex Patterns and Quantifiers", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/regex/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=s_3Ob4sJeBk");
-        addQ(t, "matches(), find(), group(), replaceAll() with Regex", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/regular-expressions-java",
-            "VIDEO", "https://www.youtube.com/watch?v=s_3Ob4sJeBk");
-
-
-        // ==========================================
-        // Section 20: Design Patterns
-        // ==========================================
-        s = createSection("Design Patterns");
-
-        t = createTopic(s, "Creational Patterns");
-        addQ(t, "Singleton Pattern (Eager, Lazy, Thread-Safe, Enum Singleton)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-singleton",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Factory Method Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-factory-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Abstract Factory Pattern", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-abstract-factory-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Builder Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-builder-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Prototype Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-pattern-prototype",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-
-        t = createTopic(s, "Structural Patterns");
-        addQ(t, "Adapter Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-adapter-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Decorator Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-decorator-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Facade Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-facade-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Proxy Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-proxy-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Composite Pattern", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-composite-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-
-        t = createTopic(s, "Behavioral Patterns");
-        addQ(t, "Observer Pattern (also used in Event Systems)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-observer-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Strategy Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-strategy-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Iterator Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-iterator",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Template Method Pattern", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-template-method-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-        addQ(t, "Command Pattern", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-command-pattern",
-            "VIDEO", "https://www.youtube.com/watch?v=tDxnyop48mY");
-
-
-        // ==========================================
-        // Section 21: Modern Java Features (Java 8–21)
-        // ==========================================
-        s = createSection("Modern Java Features");
-
-        t = createTopic(s, "Java 8 Features");
-        addQ(t, "Default and Static Methods in Interfaces", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-static-default-methods",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Date and Time API (LocalDate, LocalTime, LocalDateTime, ZonedDateTime)", "MEDIUM",
-            "ARTICLE", "https://docs.oracle.com/javase/tutorial/datetime/index.html",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "DateTimeFormatter", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-datetimeformatter",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-        addQ(t, "Duration and Period", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-period-duration",
-            "VIDEO", "https://www.youtube.com/watch?v=kEEoKqdVc_4");
-
-        t = createTopic(s, "Java 9–11 Features");
-        addQ(t, "Module System (Project Jigsaw) Basics", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-9-modularity",
-            "VIDEO", "https://www.youtube.com/watch?v=73mn9iQCGpU");
-        addQ(t, "var - Local Variable Type Inference (Java 10)", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-10-local-variable-type-inference",
-            "VIDEO", "https://www.youtube.com/watch?v=73mn9iQCGpU");
-        addQ(t, "String API Additions - strip(), repeat(), lines(), isBlank() (Java 11)", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-11-string-api",
-            "VIDEO", "https://www.youtube.com/watch?v=73mn9iQCGpU");
-        addQ(t, "Collection Factory Methods - List.of(), Map.of(), Set.of() (Java 9)", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-9-collections-factory-methods",
-            "VIDEO", "https://www.youtube.com/watch?v=73mn9iQCGpU");
-        addQ(t, "try-with-resources on Effectively Final Variables (Java 9)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-9-try-with-resources",
-            "VIDEO", "https://www.youtube.com/watch?v=73mn9iQCGpU");
-
-        t = createTopic(s, "Java 14–17 Features");
-        addQ(t, "Records (Java 16) - Immutable Data Classes", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-record-keyword",
-            "VIDEO", "https://www.youtube.com/watch?v=V_mzFdFTk6I");
-        addQ(t, "Sealed Classes and Interfaces (Java 17)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-sealed-classes-interfaces",
-            "VIDEO", "https://www.youtube.com/watch?v=V_mzFdFTk6I");
-        addQ(t, "Pattern Matching for instanceof (Java 16)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-pattern-matching-instanceof",
-            "VIDEO", "https://www.youtube.com/watch?v=aKaw9W789wU");
-        addQ(t, "Switch Expressions (Java 14) - Arrow Syntax and yield", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-switch",
-            "VIDEO", "https://www.youtube.com/watch?v=aKaw9W789wU");
-        addQ(t, "Text Blocks (Java 15)", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-text-blocks",
-            "VIDEO", "https://www.youtube.com/watch?v=V_mzFdFTk6I");
-        addQ(t, "Helpful NullPointerExceptions (Java 14)", "EASY",
-            "ARTICLE", "https://www.baeldung.com/java-14-nullpointerexception",
-            "VIDEO", "https://www.youtube.com/watch?v=V_mzFdFTk6I");
-
-        t = createTopic(s, "Java 21 Features");
-        addQ(t, "Virtual Threads (Project Loom)", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-virtual-thread-vs-thread",
-            "VIDEO", "https://www.youtube.com/watch?v=MOPeVNUTKBQ");
-        addQ(t, "Pattern Matching for switch (Java 21)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-switch-pattern-matching",
-            "VIDEO", "https://www.youtube.com/watch?v=aKaw9W789wU");
-        addQ(t, "Record Patterns for Deconstruction", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-21-record-patterns",
-            "VIDEO", "https://www.youtube.com/watch?v=b5tq4hU2WS8");
-        addQ(t, "Sequenced Collections (SequencedCollection, SequencedMap)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-21-sequenced-collections",
-            "VIDEO", "https://www.youtube.com/watch?v=b5tq4hU2WS8");
-
-
-        // ==========================================
-        // Section 22: Memory Management and JVM Internals
-        // ==========================================
-        s = createSection("Memory Management and JVM Internals");
-
-        t = createTopic(s, "JVM Memory Model");
-        addQ(t, "JVM Memory Areas - Heap, Stack, Method Area, PC Register, Native Stack", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-stack-heap",
-            "VIDEO", "https://www.youtube.com/watch?v=7uRtdHa7sEU");
-        addQ(t, "Heap Memory - Young Generation, Old Generation, Metaspace", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-memory-management-interview-questions",
-            "VIDEO", "https://www.youtube.com/watch?v=7uRtdHa7sEU");
-        addQ(t, "Stack Memory and Stack Frames", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-stack-heap",
-            "VIDEO", "https://www.youtube.com/watch?v=7uRtdHa7sEU");
-        addQ(t, "Method Area and Runtime Constant Pool", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/jvm-method-area-vs-metaspace",
-            "VIDEO", "https://www.youtube.com/watch?v=7uRtdHa7sEU");
-
-        t = createTopic(s, "Garbage Collection");
+        t = createTopic(s, "How Garbage Collection Works");
         addQ(t, "What is Garbage Collection?", "EASY",
-            "ARTICLE", "https://www.baeldung.com/jvm-garbage-collectors",
-            "VIDEO", "https://www.youtube.com/watch?v=UnaNQgzw4zY");
-        addQ(t, "GC Roots and Reachability", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-gc-roots",
-            "VIDEO", "https://www.youtube.com/watch?v=UnaNQgzw4zY");
-        addQ(t, "Minor GC vs Major GC vs Full GC", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-minor-major-gc",
-            "VIDEO", "https://www.youtube.com/watch?v=UnaNQgzw4zY");
-        addQ(t, "GC Algorithms - Serial, Parallel, G1, ZGC, Shenandoah", "HARD",
-            "ARTICLE", "https://www.baeldung.com/jvm-garbage-collectors",
-            "VIDEO", "https://www.youtube.com/watch?v=UnaNQgzw4zY");
-        addQ(t, "finalize() Method and Cleaner API", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-finalize",
-            "VIDEO", "https://www.youtube.com/watch?v=UnaNQgzw4zY");
-        addQ(t, "Memory Leaks - Common Causes and How to Detect", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-memory-leaks",
-            "VIDEO", "https://www.youtube.com/watch?v=UnaNQgzw4zY");
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOllQyx0M9BgrqdRno8HMaU0");
+        addQ(t, "Eligible Objects for GC", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOllQyx0M9BgrqdRno8HMaU0");
+        addQ(t, "Ways to Make an Object Eligible for GC", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOllQyx0M9BgrqdRno8HMaU0");
+        addQ(t, "System.gc() and Runtime.gc()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOllQyx0M9BgrqdRno8HMaU0");
+        addQ(t, "finalize() Method in GC", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOllQyx0M9BgrqdRno8HMaU0");
+        addQ(t, "Generational Garbage Collection (Young, Old, PermGen)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/objectcreation.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOllQyx0M9BgrqdRno8HMaU0");
 
-        t = createTopic(s, "Object Lifecycle and References");
-        addQ(t, "Object Creation Internals (new Keyword Deep Dive)", "MEDIUM",
-            "ARTICLE", "https://www.baeldung.com/java-object-creation",
-            "VIDEO", "https://www.youtube.com/watch?v=7uRtdHa7sEU");
-        addQ(t, "Strong, Weak, Soft and Phantom References", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-weak-reference",
-            "VIDEO", "https://www.youtube.com/watch?v=7uRtdHa7sEU");
-        addQ(t, "WeakReference and WeakHashMap Use Cases", "HARD",
-            "ARTICLE", "https://www.baeldung.com/java-weakhashmap",
-            "VIDEO", "https://www.youtube.com/watch?v=7uRtdHa7sEU");
+
+        // ==========================================
+        // Section 17: ENUM
+        // ==========================================
+        s = createSection("ENUM");
+
+        t = createTopic(s, "Introduction to Enums");
+        addQ(t, "What is an Enum?", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmAtH3O4mUyaFlX8paWwye9");
+        addQ(t, "Enum Declaration and Usage", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmAtH3O4mUyaFlX8paWwye9");
+        addQ(t, "Enum in switch Statement", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmAtH3O4mUyaFlX8paWwye9");
+
+        t = createTopic(s, "Enum Advanced Features");
+        addQ(t, "Enum with Constructor, Fields, and Methods", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmAtH3O4mUyaFlX8paWwye9");
+        addQ(t, "Enum implements Interface", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmAtH3O4mUyaFlX8paWwye9");
+        addQ(t, "values(), ordinal(), name(), valueOf()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmAtH3O4mUyaFlX8paWwye9");
+        addQ(t, "EnumSet and EnumMap", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/api/java/util/EnumSet.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmAtH3O4mUyaFlX8paWwye9");
+
+
+        // ==========================================
+        // Section 18: Regular Expressions
+        // ==========================================
+        s = createSection("Regular Expressions");
+
+        t = createTopic(s, "Regex Basics");
+        addQ(t, "Introduction to Regular Expressions", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/regex/intro.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkRBNGYQcanie7yJxnVh7Vy");
+        addQ(t, "Character Classes ([abc], [^abc], [a-z])", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/regex/char_classes.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkRBNGYQcanie7yJxnVh7Vy");
+        addQ(t, "Predefined Character Classes (\\d, \\w, \\s)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/regex/pre_char_classes.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkRBNGYQcanie7yJxnVh7Vy");
+        addQ(t, "Quantifiers (*, +, ?, {n}, {n,m})", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/regex/quant.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkRBNGYQcanie7yJxnVh7Vy");
+
+        t = createTopic(s, "Pattern and Matcher Classes");
+        addQ(t, "Pattern.compile() and Matcher", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/regex/pattern.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkRBNGYQcanie7yJxnVh7Vy");
+        addQ(t, "matches(), find(), group()", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/regex/matcher.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkRBNGYQcanie7yJxnVh7Vy");
+        addQ(t, "String.matches(), String.split(), String.replaceAll() with Regex", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/regex/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkRBNGYQcanie7yJxnVh7Vy");
+
+
+        // ==========================================
+        // Section 19: Assertions
+        // ==========================================
+        s = createSection("Assertions");
+
+        t = createTopic(s, "Introduction to Assertions");
+        addQ(t, "What is an Assertion?", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/technotes/guides/language/assert.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnaOQ694hLSx-U9KJJ8KMZR");
+        addQ(t, "assert Keyword - Simple and Augmented Form", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/technotes/guides/language/assert.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnaOQ694hLSx-U9KJJ8KMZR");
+        addQ(t, "Enabling and Disabling Assertions (-ea, -da flags)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/technotes/guides/language/assert.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnaOQ694hLSx-U9KJJ8KMZR");
+        addQ(t, "AssertionError", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/technotes/guides/language/assert.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnaOQ694hLSx-U9KJJ8KMZR");
+        addQ(t, "Appropriate and Inappropriate Uses of Assertions", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/technotes/guides/language/assert.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOnaOQ694hLSx-U9KJJ8KMZR");
+
+
+        // ==========================================
+        // Section 20: JVM Architecture
+        // ==========================================
+        s = createSection("JVM Architecture");
+
+        t = createTopic(s, "Memory Areas in JVM");
+        addQ(t, "Method Area (Class Area)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl3pHYnuCUoyD_GFKp6SPRA");
+        addQ(t, "Heap Area", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl3pHYnuCUoyD_GFKp6SPRA");
+        addQ(t, "Stack Area (JVM Stack and Frames)", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl3pHYnuCUoyD_GFKp6SPRA");
+        addQ(t, "PC Registers and Native Method Stack", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl3pHYnuCUoyD_GFKp6SPRA");
+
+        t = createTopic(s, "ClassLoader and Execution Engine");
+        addQ(t, "ClassLoader Subsystem - Bootstrap, Extension, Application", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-5.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl3pHYnuCUoyD_GFKp6SPRA");
+        addQ(t, "Class Loading - Loading, Linking, Initialization", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-5.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl3pHYnuCUoyD_GFKp6SPRA");
+        addQ(t, "Execution Engine - Interpreter and JIT Compiler", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOl3pHYnuCUoyD_GFKp6SPRA");
+
+
+        // ==========================================
+        // Section 21: Internationalization (I18N)
+        // ==========================================
+        s = createSection("Internationalization");
+
+        t = createTopic(s, "I18N Basics");
+        addQ(t, "What is Internationalization (I18N)?", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/i18n/intro/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmT49qQWTgDUNzD8b3_OAJC");
+        addQ(t, "Locale Class", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/i18n/locale/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmT49qQWTgDUNzD8b3_OAJC");
+        addQ(t, "ResourceBundle and Properties Files", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/i18n/resbundle/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmT49qQWTgDUNzD8b3_OAJC");
+        addQ(t, "NumberFormat and DateFormat for Locale-Specific Formatting", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/i18n/format/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmT49qQWTgDUNzD8b3_OAJC");
+        addQ(t, "Unicode and Character Encoding", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/i18n/text/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOmT49qQWTgDUNzD8b3_OAJC");
+
+
+        // ==========================================
+        // Section 22: Development
+        // ==========================================
+        s = createSection("Development");
+
+        t = createTopic(s, "Java Development Tools");
+        addQ(t, "javac - Java Compiler Options", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/technotes/tools/unix/javac.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkYSrI3Ji-cmIWE9_qSh8oq");
+        addQ(t, "java - Running Java Programs with Options", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkYSrI3Ji-cmIWE9_qSh8oq");
+        addQ(t, "JAR Files - Creating and Using", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/deployment/jar/index.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkYSrI3Ji-cmIWE9_qSh8oq");
+        addQ(t, "Classpath and Module Path", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/tutorial/essential/environment/paths.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkYSrI3Ji-cmIWE9_qSh8oq");
+        addQ(t, "javadoc - Generating API Documentation", "EASY",
+                "ARTICLE", "https://docs.oracle.com/javase/8/docs/technotes/tools/unix/javadoc.html",
+                "VIDEO", "https://www.youtube.com/playlist?list=PLd3UqWTnYXOkYSrI3Ji-cmIWE9_qSh8oq");
 
 
         // ==========================================
@@ -1140,10 +1047,10 @@ public class JavaBasicsPrepSeeder {
         int sectionPos = 0;
         for (RoadmapSection sec : Roadmap.sections) {
             com.careerforge.roadmap.entity.RoadmapSection dbSec = com.careerforge.roadmap.entity.RoadmapSection.builder()
-                .roadmap(dbRoadmap)
-                .title(sec.title)
-                .position(sectionPos++)
-                .build();
+                    .roadmap(dbRoadmap)
+                    .title(sec.title)
+                    .position(sectionPos++)
+                    .build();
             dbParentSectionsToSave.add(dbSec);
         }
         List<com.careerforge.roadmap.entity.RoadmapSection> savedParents = roadmapSectionRepository.saveAll(dbParentSectionsToSave);
@@ -1156,12 +1063,12 @@ public class JavaBasicsPrepSeeder {
             int topicPos = 0;
             for (Topic topic : sec.topics) {
                 com.careerforge.roadmap.entity.RoadmapSection dbTopic = com.careerforge.roadmap.entity.RoadmapSection.builder()
-                    .roadmap(dbRoadmap)
-                    .parentSection(dbSec)
-                    .parentId(dbSec.getId())
-                    .title(topic.title)
-                    .position(topicPos++)
-                    .build();
+                        .roadmap(dbRoadmap)
+                        .parentSection(dbSec)
+                        .parentId(dbSec.getId())
+                        .title(topic.title)
+                        .position(topicPos++)
+                        .build();
                 dbTopicsToSave.add(dbTopic);
             }
         }
@@ -1185,9 +1092,9 @@ public class JavaBasicsPrepSeeder {
                         diffEnum = com.careerforge.common.entity.Difficulty.EASY;
                     }
                     com.careerforge.roadmap.entity.Question dbQ = com.careerforge.roadmap.entity.Question.builder()
-                        .title(q.title)
-                        .difficulty(diffEnum)
-                        .build();
+                            .title(q.title)
+                            .difficulty(diffEnum)
+                            .build();
                     dbQuestionsToSave.add(dbQ);
                     originalQuestions.add(q);
                     dbTopicForQuestions.add(dbTopic);
@@ -1214,22 +1121,22 @@ public class JavaBasicsPrepSeeder {
             int linkPos = 0;
             if (q.solveLink != null && !q.solveLink.isEmpty()) {
                 dbLinksToSave.add(com.careerforge.roadmap.entity.QuestionLink.builder()
-                    .question(dbQ)
-                    .linkType(com.careerforge.roadmap.entity.LinkType.SOLVE)
-                    .label("Solve")
-                    .url(q.solveLink)
-                    .position(linkPos++)
-                    .build());
+                        .question(dbQ)
+                        .linkType(com.careerforge.roadmap.entity.LinkType.SOLVE)
+                        .label("Solve")
+                        .url(q.solveLink)
+                        .position(linkPos++)
+                        .build());
             }
 
             if (q.editorialLink != null && !q.editorialLink.isEmpty()) {
                 dbLinksToSave.add(com.careerforge.roadmap.entity.QuestionLink.builder()
-                    .question(dbQ)
-                    .linkType(com.careerforge.roadmap.entity.LinkType.ARTICLE)
-                    .label("Editorial")
-                    .url(q.editorialLink)
-                    .position(linkPos++)
-                    .build());
+                        .question(dbQ)
+                        .linkType(com.careerforge.roadmap.entity.LinkType.ARTICLE)
+                        .label("Editorial")
+                        .url(q.editorialLink)
+                        .position(linkPos++)
+                        .build());
             }
 
             for (QuestionLink link : q.links) {
@@ -1240,19 +1147,19 @@ public class JavaBasicsPrepSeeder {
                     lt = com.careerforge.roadmap.entity.LinkType.ARTICLE;
                 }
                 dbLinksToSave.add(com.careerforge.roadmap.entity.QuestionLink.builder()
-                    .question(dbQ)
-                    .linkType(lt)
-                    .label(lt == com.careerforge.roadmap.entity.LinkType.VIDEO ? "Video Tutorial" : "Article Tutorial")
-                    .url(link.url)
-                    .position(linkPos++)
-                    .build());
+                        .question(dbQ)
+                        .linkType(lt)
+                        .label(lt == com.careerforge.roadmap.entity.LinkType.VIDEO ? "Video Tutorial" : "Article Tutorial")
+                        .url(link.url)
+                        .position(linkPos++)
+                        .build());
             }
 
             dbRSQsToSave.add(com.careerforge.roadmap.entity.RoadmapSectionQuestion.builder()
-                .roadmapSection(dbTopic)
-                .question(dbQ)
-                .position(questionPos++)
-                .build());
+                    .roadmapSection(dbTopic)
+                    .question(dbQ)
+                    .position(questionPos++)
+                    .build());
         }
 
         questionLinkRepository.saveAll(dbLinksToSave);
@@ -1295,29 +1202,11 @@ public class JavaBasicsPrepSeeder {
         }
         q.setEditorialLink(editorial);
 
-        boolean hasVideo = false;
-        boolean hasArticle = false;
-
         for (int i = 0; i < links.length; i += 2) {
-            String type = links[i];
-            String url = links[i + 1];
-            if ("VIDEO".equals(type)) {
-                if (!hasVideo) {
-                    q.addLink(new QuestionLink(type, url));
-                    hasVideo = true;
-                }
-            } else if ("ARTICLE".equals(type)) {
-                if (!hasArticle) {
-                    q.addLink(new QuestionLink(type, url));
-                    hasArticle = true;
-                }
-            } else {
-                q.addLink(new QuestionLink(type, url));
-            }
+            q.addLink(new QuestionLink(links[i], links[i + 1]));
         }
         topic.addQuestion(q);
     }
-
 
     // ==========================================
     // Boilerplate In-Memory Graph Classes
@@ -1325,39 +1214,23 @@ public class JavaBasicsPrepSeeder {
 
     public static class Roadmap {
         public static List<RoadmapSection> sections = new ArrayList<>();
-        public static void addSection(RoadmapSection section) {
-            sections.add(section);
-        }
+        public static void addSection(RoadmapSection section) { sections.add(section); }
     }
 
     public static class RoadmapSection {
         public String slug;
         public String title;
         public List<Topic> topics = new ArrayList<>();
-
-        public RoadmapSection(String slug, String title) {
-            this.slug = slug;
-            this.title = title;
-        }
-
-        public void addTopic(Topic topic) {
-            this.topics.add(topic);
-        }
+        public RoadmapSection(String slug, String title) { this.slug = slug; this.title = title; }
+        public void addTopic(Topic topic) { this.topics.add(topic); }
     }
 
     public static class Topic {
         public String slug;
         public String title;
         public List<Question> questions = new ArrayList<>();
-
-        public Topic(String slug, String title) {
-            this.slug = slug;
-            this.title = title;
-        }
-
-        public void addQuestion(Question question) {
-            this.questions.add(question);
-        }
+        public Topic(String slug, String title) { this.slug = slug; this.title = title; }
+        public void addQuestion(Question question) { this.questions.add(question); }
     }
 
     public static class Question {
@@ -1367,13 +1240,9 @@ public class JavaBasicsPrepSeeder {
         public String solveLink;
         public String editorialLink;
         public List<QuestionLink> links = new ArrayList<>();
-
         public Question(String slug, String title, String difficulty) {
-            this.slug = slug;
-            this.title = title;
-            this.difficulty = difficulty;
+            this.slug = slug; this.title = title; this.difficulty = difficulty;
         }
-
         public void setSolveLink(String solveLink) { this.solveLink = solveLink; }
         public void setEditorialLink(String editorialLink) { this.editorialLink = editorialLink; }
         public void addLink(QuestionLink link) { this.links.add(link); }
@@ -1382,10 +1251,6 @@ public class JavaBasicsPrepSeeder {
     public static class QuestionLink {
         public String linkType;
         public String url;
-
-        public QuestionLink(String linkType, String url) {
-            this.linkType = linkType;
-            this.url = url;
-        }
+        public QuestionLink(String linkType, String url) { this.linkType = linkType; this.url = url; }
     }
 }
