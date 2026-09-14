@@ -22,6 +22,9 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.username:noreply@careerforge.com}")
     private String fromEmail;
 
+    @Value("${spring.mail.host:}")
+    private String mailHost;
+
     @Autowired(required = false)
     public EmailServiceImpl(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -44,8 +47,8 @@ public class EmailServiceImpl implements EmailService {
 
         log.info("🔑 [OTP-DISPATCH] {} for {}: {}", type, toEmail, otpCode);
 
-        if (mailSender == null) {
-            log.info("MailSender not configured. Skipping SMTP dispatch for {}", toEmail);
+        if (mailSender == null || mailHost == null || mailHost.isBlank() || "localhost".equalsIgnoreCase(mailHost)) {
+            log.info("📧 [OTP-NOTICE] SMTP host is not configured. Use OTP [{}] to verify {} in development.", otpCode, toEmail);
             return;
         }
 
@@ -53,7 +56,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(fromEmail);
+            helper.setFrom(fromEmail.isBlank() ? "noreply@careerforge.com" : fromEmail);
             helper.setTo(toEmail);
             helper.setSubject(subject);
 
@@ -63,7 +66,7 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(message);
             log.info("📧 Verification email sent successfully to {}", toEmail);
         } catch (Exception e) {
-            log.warn("Failed to dispatch email via SMTP to {}: {}. (OTP is logged in console)", toEmail, e.getMessage());
+            log.warn("Failed to dispatch email via SMTP to {}: {}. (OTP is: {})", toEmail, e.getMessage(), otpCode);
         }
     }
 
