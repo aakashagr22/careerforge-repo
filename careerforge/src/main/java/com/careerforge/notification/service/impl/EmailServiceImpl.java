@@ -12,6 +12,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
 public class EmailServiceImpl implements EmailService {
 
@@ -52,23 +54,25 @@ public class EmailServiceImpl implements EmailService {
             return;
         }
 
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        CompletableFuture.runAsync(() -> {
+            try {
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            String sender = (fromEmail != null && !fromEmail.isBlank()) ? fromEmail : "noreply@careerforge.com";
-            helper.setFrom(sender, "CareerForge");
-            helper.setTo(toEmail);
-            helper.setSubject(subject);
+                String sender = (fromEmail != null && !fromEmail.isBlank()) ? fromEmail : "noreply@careerforge.com";
+                helper.setFrom(sender, "CareerForge");
+                helper.setTo(toEmail);
+                helper.setSubject(subject);
 
-            String htmlContent = buildOtpHtmlTemplate(title, description, otpCode);
-            helper.setText(htmlContent, true);
+                String htmlContent = buildOtpHtmlTemplate(title, description, otpCode);
+                helper.setText(htmlContent, true);
 
-            mailSender.send(message);
-            log.info("📧 Verification email sent successfully to {}", toEmail);
-        } catch (Exception e) {
-            log.error("Failed to dispatch email via SMTP to {}: {}. (OTP code: {})", toEmail, e.getMessage(), otpCode, e);
-        }
+                mailSender.send(message);
+                log.info("📧 Verification email sent successfully to {}", toEmail);
+            } catch (Exception e) {
+                log.error("Failed to dispatch email via SMTP to {}: {}. (OTP code: {})", toEmail, e.getMessage(), otpCode, e);
+            }
+        });
     }
 
     private String buildOtpHtmlTemplate(String title, String description, String otpCode) {
