@@ -48,7 +48,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          type: web
-          name: careerforge-backend
-          property: host
+        value: https://careerforge-backend-7p3w.onrender.com
