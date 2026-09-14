@@ -12,17 +12,27 @@ public class ChatbotKnowledgeBase {
         if (question == null) return Optional.empty();
         String q = question.toLowerCase().trim();
 
-        // 1. Journey & Pacing Questions
-        if (q.contains("journey") || q.contains("how to follow") || q.contains("start my") || q.contains("roadmap") || q.contains("path") || q.contains("semester")) {
+        // 1. Internships & Job Applications
+        if (q.contains("internship") || q.contains("apply") || q.contains("hiring") || q.contains("placement drive") || q.contains("job")) {
+            return Optional.of(buildInternshipResponse());
+        }
+
+        // 2. Where to find DSA Sheets / Practice Sheets
+        if ((q.contains("where") || q.contains("find") || q.contains("get") || q.contains("how to access")) && (q.contains("dsa") || q.contains("sheet"))) {
+            return Optional.of(buildDsaSheetLocationResponse());
+        }
+
+        // 3. Learning steps / Journey in this site
+        if (q.contains("step") || q.contains("journey") || q.contains("how to follow") || q.contains("start my") || q.contains("roadmap") || q.contains("path") || q.contains("semester")) {
             return Optional.of(buildJourneyResponse(targetRole, framework, semester));
         }
 
-        // 2. DSA & Practice Sheets
+        // 4. DSA & Topic Strategies
         if (q.contains("dsa") || q.contains("sheet") || q.contains("striver") || q.contains("algorithm") || q.contains("data structure") || q.contains("leetcode")) {
             return Optional.of(buildDsaResponse());
         }
 
-        // 3. Spring Boot Queries
+        // 5. Spring Boot Queries
         if (q.contains("spring boot") || q.contains("bean") || q.contains("component") || q.contains("autowired") || q.contains("rest controller") || q.contains("jpa")) {
             return Optional.of(buildSpringBootResponse(q));
         }
@@ -254,4 +264,75 @@ public class ChatbotKnowledgeBase {
                 ))
                 .build();
     }
+
+    private ChatbotResponse buildInternshipResponse() {
+        String answer = """
+                ### 💼 How to Find & Apply for Internships on CareerForge
+                
+                Here is the step-by-step roadmap to finding internship opportunities and preparing on this platform:
+                
+                1. **Study Resources → Internships Folder**:
+                   - Click on **Study Resources** (`/student/resources`) in the left sidebar.
+                   - Open the **Internships** folder, where guides, application checklists, company-wise preparation material, and resume templates are organized.
+                
+                2. **Placement & Drive Announcements**:
+                   - Check **Announcements** (`/student/announcements`) regularly for official campus notices, pool drive alerts, and application deadlines.
+                
+                3. **Read Senior Interview Experiences**:
+                   - Explore **Placement Blogs** (`/student/blogs`) to review the exact rounds, online assessment (OA) questions, and technical interview patterns asked at top tech companies.
+                
+                4. **Competitive Coding Practice**:
+                   - Participate in live challenges on the **Contest** platform (linked below Chat in your sidebar) to sharpen your problem-solving speed under pressure.
+                """;
+
+        return ChatbotResponse.builder()
+                .answer(answer)
+                .isOfflineKnowledge(true)
+                .suggestedFollowUps(List.of(
+                        "What projects should I put on my resume for internships?",
+                        "How to prepare for Online Assessment (OA) rounds?",
+                        "What are the most common technical interview questions?"
+                ))
+                .relevantLinks(List.of(
+                        ChatbotResponse.ChatbotResourceLinkDto.builder().title("Study Resources (Internships)").url("/student/resources").type("RESOURCE").build(),
+                        ChatbotResponse.ChatbotResourceLinkDto.builder().title("Placement Announcements").url("/student/announcements").type("RESOURCE").build(),
+                        ChatbotResponse.ChatbotResourceLinkDto.builder().title("Placement Blogs").url("/student/blogs").type("RESOURCE").build()
+                ))
+                .build();
+    }
+
+    private ChatbotResponse buildDsaSheetLocationResponse() {
+        String answer = """
+                ### 📑 Where to Find DSA Sheets on CareerForge
+                
+                You have direct access to curated DSA practice sheets right on this platform:
+                
+                1. **Dedicated Practice Sheets Page**:
+                   - Click on **Practice Sheets** (`/student/sheets`) in your left sidebar.
+                   - Browse curated sheets (e.g. A2Z DSA Sheet, SDE Sheet, CP Sheet) with topic-by-topic checkboxes (Arrays, Linked Lists, Stacks/Queues, Trees, Graphs, DP).
+                   - Track your solved questions and completion percentage in real time.
+                
+                2. **My Journey Milestones**:
+                   - Click on **My Journey** (`/student/journey`) in the left sidebar.
+                   - Each semester milestone includes a linked DSA Track with recommended problem sets to solve for your academic term.
+                
+                3. **Study Resources Notes**:
+                   - Click on **Study Resources** (`/student/resources`) to view PDF notes, algorithm cheat sheets, and time-complexity summaries.
+                """;
+
+        return ChatbotResponse.builder()
+                .answer(answer)
+                .isOfflineKnowledge(true)
+                .suggestedFollowUps(List.of(
+                        "Which DSA sheet should I start first?",
+                        "How many DSA questions should I solve daily?",
+                        "How to track my progress in practice sheets?"
+                ))
+                .relevantLinks(List.of(
+                        ChatbotResponse.ChatbotResourceLinkDto.builder().title("Practice Sheets").url("/student/sheets").type("SHEET").build(),
+                        ChatbotResponse.ChatbotResourceLinkDto.builder().title("My Journey").url("/student/journey").type("ROADMAP").build()
+                ))
+                .build();
+    }
 }
+

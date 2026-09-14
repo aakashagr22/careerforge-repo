@@ -48,6 +48,12 @@ class ChatbotServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private com.careerforge.resource.repository.ResourceFolderRepository resourceFolderRepository;
+
+    @Mock
+    private com.careerforge.sheet.repository.SheetRepository sheetRepository;
+
     @InjectMocks
     private ChatbotServiceImpl chatbotService;
 

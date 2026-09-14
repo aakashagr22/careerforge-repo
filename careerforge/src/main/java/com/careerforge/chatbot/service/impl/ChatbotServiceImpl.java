@@ -8,6 +8,10 @@ import com.careerforge.chatbot.dto.ChatbotResponse;
 import com.careerforge.chatbot.service.ChatbotKnowledgeBase;
 import com.careerforge.chatbot.service.ChatbotRateLimiter;
 import com.careerforge.chatbot.service.ChatbotService;
+import com.careerforge.resource.entity.ResourceFolder;
+import com.careerforge.resource.repository.ResourceFolderRepository;
+import com.careerforge.sheet.entity.Sheet;
+import com.careerforge.sheet.repository.SheetRepository;
 import com.careerforge.student.entity.StudentProfile;
 import com.careerforge.student.repository.StudentProfileRepository;
 import com.careerforge.user.entity.User;
@@ -28,6 +32,8 @@ public class ChatbotServiceImpl implements ChatbotService {
     private final ChatbotKnowledgeBase knowledgeBase;
     private final StudentProfileRepository studentProfileRepository;
     private final com.careerforge.user.repository.UserRepository userRepository;
+    private final ResourceFolderRepository resourceFolderRepository;
+    private final SheetRepository sheetRepository;
 
     @Value("${app.chatbot.daily-limit:20}")
     private int dailyLimit;
@@ -47,7 +53,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         int semester = (profile != null && profile.getSemester() != null) ? profile.getSemester() : 1;
         int streak = (profile != null && profile.getStreak() != null) ? profile.getStreak() : 0;
 
-        // 3. Build system prompt with student context
+        // 3. Build system prompt with student context and live platform inventory
         String systemPrompt = buildSystemPrompt(user.getFirstName(), roleStr, frameworkStr, semester, streak, request.getPageContext());
 
         // 4. Prune history to last 3 messages to optimize Groq tokens
@@ -130,6 +136,16 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     private String buildSystemPrompt(String name, String role, String framework, int semester, int streak, String pageContext) {
+        String availableFolders = resourceFolderRepository.findAll().stream()
+                .map(ResourceFolder::getName)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("Internships, Core CS, DSA, Full-Stack Development");
+
+        String availableSheets = sheetRepository.findAll().stream()
+                .map(Sheet::getTitle)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("A2Z DSA Sheet, SDE Sheet, CP Sheet");
+
         return String.format("""
                 You are ForgeBot, the expert AI Career & Technical Mentor built into the CareerForge education platform.
 
@@ -141,21 +157,24 @@ public class ChatbotServiceImpl implements ChatbotService {
                 - Study Streak: %d days
                 - Current App Context: %s
 
-                PLATFORM CAPABILITIES & NAVIGATION:
-                - /student/journey: Personalized semester-by-semester learning milestones.
-                - /student/sheets: Curated DSA practice sheets with topic-by-topic tracking.
-                - /student/resources: Organized repository of notes, cheat sheets, and interview guides.
-                - /student/community: Q&A forum to ask questions to peers.
-                - /student/blogs: Placement interview experiences shared by seniors.
-                - https://kernel-sable.vercel.app/signin: External coding contest platform.
+                PLATFORM CONTENT & NAVIGATION DIRECTORY:
+                - Study Resource Folders on CareerForge: [%s]
+                  * IMPORTANT: If the student asks about internships, referrals, job applications, or company preparation, explicitly tell them to click "Study Resources" (/student/resources) in the left sidebar and open the "Internships" folder! Also recommend "Announcements" (/student/announcements) for active drives and "Placement Blogs" (/student/blogs) for interview experiences.
+                - Curated Practice Sheets on CareerForge: [%s]
+                  * IMPORTANT: If the student asks where to find or get DSA sheets, guide them to click "Practice Sheets" (/student/sheets) in the left sidebar or "My Journey" (/student/journey) for their semester track.
+                - My Journey (/student/journey): Semester-by-semester milestones and pacing for %s + %s.
+                - Q&A Community (/student/community): Peer doubts and discussions.
+                - Contests (https://kernel-sable.vercel.app/signin): Online coding challenges.
 
                 INSTRUCTIONS:
                 1. Answer coding & technical questions (Java, Spring Boot, React, TypeScript, Python, DSA, System Design, SQL, Docker, etc.) accurately and concisely with markdown formatting and clean code blocks.
-                2. If the student asks about how to follow their journey, roadmaps, or what to learn next, tailor your guidance specifically to their Target Role (%s), Framework (%s), and Semester (%d).
-                3. Keep answers practical, actionable, and structured with bullet points. Avoid unnecessary fluff. Maximum length: ~400 words.
+                2. When asked about learning steps, roadmaps, or site resources, provide concrete, step-by-step navigation instructions pointing to the exact pages and folders listed above.
+                3. Tailor learning pacing to the student's Target Role (%s), Framework (%s), and Semester (%d).
+                4. Keep answers practical, structured with bullet points, and friendly. Maximum length: ~400 words.
                 """,
                 (name != null ? name : "Student"), role, framework, semester, streak,
                 (pageContext != null ? pageContext : "general"),
+                availableFolders, availableSheets, role, framework,
                 role, framework, semester);
     }
 
