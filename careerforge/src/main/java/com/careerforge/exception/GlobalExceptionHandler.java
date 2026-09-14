@@ -70,8 +70,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(org.springframework.web.context.request.async.AsyncRequestNotUsableException.class)
+    public void handleAsyncRequestNotUsable(org.springframework.web.context.request.async.AsyncRequestNotUsableException ex) {
+        log.debug("Client disconnected before async response completed: {}", ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        if (ex.getCause() instanceof java.io.IOException && ex.getMessage() != null && ex.getMessage().contains("Connection reset by peer")) {
+            log.debug("Client aborted connection: {}", ex.getMessage());
+            return null;
+        }
         log.error("An unexpected error occurred: ", ex);
         ErrorResponse errorResponse = ErrorResponse.of(
                 "An internal server error occurred",
