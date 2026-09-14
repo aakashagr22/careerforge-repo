@@ -7,8 +7,8 @@ import { notificationService } from '../services/notificationService';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Flame, LayoutDashboard, Library, User, Settings, Compass, Megaphone,
-  LogOut, Sun, Moon, Laptop, Bell, Menu, X, Check, BookOpen, MessageSquare, MessageCircle, CircleHelp
-  
+  LogOut, Sun, Moon, Laptop, Bell, Menu, X, Check, BookOpen, MessageSquare, MessageCircle, CircleHelp,
+  Trophy, ExternalLink
 } from 'lucide-react';
 // Q&A icon is used by the student community link.
 
@@ -51,6 +51,7 @@ export const StudentLayout: React.FC = () => {
     { to: '/student/resources', label: 'Study Resources', icon: Library },
     { to: '/student/community', label: 'Q&A Community', icon: CircleHelp },
     { to: '/student/chat', label: 'Chat', icon: MessageCircle },
+    { to: 'https://kernel-sable.vercel.app/signin', label: 'Contest', icon: Trophy, isExternal: true },
     { to: '/student/announcements', label: 'Announcements', icon: Megaphone },
     { to: '/student/blogs', label: 'Placement Blogs', icon: BookOpen },
     { to: '/student/suggestions', label: 'Suggestions', icon: MessageSquare },
@@ -93,6 +94,26 @@ export const StudentLayout: React.FC = () => {
         <nav className="flex-1 px-4 py-6 space-y-1">
           {navLinks.map((link) => {
             const Icon = link.icon;
+            if (link.isExternal) {
+              return (
+                <a
+                  key={link.label}
+                  href={link.to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between px-3 py-2.5 rounded-xl font-medium text-sm text-slate-500 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-200 group"
+                  title={!sidebarOpen ? link.label : undefined}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Icon className="h-5 w-5 shrink-0 text-amber-500 group-hover:scale-110 transition-transform" />
+                    {sidebarOpen && <span>{link.label}</span>}
+                  </div>
+                  {sidebarOpen && (
+                    <ExternalLink className="h-3.5 w-3.5 opacity-60 group-hover:opacity-100 transition-opacity shrink-0" />
+                  )}
+                </a>
+              );
+            }
             return (
               <NavLink
                 key={link.to}
@@ -157,6 +178,24 @@ export const StudentLayout: React.FC = () => {
               <nav className="flex-1 space-y-1">
                 {navLinks.map((link) => {
                   const Icon = link.icon;
+                  if (link.isExternal) {
+                    return (
+                      <a
+                        key={link.label}
+                        href={link.to}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setMobileSidebarOpen(false)}
+                        className="flex items-center justify-between px-3 py-3 rounded-xl font-medium text-sm text-slate-500 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-200 group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icon className="h-5 w-5 text-amber-500 group-hover:scale-110 transition-transform" />
+                          <span>{link.label}</span>
+                        </div>
+                        <ExternalLink className="h-4 w-4 opacity-60 group-hover:opacity-100" />
+                      </a>
+                    );
+                  }
                   return (
                     <NavLink
                       key={link.to}
@@ -164,7 +203,7 @@ export const StudentLayout: React.FC = () => {
                       onClick={() => setMobileSidebarOpen(false)}
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
-                          ? 'bg-brand-55 dark:bg-brand-900/20 text-brand-600 dark:text-brand-300'
+                          ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-300'
                           : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50 hover:text-slate-900 dark:hover:text-slate-200'
                         }`
                       }
