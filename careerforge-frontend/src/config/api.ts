@@ -1,10 +1,21 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
-const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';
+const resolveBaseUrl = () => {
+  let url = (import.meta.env.VITE_API_BASE_URL || '').trim();
+  if (!url) {
+    return 'http://localhost:8082';
+  }
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = `https://${url}`;
+  }
+  return url.replace(/\/+$/, '');
+};
+
+export const API_BASE_URL = resolveBaseUrl();
 
 export const apiClient = axios.create({
-  baseURL: VITE_API_BASE_URL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -26,7 +37,20 @@ apiClient.interceptors.request.use(
 
 // Response Interceptor: Handle global errors, token expiration and redirects
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Guard against SPA returning index.html on 404/fallback
+    if (
+      typeof response.data === 'string' &&
+      (response.data.trim().startsWith('<!doctype html') || response.data.includes('<html'))
+    ) {
+      return Promise.reject(
+        new Error(
+          'API endpoint returned HTML instead of JSON. Please check backend connection & VITE_API_BASE_URL.'
+        )
+      );
+    }
+    return response;
+  },
   (error) => {
     const { status } = error.response || {};
 

@@ -2,10 +2,9 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { Client, StompSubscription } from '@stomp/stompjs';
 import { useAuthStore } from '../../../store/authStore';
 import { ChatMessage, SendMessageRequest } from '../types/chat';
+import { API_BASE_URL } from '../../../config/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';
-
-// Convert http://localhost:8082 -> ws://localhost:8082/ws/websocket for native STOMP over WebSocket
+// Convert http(s)://... -> ws(s)://.../ws/websocket for native STOMP over WebSocket
 const getWsUrl = () => {
   const url = new URL(API_BASE_URL);
   const protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
