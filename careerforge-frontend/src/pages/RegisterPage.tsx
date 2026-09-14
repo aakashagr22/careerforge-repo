@@ -6,6 +6,7 @@ import * as zod from 'zod';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import { authService } from '../services/authService';
+import { API_BASE_URL } from '../config/api';
 import { Eye, EyeOff, Loader2, Mail, CheckCircle2, RefreshCw, ArrowLeft } from 'lucide-react';
 
 const registerSchema = zod.object({
@@ -56,8 +57,12 @@ export const RegisterPage: React.FC = () => {
       toast.success('6-digit verification code sent to your email!');
     } catch (error: any) {
       console.error('Registration error detailed:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Registration failed. Please check connection.';
-      toast.error(errorMessage);
+      const isNetworkError = error.message === 'Network Error' || error.code === 'ERR_NETWORK';
+      const errorMessage = error.response?.data?.message
+        || (isNetworkError
+            ? `Cannot connect to backend (${API_BASE_URL}). If using Render free tier, please wait 30s for it to wake up and try again.`
+            : error.message || 'Registration failed. Please check connection.');
+      toast.error(errorMessage, { duration: 6000 });
     } finally {
       setLoading(false);
     }
