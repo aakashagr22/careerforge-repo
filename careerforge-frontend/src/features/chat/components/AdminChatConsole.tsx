@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { roomService } from '../services/roomService';
 import { chatService } from '../services/chatService';
-import { ChatRoom, ChatMessage, RoomType } from '../types/chat';
+import { ChatRoom, ChatMessage, RoomType, CreateRoomRequest } from '../types/chat';
 import { CreateRoomModal } from './CreateRoomModal';
 import { Plus, Trash2, ShieldAlert, Users, Hash, Eye, MessageSquare, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
