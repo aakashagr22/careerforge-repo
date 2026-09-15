@@ -4,6 +4,9 @@ import { useAuthStore } from '../store/authStore';
 const resolveBaseUrl = () => {
   let url = (import.meta.env.VITE_API_BASE_URL || '').trim();
   if (!url) {
+    if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+      return 'https://careerforge-backend-7p3w.onrender.com';
+    }
     return 'http://localhost:8082';
   }
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
