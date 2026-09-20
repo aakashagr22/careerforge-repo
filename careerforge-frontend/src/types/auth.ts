@@ -7,6 +7,8 @@ export interface User {
   email: string;
   role: Role;
   active: boolean;
+  emailVerified?: boolean;
+  previewOtp?: string;
 }
 
 export interface StudentProfile {

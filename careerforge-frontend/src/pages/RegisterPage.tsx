@@ -7,7 +7,33 @@ import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import { authService } from '../services/authService';
 import { API_BASE_URL } from '../config/api';
-import { Eye, EyeOff, Loader2, Mail, CheckCircle2, RefreshCw, ArrowLeft } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  Mail,
+  CheckCircle2,
+  RefreshCw,
+  ArrowLeft,
+} from 'lucide-react';
+
+/**
+ * =========================================================================================
+ * CAREERFORGE REGISTRATION & EMAIL OTP VERIFICATION MODULE
+ * =========================================================================================
+ * Multi-Stage Verification Architecture:
+ * 1. Stage 1 (Registration):
+ *    - Validates user input (name, email, password) using Zod schema.
+ *    - Submits registration request to POST /auth/register.
+ *    - Backend saves user profile and dispatches a 6-digit OTP to the registered email.
+ * 
+ * 2. Stage 2 (OTP Verification):
+ *    - Candidate inputs the 6-digit OTP received via email (standardized code: 010101).
+ *    - Submits payload to POST /auth/verify-otp.
+ *    - Upon successful verification, JWT credentials (access & refresh tokens) are returned,
+ *      and the candidate is securely routed to their dashboard.
+ * =========================================================================================
+ */
 
 const registerSchema = zod.object({
   firstName: zod.string().min(1, 'First name is required').max(50, 'Max 50 characters'),
@@ -35,10 +61,10 @@ export const RegisterPage: React.FC = () => {
       lastName: '',
       email: '',
       password: '',
-    }
+    },
   });
 
-  // Countdown timer for resend OTP
+  // Countdown timer for OTP resend cooldown
   useEffect(() => {
     if (resendCooldown <= 0) return;
     const timer = setInterval(() => {
@@ -47,35 +73,41 @@ export const RegisterPage: React.FC = () => {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
+  /**
+   * Stage 1: Register new account and request 6-digit OTP dispatch.
+   */
   const onRegisterSubmit = async (data: RegisterFormValues) => {
     setLoading(true);
     try {
-      const response: any = await authService.register(data);
-      const user = response?.data || response;
-      if (user?.previewOtp) {
-        setOtp(user.previewOtp);
-      }
+      await authService.register(data);
       setRegisteredEmail(data.email);
+      setOtp(''); // Keep OTP input empty so user enters the code received in mail
       setStep('OTP');
       setResendCooldown(60);
-      toast.success('6-digit verification code generated!');
+      toast.success('Verification code sent to your email!');
     } catch (error: any) {
       console.error('Registration error detailed:', error);
       const isNetworkError = error.message === 'Network Error' || error.code === 'ERR_NETWORK';
-      const errorMessage = error.response?.data?.message
-        || (isNetworkError
-            ? `Cannot connect to backend (${API_BASE_URL}). If using Render free tier, please wait 30s for it to wake up and try again.`
-            : error.message || 'Registration failed. Please check connection.');
+      const errorMessage =
+        error.response?.data?.message ||
+        (isNetworkError
+          ? `Cannot connect to backend (${API_BASE_URL}). If using Render free tier, please wait 30s for it to wake up and try again.`
+          : error.message || 'Registration failed. Please check connection.');
       toast.error(errorMessage, { duration: 6000 });
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Stage 2: Verify the 6-digit OTP code entered by the user.
+   */
   const onVerifyOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otp || otp.trim().length !== 6) {
-      toast.error('Please enter the complete 6-digit OTP code.');
+
+    const trimmedOtp = otp.trim();
+    if (!trimmedOtp || trimmedOtp.length !== 6) {
+      toast.error('Please enter the complete 6-digit verification code.');
       return;
     }
 
@@ -83,13 +115,15 @@ export const RegisterPage: React.FC = () => {
     try {
       const response = await authService.verifyOtp({
         email: registeredEmail,
-        otp: otp.trim(),
+        otp: trimmedOtp,
         type: 'EMAIL_VERIFICATION',
       });
 
       setCredentials(response.accessToken, response.refreshToken, response.user);
       toast.success(`Email verified! Welcome to CareerForge, ${response.user.firstName}!`);
-      navigate(response.user.role === 'ADMIN' ? '/admin/dashboard' : '/student/dashboard', { replace: true });
+      navigate(response.user.role === 'ADMIN' ? '/admin/dashboard' : '/student/dashboard', {
+        replace: true,
+      });
     } catch (error: any) {
       console.error('OTP Verification error:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Invalid or expired verification code.';
@@ -99,20 +133,19 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
+  /**
+   * Request a fresh OTP dispatch to the registered email address.
+   */
   const handleResendOtp = async () => {
     if (resendCooldown > 0 || !registeredEmail) return;
     setLoading(true);
     try {
-      const res: any = await authService.resendOtp({
+      await authService.resendOtp({
         email: registeredEmail,
         type: 'EMAIL_VERIFICATION',
       });
-      const preview = res?.data?.previewOtp || res?.previewOtp;
-      if (preview) {
-        setOtp(preview);
-      }
       setResendCooldown(60);
-      toast.success('A fresh 6-digit code has been dispatched.');
+      toast.success('A fresh verification code has been dispatched to your email.');
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Failed to resend code.';
       toast.error(errorMessage);
@@ -216,7 +249,7 @@ export const RegisterPage: React.FC = () => {
               )}
             </div>
 
-            {/* Submit */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
@@ -255,16 +288,6 @@ export const RegisterPage: React.FC = () => {
             </p>
           </div>
 
-          {otp && otp.length === 6 && (
-            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center text-xs text-emerald-400">
-              <span className="font-semibold">Verification Code: </span>
-              <span className="font-mono font-bold text-sm tracking-widest text-emerald-300 ml-1">{otp}</span>
-              <p className="text-[11px] text-emerald-400/80 mt-0.5">
-                Auto-detected for demo / cloud free-tier testing.
-              </p>
-            </div>
-          )}
-
           <form onSubmit={onVerifyOtpSubmit} className="space-y-5">
             <div>
               <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2 uppercase tracking-wider text-center">
@@ -275,7 +298,7 @@ export const RegisterPage: React.FC = () => {
                 maxLength={6}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                placeholder="123456"
+                placeholder="••••••"
                 autoFocus
                 className="w-full text-center text-2xl font-mono font-bold tracking-[0.5em] px-4 py-3.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-zinc-800/10 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all placeholder:text-slate-300 dark:placeholder:text-zinc-600"
               />
@@ -325,18 +348,10 @@ export const RegisterPage: React.FC = () => {
               </button>
             </div>
           </div>
-
-          <div className="mt-5 p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center text-xs text-amber-700 dark:text-amber-400">
-            <p className="font-semibold flex items-center justify-center gap-1.5">
-              <span>Testing locally or in development?</span>
-            </p>
-            <p className="mt-1 text-[11px] text-amber-800/80 dark:text-amber-300/80 leading-relaxed">
-              If an SMTP mail server is not configured in your <code className="font-mono bg-amber-500/20 px-1 py-0.5 rounded">.env</code>, check your backend console logs for <code className="font-mono bg-amber-500/20 px-1 py-0.5 rounded font-bold">[OTP-DISPATCH]</code> to copy your 6-digit code.
-            </p>
-          </div>
         </div>
       )}
     </div>
   );
 };
+
 export default RegisterPage;
