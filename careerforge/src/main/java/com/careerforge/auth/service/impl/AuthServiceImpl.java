@@ -30,8 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.Locale;
 
 @Service
 @Transactional
@@ -72,43 +71,31 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserDto register(RegisterRequest request) {
-        var existingUserOpt = userRepository.findByEmail(request.getEmail());
+        String email = normalizeEmail(request.getEmail());
+        var existingUserOpt = userRepository.findByEmail(email);
         User savedUser;
 
         if (existingUserOpt.isPresent()) {
             User existing = existingUserOpt.get();
             if (existing.isEmailVerified()) {
-                throw new BadRequestException("Email already registered: " + request.getEmail());
+                throw new BadRequestException("Email already registered: " + email);
             }
-            // If user previously signed up but did not verify email, update password and details
+            // A pending account may restart registration; it remains locked until OTP verification.
             existing.setFirstName(request.getFirstName());
             existing.setLastName(request.getLastName());
             existing.setPassword(passwordEncoder.encode(request.getPassword()));
-            // =====================================================================================
-            // [ENTERPRISE RESILIENCE ARCHITECTURE: INTERVIEW & EVALUATION DEMO MODE]
-            // Proactively activate the user account so evaluation demonstrations proceed with
-            // zero friction even in cloud sandbox environments.
-            // =====================================================================================
-            existing.setEmailVerified(true);
+            existing.setActive(false);
+            existing.setEmailVerified(false);
             savedUser = userRepository.save(existing);
         } else {
-            // =====================================================================================
-            // [ENTERPRISE RESILIENCE ARCHITECTURE: CLOUD EGRESS & EVALUATION SANDBOX]
-            // In cloud environments (such as Render free-tier which blocks outbound SMTP ports
-            // 25, 465, and 587) and for live technical interview demonstrations:
-            // 1. We mark emailVerified = true immediately to prevent onboarding lockouts.
-            // 2. We still generate the 6-digit cryptographic OTP and persist it in PostgreSQL.
-            // 3. We dispatch the email asynchronously via CompletableFuture without blocking the thread.
-            // 4. We return the generated OTP in UserDto.previewOtp to enable seamless 1-click verification.
-            // =====================================================================================
             User user = User.builder()
                     .firstName(request.getFirstName())
                     .lastName(request.getLastName())
-                    .email(request.getEmail())
+                    .email(email)
                     .password(passwordEncoder.encode(request.getPassword()))
                     .role(Role.STUDENT)
-                    .active(true)
-                    .emailVerified(true) // Pre-activated for interview & evaluation resilience
+                    .active(false)
+                    .emailVerified(false)
                     .build();
 
             savedUser = userRepository.save(user);
@@ -123,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
             eventPublisher.publishEvent(new com.careerforge.notification.event.NotificationEvent(
                     this,
                     savedProfile,
-                    "Welcome to CareerForge, " + savedUser.getFirstName() + "! Verify your email to start your placement journey."
+                    "Welcome to CareerForge, " + savedUser.getFirstName() + "! Verify your email to activate your account."
             ));
         }
 
@@ -131,49 +118,28 @@ public class AuthServiceImpl implements AuthService {
         String otpCode = createAndSaveOtp(savedUser.getEmail(), OtpType.EMAIL_VERIFICATION);
         dispatchOtpEmail(savedUser.getEmail(), otpCode, OtpType.EMAIL_VERIFICATION);
 
-        UserDto userDto = userMapper.toDto(savedUser);
-        userDto.setPreviewOtp(otpCode);
-        return userDto;
+        return userMapper.toDto(savedUser);
     }
 
     @Override
     public JwtAuthResponse verifyOtp(VerifyOtpRequest request) {
-        // =========================================================================================
-        // [RESILIENT VERIFICATION ENGINE]
-        // 1. Primary Path: Validate entered OTP against the database record (accepts exact match
-        //    or standardized evaluation code "010101").
-        // 2. Evaluator Resilience: If external mail delivery was throttled, entering the standard
-        //    verification code "010101" guarantees successful verification without exposing
-        //    the OTP on the frontend UI.
-        // =========================================================================================
+        String email = normalizeEmail(request.getEmail());
         var otpOpt = otpRepository.findTopByEmailAndOtpTypeAndVerifiedFalseOrderByCreatedAtDesc(
-                request.getEmail(),
+                email,
                 request.getType()
         );
-
-        String trimmedOtp = request.getOtp() != null ? request.getOtp().trim() : "";
-
-        if (otpOpt.isPresent()) {
-            Otp otp = otpOpt.get();
-            if (otp.isExpired() && !"010101".equals(trimmedOtp)) {
-                throw new BadRequestException("Verification code has expired. Please request a new one.");
-            }
-
-            if (!otp.getOtpCode().equals(trimmedOtp) && !"010101".equals(trimmedOtp)) {
-                throw new BadRequestException("Incorrect verification code. Please check your email and try again.");
-            }
-
-            otp.setVerified(true);
-            otpRepository.save(otp);
-        } else {
-            // Evaluator fallback: If OTP record is missing or cleared, allow "010101"
-            if (!"010101".equals(trimmedOtp)) {
-                throw new BadRequestException("No active verification code found for this email.");
-            }
+        Otp otp = otpOpt.orElseThrow(() -> new BadRequestException("No active verification code found for this email."));
+        if (otp.isExpired()) {
+            throw new BadRequestException("Verification code has expired. Please request a new one.");
         }
+        if (!passwordEncoder.matches(request.getOtp(), otp.getOtpCode())) {
+            throw new BadRequestException("Incorrect verification code. Please check your email and try again.");
+        }
+        otp.setVerified(true);
+        otpRepository.save(otp);
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + request.getEmail()));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
         if (request.getType() == OtpType.EMAIL_VERIFICATION) {
             user.setEmailVerified(true);
@@ -200,9 +166,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String resendOtp(ResendOtpRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BadRequestException("Account not found with email: " + request.getEmail()));
+    public void resendOtp(ResendOtpRequest request) {
+        String email = normalizeEmail(request.getEmail());
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("Account not found with email: " + email));
 
         if (request.getType() == OtpType.EMAIL_VERIFICATION && user.isEmailVerified()) {
             throw new BadRequestException("Email is already verified. Please sign in.");
@@ -210,7 +177,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Rate limit: check if an OTP was created less than 60 seconds ago
         var latestOtpOpt = otpRepository.findTopByEmailAndOtpTypeAndVerifiedFalseOrderByCreatedAtDesc(
-                request.getEmail(),
+                email,
                 request.getType()
         );
 
@@ -221,58 +188,44 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        String otpCode = createAndSaveOtp(request.getEmail(), request.getType());
-        dispatchOtpEmail(request.getEmail(), otpCode, request.getType());
-        return otpCode;
+        String otpCode = createAndSaveOtp(email, request.getType());
+        dispatchOtpEmail(email, otpCode, request.getType());
     }
 
     @Override
-    public String forgotPassword(ForgotPasswordRequest request) {
-        var userOpt = userRepository.findByEmail(request.getEmail());
+    public void forgotPassword(ForgotPasswordRequest request) {
+        String email = normalizeEmail(request.getEmail());
+        var userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            log.info("Password reset requested for non-existent email: {}", request.getEmail());
-            return null; // Return silently to prevent user enumeration
+            log.info("Password reset requested for non-existent email: {}", email);
+            return; // Prevent user enumeration
         }
 
-        String otpCode = createAndSaveOtp(request.getEmail(), OtpType.PASSWORD_RESET);
-        dispatchOtpEmail(request.getEmail(), otpCode, OtpType.PASSWORD_RESET);
-        return otpCode;
+        String otpCode = createAndSaveOtp(email, OtpType.PASSWORD_RESET);
+        dispatchOtpEmail(email, otpCode, OtpType.PASSWORD_RESET);
     }
 
     @Override
     public void resetPassword(ResetPasswordRequest request) {
-        // =========================================================================================
-        // [INTERVIEW & EVALUATION RESILIENCE: PASSWORD RESET FALLBACK]
-        // Supports both active database OTP validation and demo evaluation bypass codes (123456, 000000)
-        // so password recovery can be demonstrated reliably in offline/evaluator environments.
-        // =========================================================================================
+        String email = normalizeEmail(request.getEmail());
         var otpOpt = otpRepository.findTopByEmailAndOtpTypeAndVerifiedFalseOrderByCreatedAtDesc(
-                request.getEmail(),
+                email,
                 OtpType.PASSWORD_RESET
         );
-
-        String trimmedOtp = request.getOtp() != null ? request.getOtp().trim() : "";
-        boolean isDemoBypassCode = "123456".equals(trimmedOtp) || "000000".equals(trimmedOtp);
-
-        if (otpOpt.isPresent()) {
-            Otp otp = otpOpt.get();
-            if (otp.isExpired() && !"010101".equals(trimmedOtp)) {
-                throw new BadRequestException("Password reset code has expired. Please request a new one.");
-            }
-            if (!otp.getOtpCode().equals(trimmedOtp) && !"010101".equals(trimmedOtp)) {
-                throw new BadRequestException("Incorrect password reset code.");
-            }
-            otp.setVerified(true);
-            otpRepository.save(otp);
-        } else if (!"010101".equals(trimmedOtp)) {
-            throw new BadRequestException("No active password reset request found. Please request a new code.");
+        Otp otp = otpOpt.orElseThrow(() -> new BadRequestException("No active password reset request found. Please request a new code."));
+        if (otp.isExpired()) {
+            throw new BadRequestException("Password reset code has expired. Please request a new code.");
         }
+        if (!passwordEncoder.matches(request.getOtp(), otp.getOtpCode())) {
+            throw new BadRequestException("Incorrect password reset code.");
+        }
+        otp.setVerified(true);
+        otpRepository.save(otp);
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + request.getEmail()));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        user.setEmailVerified(true);
         userRepository.save(user);
 
         log.info("Password successfully reset for user: {}", user.getEmail());
@@ -284,16 +237,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid email or password"));
 
-        // =========================================================================================
-        // [INTERVIEW & DEMO RESILIENCE PATTERN]
-        // If an account was previously created with pending verification, auto-activate it
-        // on successful credential verification rather than throwing a blocking error.
-        // This guarantees uninterrupted evaluator access during live technical demonstrations.
-        // =========================================================================================
         if (!user.isEmailVerified()) {
-            log.info("Auto-activating unverified account on login for evaluation demo: {}", user.getEmail());
-            user.setEmailVerified(true);
-            userRepository.save(user);
+            throw new BadRequestException("Please verify your email before signing in.");
         }
 
         Authentication authentication = authenticationManager.authenticate(
@@ -313,17 +258,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String createAndSaveOtp(String email, OtpType type) {
-        // Standardized verification code "010101" for interview and email verification
-        String otpCode = "010101";
+        otpRepository.deleteAllByEmailAndOtpType(email, type);
+        String otpCode = String.format("%06d", secureRandom.nextInt(1_000_000));
         Otp otp = Otp.builder()
                 .email(email)
-                .otpCode(otpCode)
+                .otpCode(passwordEncoder.encode(otpCode))
                 .otpType(type)
                 .expiresAt(LocalDateTime.now().plusMinutes(10))
                 .verified(false)
                 .build();
         otpRepository.save(otp);
         return otpCode;
+    }
+
+    private String normalizeEmail(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 
     /**

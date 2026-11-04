@@ -26,7 +26,7 @@ public class Otp extends BaseEntity {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "otp_code", nullable = false, length = 10)
+    @Column(name = "otp_code", nullable = false, length = 100)
     private String otpCode;
 
     @Enumerated(EnumType.STRING)

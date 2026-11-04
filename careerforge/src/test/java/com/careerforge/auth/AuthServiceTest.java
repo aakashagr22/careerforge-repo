@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -87,8 +88,8 @@ public class AuthServiceTest {
                 .email("john.doe@example.com")
                 .password("encodedPassword")
                 .role(Role.STUDENT)
-                .active(true)
-                .emailVerified(true)
+                .active(false)
+                .emailVerified(false)
                 .build();
 
         userDto = UserDto.builder()
@@ -113,6 +114,10 @@ public class AuthServiceTest {
         assertNotNull(result);
         assertEquals(registerRequest.getEmail(), result.getEmail());
         verify(userRepository, times(1)).save(any(User.class));
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
+        assertFalse(userCaptor.getValue().isActive());
+        assertFalse(userCaptor.getValue().isEmailVerified());
         verify(studentProfileRepository, times(1)).save(any(StudentProfile.class));
         verify(otpRepository, times(1)).save(any(Otp.class));
         verify(emailService, times(1)).sendOtpEmail(eq(registerRequest.getEmail()), anyString(), eq(OtpType.EMAIL_VERIFICATION));
@@ -120,6 +125,7 @@ public class AuthServiceTest {
 
     @Test
     void register_ShouldThrowException_WhenEmailAlreadyVerified() {
+        user.setEmailVerified(true);
         when(userRepository.findByEmail(registerRequest.getEmail())).thenReturn(Optional.of(user));
 
         assertThrows(BadRequestException.class, () -> authService.register(registerRequest));
@@ -140,6 +146,7 @@ public class AuthServiceTest {
         when(otpRepository.findTopByEmailAndOtpTypeAndVerifiedFalseOrderByCreatedAtDesc(request.getEmail(), OtpType.EMAIL_VERIFICATION))
                 .thenReturn(Optional.of(otp));
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(request.getOtp(), otp.getOtpCode())).thenReturn(true);
         when(tokenProvider.generateToken(any(Authentication.class))).thenReturn("accessToken");
         when(tokenProvider.generateRefreshToken(any(Authentication.class))).thenReturn("refreshToken");
         when(userMapper.toDto(user)).thenReturn(userDto);
@@ -171,6 +178,25 @@ public class AuthServiceTest {
     }
 
     @Test
+    void verifyOtp_ShouldRejectLegacyBypassCode() {
+        VerifyOtpRequest request = new VerifyOtpRequest("john.doe@example.com", "010101", OtpType.EMAIL_VERIFICATION);
+        Otp otp = Otp.builder()
+                .email(request.getEmail())
+                .otpCode("hashedOtp")
+                .otpType(OtpType.EMAIL_VERIFICATION)
+                .expiresAt(LocalDateTime.now().plusMinutes(10))
+                .verified(false)
+                .build();
+
+        when(otpRepository.findTopByEmailAndOtpTypeAndVerifiedFalseOrderByCreatedAtDesc(request.getEmail(), OtpType.EMAIL_VERIFICATION))
+                .thenReturn(Optional.of(otp));
+        when(passwordEncoder.matches(request.getOtp(), otp.getOtpCode())).thenReturn(false);
+
+        assertThrows(BadRequestException.class, () -> authService.verifyOtp(request));
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
     void forgotPassword_ShouldGenerateOtpAndSendEmail_WhenUserExists() {
         ForgotPasswordRequest request = new ForgotPasswordRequest("john.doe@example.com");
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
@@ -195,6 +221,7 @@ public class AuthServiceTest {
         when(otpRepository.findTopByEmailAndOtpTypeAndVerifiedFalseOrderByCreatedAtDesc(request.getEmail(), OtpType.PASSWORD_RESET))
                 .thenReturn(Optional.of(otp));
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(request.getOtp(), otp.getOtpCode())).thenReturn(true);
         when(passwordEncoder.encode(request.getNewPassword())).thenReturn("newEncodedPassword");
 
         authService.resetPassword(request);
@@ -207,6 +234,8 @@ public class AuthServiceTest {
 
     @Test
     void login_ShouldReturnJwtResponse_WhenCredentialsAreValid() {
+        user.setEmailVerified(true);
+        user.setActive(true);
         LoginRequest loginRequest = new LoginRequest("john.doe@example.com", "password123");
         Authentication authentication = mock(Authentication.class);
 
@@ -222,5 +251,16 @@ public class AuthServiceTest {
         assertEquals("accessToken", response.getAccessToken());
         assertEquals("refreshToken", response.getRefreshToken());
         assertEquals(userDto, response.getUser());
+    }
+
+    @Test
+    void login_ShouldRejectUnverifiedAccount() {
+        LoginRequest loginRequest = new LoginRequest("john.doe@example.com", "password123");
+        when(userRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(user));
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> authService.login(loginRequest));
+
+        assertEquals("Please verify your email before signing in.", exception.getMessage());
+        verify(authenticationManager, never()).authenticate(any());
     }
 }

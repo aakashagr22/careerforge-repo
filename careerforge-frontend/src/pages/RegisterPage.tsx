@@ -28,7 +28,7 @@ import {
  *    - Backend saves user profile and dispatches a 6-digit OTP to the registered email.
  * 
  * 2. Stage 2 (OTP Verification):
- *    - Candidate inputs the 6-digit OTP received via email (standardized code: 010101).
+ *    - Candidate inputs the 6-digit OTP received via email.
  *    - Submits payload to POST /auth/verify-otp.
  *    - Upon successful verification, JWT credentials (access & refresh tokens) are returned,
  *      and the candidate is securely routed to their dashboard.

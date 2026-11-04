@@ -12,8 +12,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.CompletableFuture;
-
 @Service
 public class EmailServiceImpl implements EmailService {
 
@@ -47,32 +45,30 @@ public class EmailServiceImpl implements EmailService {
                 ? "Thank you for creating an account on CareerForge. Use the verification code below to activate your account and start your placement preparation."
                 : "We received a request to reset your CareerForge password. Enter the one-time code below to choose a new password.";
 
-        log.info("🔑 [OTP-DISPATCH] {} for {}: {}", type, toEmail, otpCode);
+        log.info("Dispatching {} OTP email to {}", type, toEmail);
 
         if (mailSender == null || mailHost == null || mailHost.isBlank() || "localhost".equalsIgnoreCase(mailHost)) {
-            log.warn("📧 [SMTP-DISABLED] SPRING_MAIL_HOST is not configured in .env or environment variables. Email was NOT dispatched to {}. Development OTP is: [{}]", toEmail, otpCode);
+            log.warn("SMTP is not configured. OTP email was not dispatched to {}.", toEmail);
             return;
         }
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-                String sender = (fromEmail != null && !fromEmail.isBlank()) ? fromEmail : "noreply@careerforge.com";
-                helper.setFrom(sender, "CareerForge");
-                helper.setTo(toEmail);
-                helper.setSubject(subject);
+            String sender = (fromEmail != null && !fromEmail.isBlank()) ? fromEmail : "noreply@careerforge.com";
+            helper.setFrom(sender, "CareerForge");
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
 
-                String htmlContent = buildOtpHtmlTemplate(title, description, otpCode);
-                helper.setText(htmlContent, true);
+            String htmlContent = buildOtpHtmlTemplate(title, description, otpCode);
+            helper.setText(htmlContent, true);
 
-                mailSender.send(message);
-                log.info("📧 Verification email sent successfully to {}", toEmail);
-            } catch (Exception e) {
-                log.error("Failed to dispatch email via SMTP to {}: {}. (OTP code: {})", toEmail, e.getMessage(), otpCode, e);
-            }
-        });
+            mailSender.send(message);
+            log.info("Verification email sent successfully to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to dispatch email via SMTP to {}", toEmail, e);
+        }
     }
 
     private String buildOtpHtmlTemplate(String title, String description, String otpCode) {

@@ -31,7 +31,7 @@ public class AuthController {
     @Operation(summary = "Register a new user")
     public ResponseEntity<ApiResponse<UserDto>> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         UserDto registeredUser = authService.register(registerRequest);
-        return new ResponseEntity<>(ApiResponse.success(registeredUser, "User registered successfully"), HttpStatus.CREATED);
+        return new ResponseEntity<>(ApiResponse.success(registeredUser, "Registration received. Check your email for the verification code."), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
@@ -50,16 +50,16 @@ public class AuthController {
 
     @PostMapping("/resend-otp")
     @Operation(summary = "Resend a fresh 6-digit OTP")
-    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> resendOtp(@Valid @RequestBody com.careerforge.auth.dto.ResendOtpRequest request) {
-        String otpCode = authService.resendOtp(request);
-        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("previewOtp", otpCode), "A fresh verification code has been dispatched."));
+    public ResponseEntity<ApiResponse<Void>> resendOtp(@Valid @RequestBody com.careerforge.auth.dto.ResendOtpRequest request) {
+        authService.resendOtp(request);
+        return ResponseEntity.ok(ApiResponse.success("A fresh verification code has been dispatched."));
     }
 
     @PostMapping("/forgot-password")
     @Operation(summary = "Request a 6-digit password reset OTP")
-    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> forgotPassword(@Valid @RequestBody com.careerforge.auth.dto.ForgotPasswordRequest request) {
-        String otpCode = authService.forgotPassword(request);
-        return ResponseEntity.ok(ApiResponse.success(otpCode != null ? java.util.Map.of("previewOtp", otpCode) : java.util.Map.of(), "If an account exists with this email, a reset code has been sent."));
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody com.careerforge.auth.dto.ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("If an account exists with this email, a reset code has been sent."));
     }
 
     @PostMapping("/reset-password")
