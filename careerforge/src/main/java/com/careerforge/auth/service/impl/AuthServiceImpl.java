@@ -284,7 +284,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             emailService.sendOtpEmail(email, otpCode, type);
         } catch (Exception e) {
-            log.warn("SMTP email dispatch skipped/failed for {} [type: {}]: {}", email, type, e.getMessage());
+            log.warn("OTP email dispatch failed for {} [type: {}]: {}", email, type, e.getMessage());
         }
     }
 }

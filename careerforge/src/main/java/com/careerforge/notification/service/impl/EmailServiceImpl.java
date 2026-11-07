@@ -2,32 +2,41 @@ package com.careerforge.notification.service.impl;
 
 import com.careerforge.auth.entity.OtpType;
 import com.careerforge.notification.service.EmailService;
-import jakarta.mail.internet.MimeMessage;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 @Service
 public class EmailServiceImpl implements EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailServiceImpl.class);
 
-    private final JavaMailSender mailSender;
+    private static final URI RESEND_EMAILS_URI = URI.create("https://api.resend.com/emails");
 
-    @Value("${spring.mail.username:noreply@careerforge.com}")
+    private final HttpClient httpClient;
+    private final ObjectMapper objectMapper;
+
+    @Value("${app.email.resend-api-key:}")
+    private String resendApiKey;
+
+    @Value("${app.email.from:}")
     private String fromEmail;
 
-    @Value("${spring.mail.host:}")
-    private String mailHost;
-
-    @Autowired(required = false)
-    public EmailServiceImpl(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+    public EmailServiceImpl(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
     }
 
     @Override
@@ -47,27 +56,35 @@ public class EmailServiceImpl implements EmailService {
 
         log.info("Dispatching {} OTP email to {}", type, toEmail);
 
-        if (mailSender == null || mailHost == null || mailHost.isBlank() || "localhost".equalsIgnoreCase(mailHost)) {
-            log.warn("SMTP is not configured. OTP email was not dispatched to {}.", toEmail);
+        if (resendApiKey == null || resendApiKey.isBlank() || fromEmail == null || fromEmail.isBlank()) {
+            log.error("Resend is not configured. Set RESEND_API_KEY and EMAIL_FROM before requesting OTP emails.");
             return;
         }
 
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            String sender = (fromEmail != null && !fromEmail.isBlank()) ? fromEmail : "noreply@careerforge.com";
-            helper.setFrom(sender, "CareerForge");
-            helper.setTo(toEmail);
-            helper.setSubject(subject);
-
             String htmlContent = buildOtpHtmlTemplate(title, description, otpCode);
-            helper.setText(htmlContent, true);
+            String body = objectMapper.writeValueAsString(Map.of(
+                    "from", fromEmail.trim(),
+                    "to", List.of(toEmail),
+                    "subject", subject,
+                    "html", htmlContent
+            ));
+            HttpRequest request = HttpRequest.newBuilder(RESEND_EMAILS_URI)
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer " + resendApiKey.trim())
+                    .header("Content-Type", "application/json")
+                    .header("User-Agent", "CareerForge/1.0")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            mailSender.send(message);
-            log.info("Verification email sent successfully to {}", toEmail);
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                log.error("Resend rejected OTP email to {} with HTTP {}: {}", toEmail, response.statusCode(), response.body());
+                return;
+            }
+            log.info("OTP email accepted by Resend for {}", toEmail);
         } catch (Exception e) {
-            log.error("Failed to dispatch email via SMTP to {}", toEmail, e);
+            log.error("Failed to dispatch OTP email to Resend for {}", toEmail, e);
         }
     }
 

@@ -24,13 +24,9 @@ services:
         value: 86400000
       - key: JWT_REFRESH_EXPIRATION_MS
         value: 604800000
-      - key: SPRING_MAIL_HOST
+      - key: RESEND_API_KEY
         sync: false
-      - key: SPRING_MAIL_PORT
-        value: 587
-      - key: SPRING_MAIL_USERNAME
-        sync: false
-      - key: SPRING_MAIL_PASSWORD
+      - key: EMAIL_FROM
         sync: false
 
   # ==========================================================
