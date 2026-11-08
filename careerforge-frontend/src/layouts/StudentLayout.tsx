@@ -69,24 +69,24 @@ export const StudentLayout: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="h-screen flex overflow-hidden bg-slate-100 dark:bg-dark-bg text-slate-900 dark:text-slate-100 transition-colors duration-200">
 
       {/* ==================== DESKTOP SIDEBAR ==================== */}
-      <aside className={`hidden md:flex flex-col border-r border-slate-200/80 dark:border-dark-border bg-white dark:bg-dark-card transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200/80 dark:border-dark-border">
+      <aside className={`hidden md:flex flex-col border-r border-slate-800 bg-slate-950 text-slate-100 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
+        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="h-9 w-9 rounded-lg bg-brand-600 flex items-center justify-center text-white shrink-0">
               <Flame className="h-5 w-5" />
             </div>
             {sidebarOpen && (
-              <span className="font-heading font-bold text-lg tracking-tight text-slate-900 dark:text-white">
+              <span className="font-heading font-bold text-lg tracking-tight text-white">
                 CareerForge
               </span>
             )}
           </div>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+            className="text-slate-400 hover:text-white transition-colors"
           >
             {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
@@ -102,7 +102,7 @@ export const StudentLayout: React.FC = () => {
                   href={link.to}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between px-3 py-2.5 rounded-xl font-medium text-sm text-slate-500 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-200 group"
+                  className="flex items-center justify-between px-3 py-2.5 rounded-xl font-medium text-sm text-slate-300 hover:bg-amber-400/10 hover:text-amber-200 transition-all duration-200 group"
                   title={!sidebarOpen ? link.label : undefined}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -121,8 +121,8 @@ export const StudentLayout: React.FC = () => {
                 to={link.to}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
-                    ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-300'
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'bg-brand-500/15 text-brand-100 ring-1 ring-inset ring-brand-400/20'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                   }`
                 }
               >
@@ -133,10 +133,10 @@ export const StudentLayout: React.FC = () => {
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-200/80 dark:border-dark-border">
+        <div className="p-4 border-t border-slate-800">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all duration-200"
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-300 hover:bg-red-400/10 transition-all duration-200"
           >
             <LogOut className="h-5 w-5 shrink-0" />
             {sidebarOpen && <span>Logout</span>}
@@ -160,14 +160,14 @@ export const StudentLayout: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25 }}
-              className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-dark-card border-r border-slate-200/80 dark:border-dark-border z-50 p-6 flex flex-col md:hidden"
+              className="fixed inset-y-0 left-0 w-64 bg-slate-950 border-r border-slate-800 text-slate-100 z-50 p-6 flex flex-col md:hidden"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 rounded-lg bg-brand-600 flex items-center justify-center text-white">
                     <Flame className="h-5 w-5" />
                   </div>
-                  <span className="font-heading font-bold text-lg text-slate-900 dark:text-white">
+                  <span className="font-heading font-bold text-lg text-white">
                     CareerForge
                   </span>
                 </div>
@@ -204,8 +204,8 @@ export const StudentLayout: React.FC = () => {
                       onClick={() => setMobileSidebarOpen(false)}
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
-                          ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-300'
-                          : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+                          ? 'bg-brand-500/15 text-brand-100 ring-1 ring-inset ring-brand-400/20'
+                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                         }`
                       }
                     >
@@ -218,7 +218,7 @@ export const StudentLayout: React.FC = () => {
 
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all duration-200 mt-auto"
+                className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm font-medium text-red-300 hover:bg-red-400/10 transition-all duration-200 mt-auto"
               >
                 <LogOut className="h-5 w-5" />
                 <span>Logout</span>

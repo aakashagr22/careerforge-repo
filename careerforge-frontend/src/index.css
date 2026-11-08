@@ -5,24 +5,24 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
 
-  /* Premium SaaS Violet Palette */
-  --color-brand-50: #f5f3ff;
-  --color-brand-100: #ede9fe;
-  --color-brand-200: #ddd6fe;
-  --color-brand-300: #c084fc;
-  --color-brand-400: #a78bfa;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-brand-650: #7432e2;
-  --color-brand-700: #6d28d9;
-  --color-brand-800: #5b21b6;
-  --color-brand-900: #4c1d95;
+  /* CareerForge blue discovery palette */
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-650: #1d58d8;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a8a;
 
   /* Sleek Dark Mode colors */
-  --color-dark-bg: #09090b;       /* Zinc 950 */
-  --color-dark-card: #18181b;     /* Zinc 900 */
-  --color-dark-border: #27272a;   /* Zinc 800 */
-  --color-dark-hover: #3f3f46;    /* Zinc 700 */
+  --color-dark-bg: #0b1220;
+  --color-dark-card: #111c2e;
+  --color-dark-border: #21314b;
+  --color-dark-hover: #2b3c59;
 }
 
 /* Custom CSS Base resets */
@@ -56,4 +56,20 @@
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-slate-300 dark:bg-zinc-700;
+}
+
+/* Shared blue network artwork for account pages. */
+.auth-discovery-panel {
+  background:
+    radial-gradient(circle at 18% 24%, rgba(255, 255, 255, .42), transparent 25%),
+    radial-gradient(circle at 76% 74%, rgba(129, 209, 255, .55), transparent 32%),
+    linear-gradient(135deg, #1d4ed8 0%, #3b82f6 47%, #a5d8ff 100%);
+}
+
+.auth-network-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.26) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.26) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: radial-gradient(ellipse at center, black 18%, transparent 72%);
 }
