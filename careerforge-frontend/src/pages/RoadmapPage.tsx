@@ -284,6 +284,7 @@ export const RoadmapPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const roadmapId = searchParams.get('roadmapId') || undefined;
+  const roadmapQueryKey = ['studentRoadmap', roadmapId] as const;
   const queryClient = useQueryClient();
   const [editingQuestionNote, setEditingQuestionNote] = useState<{ id: string; title: string; note: string } | null>(null);
   const [noteValue, setNoteValue] = useState('');
@@ -313,7 +314,7 @@ export const RoadmapPage: React.FC = () => {
   const isProfileConfigured = !!(profile?.semester && profile?.preferredLanguage && profile?.targetRole);
 
   const { data: roadmapData, isLoading: loadingRoadmap, error: roadmapError } = useQuery({
-    queryKey: ['studentRoadmap', roadmapId],
+    queryKey: roadmapQueryKey,
     queryFn: () => roadmapService.getPersonalizedRoadmap(roadmapId),
     enabled: Boolean(roadmapId) || isProfileConfigured,
   });
@@ -354,20 +355,19 @@ export const RoadmapPage: React.FC = () => {
       roadmapService.updateQuestionProgress(id, { completed, revisionMarked }),
     onMutate: async ({ initialSnapshot }) => {
       // Cancel any outgoing refetches so they don't overwrite our optimistic update
-      await queryClient.cancelQueries({ queryKey: ['studentRoadmap'] });
+      await queryClient.cancelQueries({ queryKey: roadmapQueryKey });
       return { previousData: initialSnapshot };
     },
     onError: (_err, _vars, context: any) => {
       // Roll back to the snapshot before this batch of toggles on error
       if (context?.previousData) {
-        queryClient.setQueryData(['studentRoadmap'], context.previousData);
+        queryClient.setQueryData(roadmapQueryKey, context.previousData);
       }
       toast.error('Failed to sync progress with the server.');
     },
-    onSettled: () => {
-      // Re-sync with server in background (silent)
-      queryClient.invalidateQueries({ queryKey: ['studentRoadmap'] });
-    },
+    // Do not refetch the full roadmap after every checkbox click. The local
+    // cache has already been updated optimistically; a fresh fetch happens
+    // naturally when the page is opened again.
   });
 
   // Mutation for saving notes — keeps toast since it's an explicit user action with a modal
@@ -385,9 +385,13 @@ export const RoadmapPage: React.FC = () => {
 
   const handleToggleComplete = (id: string, currentVal: boolean) => {
     const newVal = !currentVal;
+    const prevPending = pendingUpdatesRef.current[id];
+    const initialSnapshot = prevPending
+      ? prevPending.initialSnapshot
+      : queryClient.getQueryData<PersonalizedRoadmapResponse>(roadmapQueryKey);
 
     // 1. Instantly update UI cache
-    queryClient.setQueryData<PersonalizedRoadmapResponse>(['studentRoadmap'], (old) => {
+    queryClient.setQueryData<PersonalizedRoadmapResponse>(roadmapQueryKey, (old) => {
       if (!old) return old;
       return {
         ...old,
@@ -396,12 +400,9 @@ export const RoadmapPage: React.FC = () => {
     });
 
     // 2. Debounce backend API request
-    const prevPending = pendingUpdatesRef.current[id];
     if (prevPending) {
       window.clearTimeout(prevPending.timer);
     }
-
-    const initialSnapshot = prevPending ? prevPending.initialSnapshot : queryClient.getQueryData<PersonalizedRoadmapResponse>(['studentRoadmap']);
 
     const timer = window.setTimeout(() => {
       toggleProgressMutation.mutate({ id, completed: newVal, initialSnapshot });

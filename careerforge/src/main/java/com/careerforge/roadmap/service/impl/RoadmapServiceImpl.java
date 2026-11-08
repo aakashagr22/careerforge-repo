@@ -9,6 +9,7 @@ import com.careerforge.roadmap.mapper.QuestionMapper;
 import com.careerforge.roadmap.mapper.RoadmapMapper;
 import com.careerforge.roadmap.mapper.RoadmapSectionMapper;
 import com.careerforge.roadmap.repository.*;
+import com.careerforge.progress.service.ProgressService;
 import com.careerforge.roadmap.service.RoadmapService;
 import com.careerforge.student.entity.StudentProfile;
 import com.careerforge.student.repository.StudentProfileRepository;
@@ -35,6 +36,7 @@ public class RoadmapServiceImpl implements RoadmapService {
     private final RoadmapSectionQuestionRepository roadmapSectionQuestionRepository;
     private final StudentRoadmapQuestionProgressRepository studentRoadmapQuestionProgressRepository;
     private final StudentProfileRepository studentProfileRepository;
+    private final ProgressService progressService;
     
     private final RoadmapMapper roadmapMapper;
     private final RoadmapSectionMapper roadmapSectionMapper;
@@ -47,6 +49,7 @@ public class RoadmapServiceImpl implements RoadmapService {
                               RoadmapSectionQuestionRepository roadmapSectionQuestionRepository,
                               StudentRoadmapQuestionProgressRepository studentRoadmapQuestionProgressRepository,
                               StudentProfileRepository studentProfileRepository,
+                              ProgressService progressService,
                               RoadmapMapper roadmapMapper,
                               RoadmapSectionMapper roadmapSectionMapper,
                               QuestionMapper questionMapper) {
@@ -57,6 +60,7 @@ public class RoadmapServiceImpl implements RoadmapService {
         this.roadmapSectionQuestionRepository = roadmapSectionQuestionRepository;
         this.studentRoadmapQuestionProgressRepository = studentRoadmapQuestionProgressRepository;
         this.studentProfileRepository = studentProfileRepository;
+        this.progressService = progressService;
         this.roadmapMapper = roadmapMapper;
         this.roadmapSectionMapper = roadmapSectionMapper;
         this.questionMapper = questionMapper;
@@ -478,8 +482,9 @@ public class RoadmapServiceImpl implements RoadmapService {
                         .revisionMarked(false)
                         .build());
 
+        boolean newlyCompleted = request.getCompleted() != null && request.getCompleted() && !progress.isCompleted();
         if (request.getCompleted() != null) {
-            if (request.getCompleted() && !progress.isCompleted()) {
+            if (newlyCompleted) {
                 progress.setCompletedAt(LocalDateTime.now());
             } else if (!request.getCompleted()) {
                 progress.setCompletedAt(null);
@@ -496,6 +501,9 @@ public class RoadmapServiceImpl implements RoadmapService {
         }
 
         studentRoadmapQuestionProgressRepository.save(progress);
+        if (newlyCompleted) {
+            progressService.updateActivityAndStreak(studentUserId);
+        }
         log.info("Updated progress for student: {} on section question: {}", student.getId(), sectionQuestionId);
     }
 

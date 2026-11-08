@@ -30,7 +30,9 @@ export const StudentDashboard: React.FC = () => {
   });
 
   const handleResume = () => {
-    navigate('/student/roadmap');
+    // The Journey is the student's selected preparation path. Navigating to a
+    // bare roadmap lets the backend choose a different default roadmap.
+    navigate('/student/journey');
   };
 
   if (isLoading) {
@@ -113,7 +115,7 @@ export const StudentDashboard: React.FC = () => {
   const stats = [
     {
       title: 'Current Streak',
-      value: `${data.streak} Days`,
+      value: `${data.currentStreak ?? 0} Days`,
       description: 'Consecutive active days',
       icon: Flame,
       color: 'bg-amber-500/10 text-amber-500',
@@ -141,7 +143,10 @@ export const StudentDashboard: React.FC = () => {
     },
   ];
 
-  const roadmapPercent = Math.round(data.roadmapCompletionPercentage || 0);
+  const roadmapPercent = Math.round(data.roadmapProgress || 0);
+
+  const formatLabel = (value?: string | null) =>
+    value ? value.replace(/_/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase()) : 'General';
 
   return (
     <div className="space-y-8 pb-12">
@@ -238,7 +243,7 @@ export const StudentDashboard: React.FC = () => {
               Personalized Roadmap Progress
             </span>
             <h3 className="text-xl font-bold font-heading text-slate-800 dark:text-white mt-0.5">
-              {profile?.targetRole ? `${profile.targetRole.replace('_', ' ')} (${profile.framework || 'General'})` : 'Roadmap Progress'}
+              {profile?.targetRole ? `${formatLabel(profile.targetRole)} (${formatLabel(profile.framework)})` : 'Roadmap Progress'}
             </h3>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -295,7 +300,7 @@ export const StudentDashboard: React.FC = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" strokeOpacity={0.1} />
                   <XAxis 
-                    dataKey="dayName" 
+                    dataKey="dayOfWeek" 
                     stroke="#888888" 
                     fontSize={11} 
                     tickLine={false} 

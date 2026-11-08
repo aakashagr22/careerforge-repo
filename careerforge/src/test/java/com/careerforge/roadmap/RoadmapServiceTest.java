@@ -10,6 +10,7 @@ import com.careerforge.roadmap.mapper.RoadmapMapper;
 import com.careerforge.roadmap.mapper.RoadmapSectionMapper;
 import com.careerforge.roadmap.repository.*;
 import com.careerforge.roadmap.service.impl.RoadmapServiceImpl;
+import com.careerforge.progress.service.ProgressService;
 import com.careerforge.student.entity.Language;
 import com.careerforge.student.entity.StudentProfile;
 import com.careerforge.student.entity.TargetRole;
@@ -55,6 +56,9 @@ public class RoadmapServiceTest {
 
     @Mock
     private StudentProfileRepository studentProfileRepository;
+
+    @Mock
+    private ProgressService progressService;
 
     @Mock
     private RoadmapMapper roadmapMapper;

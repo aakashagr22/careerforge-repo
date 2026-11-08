@@ -1,12 +1,12 @@
 export interface WeeklyProgress {
-  dayName: string;
+  dayOfWeek: string;
   completedCount: number;
 }
 
 export interface DashboardData {
-  streak: number;
+  currentStreak: number;
   completedTopics: number;
   completedSheets: number;
-  roadmapCompletionPercentage: number;
+  roadmapProgress: number;
   weeklyProgress: WeeklyProgress[];
 }
