@@ -9,4 +9,5 @@ import java.util.UUID;
 
 public interface CommunityQuestionRepository extends JpaRepository<CommunityQuestion, UUID> {
     Page<CommunityQuestion> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    long countByAuthorId(UUID authorId);
 }

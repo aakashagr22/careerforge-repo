@@ -67,6 +67,12 @@ app:
     resend-api-key: ${RESEND_API_KEY:}
     from: ${EMAIL_FROM:}
 
+  # Never seed showcase content unless explicitly enabled (for example in a demo deployment).
+  demo-data:
+    enabled: ${DEMO_DATA_ENABLED:false}
+    student-count: ${DEMO_STUDENT_COUNT:500}
+    community-question-count: ${DEMO_COMMUNITY_QUESTION_COUNT:24}
+
 springdoc:
   api-docs:
     path: /v3/api-docs

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -12,6 +13,7 @@ public interface StudentProfileRepository extends JpaRepository<StudentProfile, 
     Optional<StudentProfile> findByUserId(UUID userId);
     Optional<StudentProfile> findByUserEmail(String email);
     boolean existsByEnrollmentNo(String enrollmentNo);
+    List<StudentProfile> findByEnrollmentNoStartingWith(String enrollmentPrefix);
 
     @org.springframework.data.jpa.repository.Query("SELECT COALESCE(AVG(s.streak), 0.0) FROM StudentProfile s")
     Double getAverageStreak();

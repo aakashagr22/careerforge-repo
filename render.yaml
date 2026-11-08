@@ -29,6 +29,12 @@ services:
         sync: false
       - key: EMAIL_FROM
         sync: false
+      - key: DEMO_DATA_ENABLED
+        value: "false"
+      - key: DEMO_STUDENT_COUNT
+        value: "500"
+      - key: DEMO_COMMUNITY_QUESTION_COUNT
+        value: "24"
 
   # ==========================================================
   # 2. React Vite Frontend Static Site

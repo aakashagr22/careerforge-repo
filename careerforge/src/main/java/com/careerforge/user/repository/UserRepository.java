@@ -15,6 +15,7 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
+    List<User> findByEmailStartingWith(String emailPrefix);
     long countByRoleAndActiveTrue(com.careerforge.user.entity.Role role);
 
     @Query("""
