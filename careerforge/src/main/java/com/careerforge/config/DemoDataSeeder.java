@@ -185,7 +185,8 @@ public class DemoDataSeeder implements CommandLineRunner {
                 StudentProfile profile = StudentProfile.builder()
                         .user(usersByEmail.get(email))
                         .semester((index % 8) + 1)
-                        .startingSemester(((index - 1) % 6) + 1)
+                        // The database constraint permits starting semesters 1 through 5.
+                        .startingSemester(((index - 1) % 5) + 1)
                         .branch(branches[index % branches.length])
                         .section(String.valueOf((char) ('A' + (index % 3))))
                         .enrollmentNo(enrollmentNo)
