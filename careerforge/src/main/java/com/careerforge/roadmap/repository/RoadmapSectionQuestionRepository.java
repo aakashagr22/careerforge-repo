@@ -18,4 +18,6 @@ public interface RoadmapSectionQuestionRepository extends JpaRepository<RoadmapS
            "LEFT JOIN FETCH q.links " +
            "WHERE rsq.roadmapSection.roadmap.id = :roadmapId")
     List<RoadmapSectionQuestion> findByRoadmapSectionRoadmapId(@Param("roadmapId") UUID roadmapId);
+
+    long countByRoadmapSectionRoadmapId(UUID roadmapId);
 }

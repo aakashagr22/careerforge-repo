@@ -100,9 +100,7 @@ public class ProgressServiceTest {
         when(studentProfileRepository.findByUserId(userId)).thenReturn(Optional.of(student));
         when(progressRepository.findByStudentId(student.getId())).thenReturn(Optional.of(progress));
         when(studentSheetProgressRepository.countByStudentIdAndCompletedTrue(student.getId())).thenReturn(5L);
-        when(sheetRepository.findAll()).thenReturn(List.of(sheet));
-        when(sheetTopicRepository.countBySheetId(sheet.getId())).thenReturn(5L);
-        when(studentSheetProgressRepository.countCompletedByStudentIdAndSheetId(student.getId(), sheet.getId())).thenReturn(5L);
+        when(studentSheetProgressRepository.countCompletedSheetsByStudentId(student.getId())).thenReturn(1L);
         when(studentSheetProgressRepository.findAllByStudentId(student.getId())).thenReturn(Collections.emptyList());
         when(progressRepository.save(any(Progress.class))).thenReturn(progress);
 
@@ -111,8 +109,7 @@ public class ProgressServiceTest {
                 .build();
         when(roadmapRepository.findBySemesterAndTargetRole(5, "SDE")).thenReturn(Optional.of(mockRoadmap));
         
-        List<com.careerforge.roadmap.entity.RoadmapSectionQuestion> mockList = java.util.Collections.nCopies(10, new com.careerforge.roadmap.entity.RoadmapSectionQuestion());
-        when(roadmapSectionQuestionRepository.findByRoadmapSectionRoadmapId(mockRoadmap.getId())).thenReturn(mockList);
+        when(roadmapSectionQuestionRepository.countByRoadmapSectionRoadmapId(mockRoadmap.getId())).thenReturn(10L);
         when(studentRoadmapQuestionProgressRepository.countByStudentIdAndRoadmapSectionQuestionRoadmapSectionRoadmapIdAndCompletedTrue(student.getId(), mockRoadmap.getId())).thenReturn(5L);
 
         DashboardResponseDto dashboard = progressService.getStudentDashboard(userId);

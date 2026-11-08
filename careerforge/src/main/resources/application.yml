@@ -78,8 +78,9 @@ springdoc:
 
 logging:
   level:
-    root: INFO
-    com.careerforge: DEBUG
+    root: ${LOG_LEVEL_ROOT:INFO}
+    # Enable DEBUG temporarily through Render environment variables only when diagnosing an issue.
+    com.careerforge: ${LOG_LEVEL_CAREERFORGE:INFO}
     org.springframework.security: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.SQL: ${LOG_LEVEL_HIBERNATE_SQL:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_HIBERNATE_BINDER:WARN}

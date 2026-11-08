@@ -6,10 +6,7 @@ import com.careerforge.progress.dto.WeeklyProgressDto;
 import com.careerforge.progress.entity.Progress;
 import com.careerforge.progress.repository.ProgressRepository;
 import com.careerforge.progress.service.ProgressService;
-import com.careerforge.sheet.entity.Sheet;
 import com.careerforge.sheet.entity.StudentSheetProgress;
-import com.careerforge.sheet.repository.SheetRepository;
-import com.careerforge.sheet.repository.SheetTopicRepository;
 import com.careerforge.sheet.repository.StudentSheetProgressRepository;
 import com.careerforge.student.entity.StudentProfile;
 import com.careerforge.student.repository.StudentProfileRepository;
@@ -37,8 +34,6 @@ public class ProgressServiceImpl implements ProgressService {
 
     private final ProgressRepository progressRepository;
     private final StudentProfileRepository studentProfileRepository;
-    private final SheetRepository sheetRepository;
-    private final SheetTopicRepository sheetTopicRepository;
     private final StudentSheetProgressRepository studentSheetProgressRepository;
     private final RoadmapRepository roadmapRepository;
     private final RoadmapSectionQuestionRepository roadmapSectionQuestionRepository;
@@ -46,16 +41,12 @@ public class ProgressServiceImpl implements ProgressService {
 
     public ProgressServiceImpl(ProgressRepository progressRepository,
                                StudentProfileRepository studentProfileRepository,
-                               SheetRepository sheetRepository,
-                               SheetTopicRepository sheetTopicRepository,
                                StudentSheetProgressRepository studentSheetProgressRepository,
                                RoadmapRepository roadmapRepository,
                                RoadmapSectionQuestionRepository roadmapSectionQuestionRepository,
                                StudentRoadmapQuestionProgressRepository studentRoadmapQuestionProgressRepository) {
         this.progressRepository = progressRepository;
         this.studentProfileRepository = studentProfileRepository;
-        this.sheetRepository = sheetRepository;
-        this.sheetTopicRepository = sheetTopicRepository;
         this.studentSheetProgressRepository = studentSheetProgressRepository;
         this.roadmapRepository = roadmapRepository;
         this.roadmapSectionQuestionRepository = roadmapSectionQuestionRepository;
@@ -79,18 +70,8 @@ public class ProgressServiceImpl implements ProgressService {
 
         long completedTopics = studentSheetProgressRepository.countByStudentIdAndCompletedTrue(student.getId());
 
-        // Calculate completed sheets (sheets where all topics are completed)
-        List<Sheet> allSheets = sheetRepository.findAll();
-        long completedSheetsCount = 0;
-        for (Sheet sheet : allSheets) {
-            long totalTopics = sheetTopicRepository.countBySheetId(sheet.getId());
-            if (totalTopics > 0) {
-                long completedInSheet = studentSheetProgressRepository.countCompletedByStudentIdAndSheetId(student.getId(), sheet.getId());
-                if (totalTopics == completedInSheet) {
-                    completedSheetsCount++;
-                }
-            }
-        }
+        // One aggregate query instead of loading every sheet and querying each sheet separately.
+        long completedSheetsCount = studentSheetProgressRepository.countCompletedSheetsByStudentId(student.getId());
 
         // Calculate roadmap progress (completions / total roadmap questions available for student's active roadmap)
         long totalRoadmapQuestions = 0;
@@ -103,7 +84,7 @@ public class ProgressServiceImpl implements ProgressService {
             );
             if (roadmapOpt.isPresent()) {
                 UUID roadmapId = roadmapOpt.get().getId();
-                totalRoadmapQuestions = roadmapSectionQuestionRepository.findByRoadmapSectionRoadmapId(roadmapId).size();
+                totalRoadmapQuestions = roadmapSectionQuestionRepository.countByRoadmapSectionRoadmapId(roadmapId);
                 completedRoadmapQuestions = studentRoadmapQuestionProgressRepository
                         .countByStudentIdAndRoadmapSectionQuestionRoadmapSectionRoadmapIdAndCompletedTrue(student.getId(), roadmapId);
             }

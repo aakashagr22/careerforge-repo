@@ -11,6 +11,7 @@ import com.careerforge.exception.ResourceNotFoundException;
 import com.careerforge.user.entity.User;
 import com.careerforge.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,14 +83,8 @@ public class PrivateConversationServiceImpl implements PrivateConversationServic
 
         String searchTerm = query.trim().toLowerCase();
 
-        // Search across all active users by name or email (excluding current user)
-        return userRepository.findAll().stream()
-                .filter(user -> user.isActive() && !user.getId().equals(currentUserId))
-                .filter(user ->
-                        user.getFirstName().toLowerCase().contains(searchTerm) ||
-                        user.getLastName().toLowerCase().contains(searchTerm) ||
-                        user.getEmail().toLowerCase().contains(searchTerm))
-                .limit(20) // Limit results
+        // Let PostgreSQL filter and limit results instead of loading every user.
+        return userRepository.searchActiveUsers(currentUserId, searchTerm, PageRequest.of(0, 20)).stream()
                 .map(user -> UserSearchResponse.builder()
                         .id(user.getId())
                         .firstName(user.getFirstName())

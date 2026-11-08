@@ -19,5 +19,23 @@ public interface StudentSheetProgressRepository extends JpaRepository<StudentShe
     @Query("SELECT COUNT(ssp) FROM StudentSheetProgress ssp WHERE ssp.student.id = :studentId AND ssp.sheetTopic.sheet.id = :sheetId AND ssp.completed = true")
     long countCompletedByStudentIdAndSheetId(@Param("studentId") UUID studentId, @Param("sheetId") UUID sheetId);
 
+    /** Counts fully completed sheets in one database query. */
+    @Query("""
+            SELECT COUNT(s)
+            FROM Sheet s
+            WHERE EXISTS (SELECT st FROM SheetTopic st WHERE st.sheet = s)
+              AND NOT EXISTS (
+                  SELECT st FROM SheetTopic st
+                  WHERE st.sheet = s
+                    AND NOT EXISTS (
+                        SELECT ssp FROM StudentSheetProgress ssp
+                        WHERE ssp.student.id = :studentId
+                          AND ssp.sheetTopic = st
+                          AND ssp.completed = true
+                    )
+              )
+            """)
+    long countCompletedSheetsByStudentId(@Param("studentId") UUID studentId);
+
     List<StudentSheetProgress> findAllByStudentId(UUID studentId);
 }

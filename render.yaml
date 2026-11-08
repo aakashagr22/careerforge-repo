@@ -8,7 +8,8 @@ services:
     dockerfilePath: ./careerforge/Dockerfile
     dockerContext: ./careerforge
     plan: free
-    healthCheckPath: /v3/api-docs
+    # Keep health checks lightweight. Generating OpenAPI is much slower than a health probe.
+    healthCheckPath: /actuator/health
     envVars:
       - key: PORT
         value: 8082
