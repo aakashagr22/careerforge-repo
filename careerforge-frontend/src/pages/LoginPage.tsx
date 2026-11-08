@@ -167,18 +167,12 @@ export const LoginPage: React.FC = () => {
         </button>
       </form>
 
-      {/* 
-        Temporarily commented out until interview so external users cannot see Sign Up.
-        Uncomment the block below whenever you want to re-enable the Sign Up link.
-      */}
-      {/*
       <div className="text-center text-xs text-slate-500 dark:text-slate-400 mt-6 border-t border-slate-200/50 dark:border-dark-border/50 pt-4">
         Don't have an account?{' '}
         <Link to="/register" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
           Sign up free
         </Link>
       </div>
-      */}
     </div>
   );
 };
