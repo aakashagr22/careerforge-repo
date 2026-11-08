@@ -83,7 +83,10 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
-                    "/swagger-ui.html"
+                    "/swagger-ui.html",
+                    // Render probes this endpoint without an Authorization header.
+                    // Actuator exposes only the health endpoint by default.
+                    "/actuator/health"
                 ).permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
