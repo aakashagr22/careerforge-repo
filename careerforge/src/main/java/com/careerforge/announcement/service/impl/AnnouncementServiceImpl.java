@@ -15,7 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,9 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
     private final AnnouncementRepository announcementRepository;
     private final UserRepository userRepository;
+
+    // In-memory cache for announcements pages (cleared on admin create/delete)
+    private final Map<String, Page<AnnouncementDto>> announcementsCache = new ConcurrentHashMap<>();
 
     @Override
     @Transactional
@@ -39,15 +44,26 @@ public class AnnouncementServiceImpl implements AnnouncementService {
                 .build();
 
         Announcement saved = announcementRepository.save(announcement);
-        log.info("Announcement created with ID: {} by admin: {}", saved.getId(), adminId);
+        // Invalidate in-memory cache upon new announcement creation
+        announcementsCache.clear();
+        log.info("Announcement created with ID: {} by admin: {} and cache invalidated", saved.getId(), adminId);
         return toDto(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<AnnouncementDto> getAnnouncements(Pageable pageable) {
-        return announcementRepository.findAllByOrderByCreatedAtDesc(pageable)
+        String cacheKey = pageable.getPageNumber() + ":" + pageable.getPageSize();
+        Page<AnnouncementDto> cached = announcementsCache.get(cacheKey);
+        if (cached != null) {
+            log.debug("Serving announcements from in-memory cache for key: {}", cacheKey);
+            return cached;
+        }
+
+        Page<AnnouncementDto> fresh = announcementRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(this::toDto);
+        announcementsCache.put(cacheKey, fresh);
+        return fresh;
     }
 
     @Override
@@ -56,7 +72,9 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         Announcement announcement = announcementRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Announcement not found"));
         announcementRepository.delete(announcement);
-        log.info("Announcement deleted with ID: {}", id);
+        // Invalidate in-memory cache upon announcement deletion
+        announcementsCache.clear();
+        log.info("Announcement deleted with ID: {} and cache invalidated", id);
     }
 
     private AnnouncementDto toDto(Announcement a) {
