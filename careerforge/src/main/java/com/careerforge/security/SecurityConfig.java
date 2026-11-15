@@ -91,7 +91,7 @@ public class SecurityConfig {
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/announcements").hasAnyRole("STUDENT", "ADMIN")
-                .requestMatchers("/api/student/resources/**", "/api/student/resource-folders/**", "/api/student/blogs/**", "/api/student/chat/**", "/api/student/chatbot/**").hasAnyRole("STUDENT", "ADMIN")
+                .requestMatchers("/api/student/resources/**", "/api/student/resource-folders/**", "/api/student/blogs/**", "/api/student/chat/**", "/api/student/chatbot/**", "/api/student/contests/**").hasAnyRole("STUDENT", "ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/student/sheets/**").hasAnyRole("STUDENT", "ADMIN")
                 .requestMatchers("/api/student/**").hasRole("STUDENT")
                 .requestMatchers("/students/**").hasAnyRole("STUDENT", "ADMIN")

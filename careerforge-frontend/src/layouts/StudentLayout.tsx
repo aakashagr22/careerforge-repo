@@ -44,7 +44,7 @@ export const StudentLayout: React.FC = () => {
     navigate('/login');
   };
 
-  const navLinks = [
+  const navLinks: { to: string; label: string; icon: any; isExternal?: boolean }[] = [
     { to: '/student/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/student/journey', label: 'My Journey', icon: Compass },
     // { to: '/student/roadmap', label: 'My Roadmap', icon: Milestone },
@@ -52,7 +52,7 @@ export const StudentLayout: React.FC = () => {
     { to: '/student/resources', label: 'Study Resources', icon: Library },
     { to: '/student/community', label: 'Q&A Community', icon: CircleHelp },
     { to: '/student/chat', label: 'Chat', icon: MessageCircle },
-    { to: 'https://kernel-sable.vercel.app/signin', label: 'Contest', icon: Trophy, isExternal: true },
+    { to: '/student/contests', label: 'Contests', icon: Trophy },
     { to: '/student/announcements', label: 'Announcements', icon: Megaphone },
     { to: '/student/blogs', label: 'Placement Blogs', icon: BookOpen },
     { to: '/student/suggestions', label: 'Suggestions', icon: MessageSquare },

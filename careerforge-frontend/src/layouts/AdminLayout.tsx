@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useTheme } from '../contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   ShieldAlert, LayoutDashboard, Users, Library, CheckSquare, Milestone, Megaphone,
   LogOut, Sun, Moon, Laptop, Menu, X, Check, BookOpen, MessageSquare, MessageCircle,
   Trophy, ExternalLink
@@ -22,14 +22,14 @@ export const AdminLayout: React.FC = () => {
     navigate('/login');
   };
 
-  const navLinks = [
+  const navLinks: { to: string; label: string; icon: any; isExternal?: boolean }[] = [
     { to: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard },
     { to: '/admin/students', label: 'Manage Students', icon: Users },
     { to: '/admin/resources', label: 'Manage Resources', icon: Library },
     { to: '/admin/sheets', label: 'Manage Sheets', icon: CheckSquare },
     { to: '/admin/roadmaps', label: 'Configure Roadmaps', icon: Milestone },
     { to: '/admin/chat', label: 'Chat Management', icon: MessageCircle },
-    { to: 'https://kernel-sable.vercel.app/signin', label: 'Contest', icon: Trophy, isExternal: true },
+    { to: '/admin/contests', label: 'Contests', icon: Trophy },
     { to: '/admin/announcements', label: 'Announcements', icon: Megaphone },
     { to: '/admin/blogs', label: 'Manage Articles', icon: BookOpen },
     { to: '/admin/suggestions', label: 'Student Suggestions', icon: MessageSquare },
@@ -37,7 +37,7 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div className="h-screen flex overflow-hidden bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      
+
       {/* ==================== DESKTOP ADMIN SIDEBAR ==================== */}
       <aside className={`hidden md:flex flex-col border-r border-slate-200/80 dark:border-dark-border bg-white dark:bg-dark-card transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200/80 dark:border-dark-border">
@@ -51,7 +51,7 @@ export const AdminLayout: React.FC = () => {
               </span>
             )}
           </div>
-          <button 
+          <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
           >
@@ -86,11 +86,10 @@ export const AdminLayout: React.FC = () => {
               <NavLink
                 key={link.to}
                 to={link.to}
-                className={({ isActive }) => 
-                  `flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
-                    isActive 
-                      ? 'bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400' 
-                      : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
+                    ? 'bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400'
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50 hover:text-slate-900 dark:hover:text-slate-200'
                   }`
                 }
               >
@@ -116,14 +115,14 @@ export const AdminLayout: React.FC = () => {
       <AnimatePresence>
         {mobileSidebarOpen && (
           <>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.4 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileSidebarOpen(false)}
               className="fixed inset-0 bg-black z-40 md:hidden"
             />
-            <motion.aside 
+            <motion.aside
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
@@ -170,11 +169,10 @@ export const AdminLayout: React.FC = () => {
                       key={link.to}
                       to={link.to}
                       onClick={() => setMobileSidebarOpen(false)}
-                      className={({ isActive }) => 
-                        `flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
-                          isActive 
-                            ? 'bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400' 
-                            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
+                          ? 'bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400'
+                          : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50 hover:text-slate-900 dark:hover:text-slate-200'
                         }`
                       }
                     >
@@ -199,10 +197,10 @@ export const AdminLayout: React.FC = () => {
 
       {/* ==================== ADMIN CONTENT WRAPPER ==================== */}
       <div className="flex-1 flex flex-col min-w-0">
-        
+
         {/* Top Header */}
         <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-dark-card border-b border-slate-200/80 dark:border-dark-border sticky top-0 z-30">
-          <button 
+          <button
             onClick={() => setMobileSidebarOpen(true)}
             className="md:hidden text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
           >
@@ -218,7 +216,7 @@ export const AdminLayout: React.FC = () => {
           <div className="flex items-center gap-4 ml-auto">
             {/* Theme Selector */}
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setThemeMenuOpen(!themeMenuOpen)}
                 className="h-9 w-9 rounded-xl flex items-center justify-center border border-slate-200/80 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50 transition-colors"
               >
@@ -230,7 +228,7 @@ export const AdminLayout: React.FC = () => {
                 {themeMenuOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setThemeMenuOpen(false)} />
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
@@ -243,9 +241,8 @@ export const AdminLayout: React.FC = () => {
                             setTheme(t);
                             setThemeMenuOpen(false);
                           }}
-                          className={`flex items-center justify-between w-full px-2.5 py-2 rounded-lg text-left capitalize ${
-                            theme === t ? 'bg-rose-50 dark:bg-rose-950/10 text-rose-600 dark:text-rose-400' : 'hover:bg-slate-100 dark:hover:bg-zinc-800/40'
-                          }`}
+                          className={`flex items-center justify-between w-full px-2.5 py-2 rounded-lg text-left capitalize ${theme === t ? 'bg-rose-50 dark:bg-rose-950/10 text-rose-600 dark:text-rose-400' : 'hover:bg-slate-100 dark:hover:bg-zinc-800/40'
+                            }`}
                         >
                           <span className="flex items-center gap-2">
                             {t === 'light' && <Sun className="h-4 w-4" />}
