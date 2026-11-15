@@ -15,6 +15,7 @@ import com.careerforge.resource.service.ResourceService;
 import com.careerforge.user.entity.User;
 import com.careerforge.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class ResourceServiceImpl implements ResourceService {
     private final ResourceMapper resourceMapper;
     private final ResourceCacheService resourceCacheService;
 
+    @Autowired
     public ResourceServiceImpl(ResourceRepository resourceRepository,
                                ResourceFolderRepository resourceFolderRepository,
                                UserRepository userRepository,
@@ -42,14 +44,7 @@ public class ResourceServiceImpl implements ResourceService {
         this.resourceFolderRepository = resourceFolderRepository;
         this.userRepository = userRepository;
         this.resourceMapper = resourceMapper;
-        this.resourceCacheService = resourceCacheService != null ? resourceCacheService : new ResourceCacheService();
-    }
-
-    public ResourceServiceImpl(ResourceRepository resourceRepository,
-                               ResourceFolderRepository resourceFolderRepository,
-                               UserRepository userRepository,
-                               ResourceMapper resourceMapper) {
-        this(resourceRepository, resourceFolderRepository, userRepository, resourceMapper, new ResourceCacheService());
+        this.resourceCacheService = resourceCacheService;
     }
 
     @Override

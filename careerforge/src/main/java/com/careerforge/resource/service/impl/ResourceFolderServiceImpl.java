@@ -10,6 +10,7 @@ import com.careerforge.resource.repository.ResourceRepository;
 import com.careerforge.resource.service.ResourceCacheService;
 import com.careerforge.resource.service.ResourceFolderService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
     private final ResourceMapper resourceMapper;
     private final ResourceCacheService resourceCacheService;
 
+    @Autowired
     public ResourceFolderServiceImpl(ResourceFolderRepository resourceFolderRepository,
                                      ResourceRepository resourceRepository,
                                      ResourceMapper resourceMapper,
@@ -38,13 +40,7 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
         this.resourceFolderRepository = resourceFolderRepository;
         this.resourceRepository = resourceRepository;
         this.resourceMapper = resourceMapper;
-        this.resourceCacheService = resourceCacheService != null ? resourceCacheService : new ResourceCacheService();
-    }
-
-    public ResourceFolderServiceImpl(ResourceFolderRepository resourceFolderRepository,
-                                     ResourceRepository resourceRepository,
-                                     ResourceMapper resourceMapper) {
-        this(resourceFolderRepository, resourceRepository, resourceMapper, new ResourceCacheService());
+        this.resourceCacheService = resourceCacheService;
     }
 
     @Override
