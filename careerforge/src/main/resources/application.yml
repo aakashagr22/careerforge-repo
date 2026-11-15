@@ -73,6 +73,11 @@ app:
     student-count: ${DEMO_STUDENT_COUNT:500}
     community-question-count: ${DEMO_COMMUNITY_QUESTION_COUNT:24}
 
+kernel:
+  api:
+    url: ${KERNEL_API_URL:http://localhost:3000}
+    key: ${KERNEL_API_KEY:kernel_secret_key_2026}
+
 springdoc:
   api-docs:
     path: /v3/api-docs

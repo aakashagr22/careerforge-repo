@@ -26,6 +26,7 @@ import { ProfilePage } from '../pages/ProfilePage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { JourneyPage } from '../pages/JourneyPage';
 import { AnnouncementsPage } from '../pages/AnnouncementsPage';
+import { ContestsPage } from '../pages/ContestsPage';
 
 import { CommunityPage } from '../pages/CommunityPage';
 // Admin Pages
@@ -76,6 +77,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="suggestions" element={<StudentSuggestionsPage />} />
         <Route path="announcements" element={<AnnouncementsPage />} />
         <Route path="community" element={<CommunityPage />} />
+        <Route path="contests" element={<ContestsPage />} />
         <Route path="chat" element={<StudentChatPage />} />
         <Route path="chat/:roomId" element={<StudentChatPage />} />
         <Route path="chat/direct/:conversationId" element={<StudentChatPage />} />
@@ -98,6 +100,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="resources" element={<ManageResourcesPage />} />
         <Route path="sheets" element={<ManageSheetsPage />} />
         <Route path="roadmaps" element={<ManageRoadmapsPage />} />
+        <Route path="contests" element={<ContestsPage />} />
         <Route path="chat" element={<AdminChatPage />} />
         <Route path="blogs" element={<ManageBlogsPage />} />
         <Route path="blogs/:id" element={<BlogDetailPage />} />

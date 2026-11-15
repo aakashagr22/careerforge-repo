@@ -459,15 +459,6 @@ public class RoadmapServiceImpl implements RoadmapService {
         RoadmapSectionQuestion rsq = roadmapSectionQuestionRepository.findById(sectionQuestionId)
                 .orElseThrow(() -> new ResourceNotFoundException("RoadmapSectionQuestion not found with ID: " + sectionQuestionId));
 
-        // Placement Access Validation
-        Roadmap roadmap = rsq.getRoadmapSection().getRoadmap();
-        boolean hasAccess = roadmap.getSemester().equals(student.getSemester()) &&
-                roadmap.getTargetRoles().contains(student.getTargetRole());
-        
-        if (!hasAccess) {
-            throw new AccessDeniedException("You do not have permission to update progress for this roadmap placement.");
-        }
-
         StudentRoadmapQuestionProgressId progressId = StudentRoadmapQuestionProgressId.builder()
                 .studentId(student.getId())
                 .roadmapSectionQuestionId(sectionQuestionId)

@@ -8,6 +8,7 @@ import com.careerforge.resource.entity.ResourceType;
 import com.careerforge.resource.mapper.ResourceMapper;
 import com.careerforge.resource.repository.ResourceFolderRepository;
 import com.careerforge.resource.repository.ResourceRepository;
+import com.careerforge.resource.service.ResourceCacheService;
 import com.careerforge.resource.service.impl.ResourceFolderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,9 @@ public class ResourceFolderServiceTest {
 
     @Mock
     private ResourceMapper resourceMapper;
+
+    @Mock
+    private ResourceCacheService resourceCacheService;
 
     @InjectMocks
     private ResourceFolderServiceImpl resourceFolderService;

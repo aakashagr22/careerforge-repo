@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,6 +39,11 @@ public class SheetServiceImpl implements SheetService {
     private final org.springframework.context.ApplicationEventPublisher eventPublisher;
     private final SheetMapper sheetMapper;
     private final SheetTopicMapper sheetTopicMapper;
+
+    // In-memory caches for static curriculum sheet content (evicted on admin CRUD)
+    private final Map<String, Page<SheetDto>> allSheetsCache = new ConcurrentHashMap<>();
+    private final Map<UUID, SheetDto> sheetDetailsCache = new ConcurrentHashMap<>();
+    private final Map<UUID, List<SheetTopicDto>> sheetTopicsCache = new ConcurrentHashMap<>();
 
     public SheetServiceImpl(SheetRepository sheetRepository,
                             SheetTopicRepository sheetTopicRepository,
@@ -66,8 +73,11 @@ public class SheetServiceImpl implements SheetService {
                 .category(request.getCategory())
                 .build();
         Sheet saved = sheetRepository.save(sheet);
-        log.info("Created new Sheet with ID: {}", saved.getId());
-        return sheetMapper.toDto(saved);
+        allSheetsCache.clear();
+        log.info("Created new Sheet with ID: {} and invalidated allSheetsCache", saved.getId());
+        SheetDto dto = sheetMapper.toDto(saved);
+        sheetDetailsCache.put(saved.getId(), dto);
+        return dto;
     }
 
     @Override
@@ -78,8 +88,11 @@ public class SheetServiceImpl implements SheetService {
         sheet.setDescription(request.getDescription());
         sheet.setCategory(request.getCategory());
         Sheet updated = sheetRepository.save(sheet);
-        log.info("Updated Sheet with ID: {}", updated.getId());
-        return sheetMapper.toDto(updated);
+        allSheetsCache.clear();
+        log.info("Updated Sheet with ID: {} and invalidated caches", updated.getId());
+        SheetDto dto = sheetMapper.toDto(updated);
+        sheetDetailsCache.put(id, dto);
+        return dto;
     }
 
     @Override
@@ -87,21 +100,39 @@ public class SheetServiceImpl implements SheetService {
         Sheet sheet = sheetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Sheet not found with ID: " + id));
         sheetRepository.delete(sheet);
-        log.info("Deleted Sheet with ID: {}", id);
+        allSheetsCache.clear();
+        sheetDetailsCache.remove(id);
+        sheetTopicsCache.remove(id);
+        log.info("Deleted Sheet with ID: {} and invalidated caches", id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public SheetDto getSheetById(UUID id) {
+        SheetDto cached = sheetDetailsCache.get(id);
+        if (cached != null) {
+            log.debug("Serving sheet details from in-memory cache for ID: {}", id);
+            return cached;
+        }
         Sheet sheet = sheetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Sheet not found with ID: " + id));
-        return sheetMapper.toDto(sheet);
+        SheetDto dto = sheetMapper.toDto(sheet);
+        sheetDetailsCache.put(id, dto);
+        return dto;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<SheetDto> getAllSheets(Pageable pageable) {
-        return sheetRepository.findAll(pageable).map(sheetMapper::toDto);
+        String cacheKey = pageable.getPageNumber() + ":" + pageable.getPageSize() + ":" + pageable.getSort();
+        Page<SheetDto> cached = allSheetsCache.get(cacheKey);
+        if (cached != null) {
+            log.debug("Serving all sheets from in-memory cache for key: {}", cacheKey);
+            return cached;
+        }
+        Page<SheetDto> page = sheetRepository.findAll(pageable).map(sheetMapper::toDto);
+        allSheetsCache.put(cacheKey, page);
+        return page;
     }
 
     // ======================== SheetTopic CRUD ========================
@@ -120,7 +151,8 @@ public class SheetServiceImpl implements SheetService {
                 .build();
 
         SheetTopic saved = sheetTopicRepository.save(topic);
-        log.info("Created new SheetTopic with ID: {} for Sheet: {}", saved.getId(), sheet.getId());
+        sheetTopicsCache.remove(sheet.getId());
+        log.info("Created new SheetTopic with ID: {} for Sheet: {} and invalidated topics cache", saved.getId(), sheet.getId());
         return sheetTopicMapper.toDto(saved);
     }
 
@@ -135,7 +167,10 @@ public class SheetServiceImpl implements SheetService {
         topic.setOrderIndex(request.getOrderIndex());
 
         SheetTopic updated = sheetTopicRepository.save(topic);
-        log.info("Updated SheetTopic with ID: {}", updated.getId());
+        if (topic.getSheet() != null) {
+            sheetTopicsCache.remove(topic.getSheet().getId());
+        }
+        log.info("Updated SheetTopic with ID: {} and invalidated topics cache", updated.getId());
         return sheetTopicMapper.toDto(updated);
     }
 
@@ -143,8 +178,12 @@ public class SheetServiceImpl implements SheetService {
     public void deleteSheetTopic(UUID id) {
         SheetTopic topic = sheetTopicRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SheetTopic not found with ID: " + id));
+        UUID sheetId = topic.getSheet() != null ? topic.getSheet().getId() : null;
         sheetTopicRepository.delete(topic);
-        log.info("Deleted SheetTopic with ID: {}", id);
+        if (sheetId != null) {
+            sheetTopicsCache.remove(sheetId);
+        }
+        log.info("Deleted SheetTopic with ID: {} and invalidated topics cache", id);
     }
 
     @Override
@@ -158,13 +197,20 @@ public class SheetServiceImpl implements SheetService {
     @Override
     @Transactional(readOnly = true)
     public List<SheetTopicDto> getTopicsBySheetId(UUID sheetId) {
+        List<SheetTopicDto> cached = sheetTopicsCache.get(sheetId);
+        if (cached != null) {
+            log.debug("Serving topics from in-memory cache for sheet ID: {}", sheetId);
+            return cached;
+        }
         if (!sheetRepository.existsById(sheetId)) {
             throw new ResourceNotFoundException("Sheet not found with ID: " + sheetId);
         }
-        return sheetTopicRepository.findBySheetIdOrderByOrderIndexAsc(sheetId)
+        List<SheetTopicDto> topics = sheetTopicRepository.findBySheetIdOrderByOrderIndexAsc(sheetId)
                 .stream()
                 .map(sheetTopicMapper::toDto)
                 .collect(Collectors.toList());
+        sheetTopicsCache.put(sheetId, topics);
+        return topics;
     }
 
     // ======================== Student Progress ========================
