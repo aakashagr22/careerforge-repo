@@ -8,6 +8,7 @@ import com.careerforge.resource.dto.UpdateResourceRequest;
 import com.careerforge.resource.entity.Resource;
 import com.careerforge.resource.mapper.ResourceMapper;
 import com.careerforge.resource.repository.ResourceRepository;
+import com.careerforge.resource.service.ResourceCacheService;
 import com.careerforge.resource.service.impl.ResourceServiceImpl;
 import com.careerforge.user.entity.Role;
 import com.careerforge.user.entity.User;
@@ -42,6 +43,9 @@ public class ResourceServiceTest {
 
     @Mock
     private ResourceMapper resourceMapper;
+
+    @Mock
+    private ResourceCacheService resourceCacheService;
 
     @InjectMocks
     private ResourceServiceImpl resourceService;

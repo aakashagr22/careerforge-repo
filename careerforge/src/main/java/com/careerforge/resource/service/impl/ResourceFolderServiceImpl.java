@@ -7,6 +7,7 @@ import com.careerforge.resource.entity.ResourceType;
 import com.careerforge.resource.mapper.ResourceMapper;
 import com.careerforge.resource.repository.ResourceFolderRepository;
 import com.careerforge.resource.repository.ResourceRepository;
+import com.careerforge.resource.service.ResourceCacheService;
 import com.careerforge.resource.service.ResourceFolderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,13 +29,22 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
     private final ResourceFolderRepository resourceFolderRepository;
     private final ResourceRepository resourceRepository;
     private final ResourceMapper resourceMapper;
+    private final ResourceCacheService resourceCacheService;
+
+    public ResourceFolderServiceImpl(ResourceFolderRepository resourceFolderRepository,
+                                     ResourceRepository resourceRepository,
+                                     ResourceMapper resourceMapper,
+                                     ResourceCacheService resourceCacheService) {
+        this.resourceFolderRepository = resourceFolderRepository;
+        this.resourceRepository = resourceRepository;
+        this.resourceMapper = resourceMapper;
+        this.resourceCacheService = resourceCacheService != null ? resourceCacheService : new ResourceCacheService();
+    }
 
     public ResourceFolderServiceImpl(ResourceFolderRepository resourceFolderRepository,
                                      ResourceRepository resourceRepository,
                                      ResourceMapper resourceMapper) {
-        this.resourceFolderRepository = resourceFolderRepository;
-        this.resourceRepository = resourceRepository;
-        this.resourceMapper = resourceMapper;
+        this(resourceFolderRepository, resourceRepository, resourceMapper, new ResourceCacheService());
     }
 
     @Override
@@ -54,7 +64,8 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
                 .build();
 
         ResourceFolder saved = resourceFolderRepository.save(folder);
-        log.info("Created resource folder: {} (id: {})", saved.getName(), saved.getId());
+        resourceCacheService.clearDirectoryCache();
+        log.info("Created resource folder: {} (id: {}) and invalidated directory cache", saved.getName(), saved.getId());
         return toFolderDto(saved);
     }
 
@@ -81,7 +92,8 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
         folder.setParentFolder(parent);
 
         ResourceFolder saved = resourceFolderRepository.save(folder);
-        log.info("Updated resource folder: {} (id: {})", saved.getName(), saved.getId());
+        resourceCacheService.clearDirectoryCache();
+        log.info("Updated resource folder: {} (id: {}) and invalidated directory cache", saved.getName(), saved.getId());
         return toFolderDto(saved);
     }
 
@@ -99,12 +111,25 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
         }
 
         resourceFolderRepository.delete(folder);
-        log.info("Deleted resource folder with id: {}", id);
+        resourceCacheService.clearDirectoryCache();
+        log.info("Deleted resource folder with id: {} and invalidated directory cache", id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public FolderDirectoryDto getFolderDirectory(UUID folderId, ResourceType type, Pageable pageable) {
+        String cacheKey = (folderId != null ? folderId.toString() : "root")
+                + ":" + (type != null ? type.name() : "ALL")
+                + ":" + pageable.getPageNumber()
+                + ":" + pageable.getPageSize()
+                + ":" + pageable.getSort();
+
+        FolderDirectoryDto cached = resourceCacheService.getDirectory(cacheKey);
+        if (cached != null) {
+            log.debug("Serving folder directory from in-memory cache for key: {}", cacheKey);
+            return cached;
+        }
+
         FolderDto currentFolderDto = null;
         List<FolderBreadcrumbDto> breadcrumbs = new ArrayList<>();
         List<FolderDto> childFolders;
@@ -146,12 +171,15 @@ public class ResourceFolderServiceImpl implements ResourceFolderService {
                     .map(resourceMapper::toDto);
         }
 
-        return FolderDirectoryDto.builder()
+        FolderDirectoryDto result = FolderDirectoryDto.builder()
                 .currentFolder(currentFolderDto)
                 .breadcrumbs(breadcrumbs)
                 .childFolders(childFolders)
                 .resources(resources)
                 .build();
+
+        resourceCacheService.putDirectory(cacheKey, result);
+        return result;
     }
 
     private FolderDto toFolderDto(ResourceFolder folder) {
