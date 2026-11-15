@@ -1,13 +1,17 @@
 package com.careerforge.contest.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,6 +21,7 @@ public class KernelContestService {
     private static final Logger log = LoggerFactory.getLogger(KernelContestService.class);
 
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
     // Cache record with expiration timestamp
     private record CacheEntry(JsonNode data, long expiresAt) {
@@ -36,12 +41,25 @@ public class KernelContestService {
 
     public KernelContestService(
             @Value("${kernel.api.url:http://localhost:3000}") String kernelUrl,
-            @Value("${kernel.api.key:kernel_secret_key_2026}") String kernelApiKey) {
+            @Value("${kernel.api.key:kernel_secret_key_2026}") String kernelApiKey,
+            ObjectMapper objectMapper) {
         log.info("Initializing KernelContestService with URL: {}", kernelUrl);
+        this.objectMapper = objectMapper;
+
+        // Force HTTP/1.1 and disable keep-alive connection reuse to avoid socket drops on Node.js/Next.js dev server
+        HttpClient httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(Duration.ofSeconds(10));
+
         this.restClient = RestClient.builder()
+                .requestFactory(requestFactory)
                 .baseUrl(kernelUrl)
                 .defaultHeader("X-Kernel-Api-Key", kernelApiKey)
                 .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader("Connection", "close")
                 .build();
     }
 
@@ -70,13 +88,18 @@ public class KernelContestService {
             }
             return freshData;
         } catch (Exception e) {
-            log.error("Failed to fetch contests from Kernel: {}", e.getMessage());
-            // Fallback: serve stale cache if Kernel is temporarily unreachable
+            log.warn("Failed to fetch contests from Kernel: {}", e.getMessage());
+            // Fallback 1: serve stale cache if Kernel is temporarily unreachable
             if (cached != null) {
                 log.warn("Serving stale cached contests due to Kernel outage");
                 return cached.data();
             }
-            throw new RuntimeException("Kernel contest service unavailable: " + e.getMessage(), e);
+            // Fallback 2: return empty contests list instead of throwing an unhandled 500 error
+            log.warn("Kernel is unreachable and no cache exists. Returning empty contests fallback.");
+            return objectMapper.createObjectNode()
+                    .put("success", false)
+                    .put("message", "Kernel contest service is temporarily unavailable")
+                    .set("contests", objectMapper.createArrayNode());
         }
     }
 
@@ -100,12 +123,16 @@ public class KernelContestService {
             }
             return freshData;
         } catch (Exception e) {
-            log.error("Failed to fetch leaderboard for contest {} from Kernel: {}", contestCode, e.getMessage());
+            log.warn("Failed to fetch leaderboard for contest {} from Kernel: {}", contestCode, e.getMessage());
             if (cached != null) {
                 log.warn("Serving stale cached leaderboard for contest: {}", cacheKey);
                 return cached.data();
             }
-            throw new RuntimeException("Kernel contest leaderboard unavailable: " + e.getMessage(), e);
+            return objectMapper.createObjectNode()
+                    .put("success", false)
+                    .put("timeLocked", false)
+                    .put("message", "Leaderboard temporarily unavailable")
+                    .set("leaderboard", objectMapper.createArrayNode());
         }
     }
 
@@ -117,8 +144,12 @@ public class KernelContestService {
                     .retrieve()
                     .body(JsonNode.class);
         } catch (Exception e) {
-            log.error("Failed to fetch student contest history for {} from Kernel: {}", studentEmail, e.getMessage());
-            throw new RuntimeException("Kernel student contest history unavailable: " + e.getMessage(), e);
+            log.warn("Failed to fetch student contest history for {} from Kernel: {}", studentEmail, e.getMessage());
+            return objectMapper.createObjectNode()
+                    .put("success", false)
+                    .put("found", false)
+                    .put("message", "Student contest history temporarily unavailable")
+                    .set("participations", objectMapper.createArrayNode());
         }
     }
 
